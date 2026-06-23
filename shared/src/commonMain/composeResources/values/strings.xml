@@ -1,0 +1,21 @@
+<resources>
+    <string name="individuals">Физические лица</string>
+    <string name="individualJob">Должность</string>
+    <string name="individualName">ФИО</string>
+    <string name="individualSeries">Серия</string>
+    <string name="individualNumber">Номер</string>
+    <string name="individualIssued">Выдан</string>
+    <string name="individualDate">Дата выдачи</string>
+
+    <string name="organizations">Организации</string>
+    <string name="organizationName">Название</string>
+    <string name="organizationConsumer">Потребитель</string>
+    <string name="organizationPayer">Плательщик</string>
+    <string name="organizationAccount">Счет</string>
+
+    <string name="products">Материальные ценности</string>
+    <string name="productName">Название</string>
+
+    <string name="suppliers">Поставщики</string>
+    <string name="supplierName">Название</string>
+</resources>
