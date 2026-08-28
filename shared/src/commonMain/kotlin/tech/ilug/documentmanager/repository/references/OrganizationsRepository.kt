@@ -23,9 +23,9 @@ class OrganizationsRepository : Reference<PowerOfAttorney.Organization>("organiz
             PowerOfAttorney.Organization(
                 id = id,
                 name = row[PowerOfAttorneyTables.OrganizationsTable.name],
-                consumer = row[PowerOfAttorneyTables.OrganizationsTable.name],
-                payer = row[PowerOfAttorneyTables.OrganizationsTable.name],
-                account = row[PowerOfAttorneyTables.OrganizationsTable.name]
+                consumer = row[PowerOfAttorneyTables.OrganizationsTable.consumer],
+                payer = row[PowerOfAttorneyTables.OrganizationsTable.payer],
+                account = row[PowerOfAttorneyTables.OrganizationsTable.account]
             )
         }
     }

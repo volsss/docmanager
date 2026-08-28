@@ -1,7 +1,7 @@
 package tech.ilug.documentmanager.di
 
 import org.koin.dsl.module
-import tech.ilug.documentmanager.repository.PowerOfAttorneyRepository
+import tech.ilug.documentmanager.repository.documents.PowerOfAttorneyRepository
 import tech.ilug.documentmanager.repository.ProjectMetadataRepository
 import tech.ilug.documentmanager.repository.references.IndividualsRepository
 import tech.ilug.documentmanager.repository.references.OrganizationsRepository
@@ -49,7 +49,12 @@ enum class Platform {
 expect fun getPlatform(): Platform
 
 interface DocumentProcessor {
-    fun process(replacements: Map<String, String>)
+    /**
+     * @param headReplacements Map of placeholder -> value
+     * @param bodyParts Map of columnName -> List of values
+     */
+    fun processSave(headReplacements: Map<String, String>, bodyParts: Map<String, List<String>>)
+    fun processPrint(headReplacements: Map<String, String>, bodyParts: Map<String, List<String>>)
 }
 
 expect fun getDocumentProcessor(): DocumentProcessor

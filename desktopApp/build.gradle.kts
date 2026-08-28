@@ -28,14 +28,25 @@ compose.desktop {
     application {
         mainClass = "tech.ilug.documentmanager.MainKt"
 
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("proguard-rules.pro"))
+            optimize.set(false)
+            obfuscate.set(false)
+        }
+
         nativeDistributions {
+            modules("java.sql", "java.naming")
+
             targetFormats (
                 TargetFormat.Dmg,
                 TargetFormat.Msi,
                 TargetFormat.Deb
             )
-            packageName = "tech.ilug.documentmanager"
+            packageName = "DocumentManager"
             packageVersion = "1.0.0"
+
+            vendor = "ILUG"
+            description = "A scalable document manager for power of attorney"
 
             appResourcesRootDir.set(
                 project.layout.projectDirectory.dir("src/main/resources")

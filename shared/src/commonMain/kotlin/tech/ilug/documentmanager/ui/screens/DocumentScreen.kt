@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -17,17 +16,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import tech.ilug.documentmanager.model.DocumentType
-import tech.ilug.documentmanager.ui.screens.forms.PowerOfAttorneyScreen
+import tech.ilug.documentmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScreen
 import tech.ilug.documentmanager.viewmodel.DocumentViewModel
+import tech.ilug.documentmanager.viewmodel.ReferenceViewModel
 
 @Composable
 fun DocumentScreen (
-    documentsViewModel: DocumentViewModel
+    documentsViewModel: DocumentViewModel,
+    referenceViewModel: ReferenceViewModel
 ) {
     val type = documentsViewModel.selectedDocumentType.collectAsState()
-
-    Text(type.value?.title ?: "Документ", style = MaterialTheme.typography.titleLarge)
-    Spacer(Modifier.height(16.dp))
+    if (type.value?.title == null) {
+        Text("Документ", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(16.dp))
+    }
 
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -35,7 +37,7 @@ fun DocumentScreen (
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (type.value) {
-            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen()
+            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(referenceViewModel)
             else -> {
                 Box (
                     modifier = Modifier.fillMaxSize(),

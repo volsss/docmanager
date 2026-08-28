@@ -1,4 +1,4 @@
-package tech.ilug.documentmanager.repository
+package tech.ilug.documentmanager.repository.documents
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -7,8 +7,10 @@ import kotlinx.datetime.toKotlinLocalDate
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 import tech.ilug.documentmanager.database.document.PowerOfAttorneyTables
 import tech.ilug.documentmanager.model.PowerOfAttorney
 import tech.ilug.documentmanager.repository.references.IndividualsRepository
@@ -28,7 +30,31 @@ class PowerOfAttorneyRepository (
     ) {
         withContext(Dispatchers.IO) {
             transaction {
-                PowerOfAttorneyTables.HeadersTable.insert {
+                val headerId = PowerOfAttorneyTables.HeadersTable.insertAndGetId {
+                    it[organizationId] = document.header.organization.id
+                    it[number] = document.header.number
+                    it[dischargeDate] = document.header.dischargeDate.toJavaLocalDate()
+                    it[endDate] = document.header.endDate.toJavaLocalDate()
+                    it[individualId] = document.header.individual.id
+                    it[supplierId] = document.header.supplier.id
+                    it[supplierAgreement] = document.header.supplierAgreement
+                }.value
+                document.body.forEach { body ->
+                    PowerOfAttorneyTables.BodiesTable.insert {
+                        it[count] = body.count
+                        it[unit] = body.unit
+                        it[PowerOfAttorneyTables.BodiesTable.headerId] = headerId
+                        it[productId] = body.product.id
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun updateDocument(document: PowerOfAttorney) {
+        withContext(Dispatchers.IO) {
+            transaction {
+                PowerOfAttorneyTables.HeadersTable.update({ PowerOfAttorneyTables.HeadersTable.id eq document.header.id }) {
                     it[organizationId] = document.header.organization.id
                     it[number] = document.header.number
                     it[dischargeDate] = document.header.dischargeDate.toJavaLocalDate()
@@ -37,26 +63,43 @@ class PowerOfAttorneyRepository (
                     it[supplierId] = document.header.supplier.id
                     it[supplierAgreement] = document.header.supplierAgreement
                 }
-                document.body.forEach { createBody(it) }
+                PowerOfAttorneyTables.BodiesTable.deleteWhere {
+                    PowerOfAttorneyTables.BodiesTable.headerId eq document.header.id
+                }
+                document.body.forEach { body ->
+                    PowerOfAttorneyTables.BodiesTable.insert {
+                        it[count] = body.count
+                        it[unit] = body.unit
+                        it[PowerOfAttorneyTables.BodiesTable.headerId] = document.header.id
+                        it[productId] = body.product.id
+                    }
+                }
             }
         }
-    }
-
-    override suspend fun updateDocument(document: PowerOfAttorney) {
-        TODO("Not yet implemented")
     }
 
     override suspend fun deleteDocument(id: Int) {
         withContext(Dispatchers.IO) {
             transaction {
-                PowerOfAttorneyTables.HeadersTable.deleteWhere {
-                    PowerOfAttorneyTables.HeadersTable.id eq id
-                }
                 PowerOfAttorneyTables.BodiesTable.deleteWhere {
                     PowerOfAttorneyTables.BodiesTable.headerId eq id
                 }
+                PowerOfAttorneyTables.HeadersTable.deleteWhere {
+                    PowerOfAttorneyTables.HeadersTable.id eq id
+                }
             }
         }
+    }
+
+    override suspend fun getAllDocuments(): List<PowerOfAttorney> {
+        val headerIds = withContext(Dispatchers.IO) {
+            transaction {
+                PowerOfAttorneyTables.HeadersTable
+                    .selectAll()
+                    .map { it[PowerOfAttorneyTables.HeadersTable.id].value }
+            }
+        }
+        return headerIds.map { getDocument(it) }
     }
 
     override suspend fun getDocument(id: Int): PowerOfAttorney {

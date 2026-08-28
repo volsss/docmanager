@@ -132,7 +132,10 @@ fun DashboardScreen (
                         Tab.DOCUMENTS -> DocumentsScreen(
                             documentViewModel, dashboardViewModel
                         )
-                        Tab.DOCUMENT -> DocumentScreen(documentViewModel)
+                        Tab.DOCUMENT -> DocumentScreen(
+                            documentViewModel,
+                            referenceViewModel
+                        )
                         Tab.REFERENCES -> ReferencesScreen(
                             referenceViewModel, dashboardViewModel
                         )

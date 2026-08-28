@@ -102,7 +102,7 @@ class PowerOfAttorney (
             number: String,
             issued: String,
             date: LocalDate
-        ) : this(-1, name, job, series, number, issued, date)
+        ) : this(-1, job, name, series, number, issued, date)
         constructor () : this(
             "",
             "",

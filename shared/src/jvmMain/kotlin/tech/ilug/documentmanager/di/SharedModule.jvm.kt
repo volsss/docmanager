@@ -1,7 +1,7 @@
 package tech.ilug.documentmanager.di
 
-import tech.ilug.documentmanager.export.Test
+import tech.ilug.documentmanager.export.JvmDocumentProcessor
 
 actual fun getPlatform(): Platform = Platform.JVM
 
-actual fun getDocumentProcessor(): DocumentProcessor = Test()
+actual fun getDocumentProcessor(): DocumentProcessor = JvmDocumentProcessor()
