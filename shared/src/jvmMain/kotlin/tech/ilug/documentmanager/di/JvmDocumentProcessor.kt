@@ -1,8 +1,7 @@
-package tech.ilug.documentmanager.export
+package tech.ilug.documentmanager.di
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
-import tech.ilug.documentmanager.di.DocumentProcessor
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame
@@ -17,29 +16,33 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 class JvmDocumentProcessor: DocumentProcessor {
     override fun processSave(
+        documentName: String,
+        documentResourceFile: String,
         headReplacements: Map<String, String>,
         bodyParts: Map<String, List<String>>
     ) {
-        val destination = chooseSaveFile("Доверенность.docx") ?: return
-        processSaveToFile(destination, headReplacements, bodyParts)
+        val destination = chooseSaveFile("$documentName.docx") ?: return
+        processSaveToFile(destination, documentResourceFile, headReplacements, bodyParts)
     }
 
     override fun processPrint(
+        documentName: String,
+        documentResourceFile: String,
         headReplacements: Map<String, String>,
         bodyParts: Map<String, List<String>>
     ) {
         if (isPrintingAvailable()) {
             try {
-                val tempFile = File.createTempFile("Доверенность_", ".docx")
+                val tempFile = File.createTempFile("${documentName}_", ".docx")
                 tempFile.deleteOnExit()
-                processSaveToFile(tempFile, headReplacements, bodyParts)
+                processSaveToFile(tempFile, documentResourceFile, headReplacements, bodyParts)
                 Desktop.getDesktop().print(tempFile)
                 return
             } catch (e: Exception) {
                 println("Printing failed: ${e.message}, falling back to saving to file")
             }
         }
-        processSave(headReplacements, bodyParts)
+        processSave(documentName, documentResourceFile, headReplacements, bodyParts)
     }
 
     fun isPrintingAvailable(): Boolean {
@@ -54,7 +57,7 @@ class JvmDocumentProcessor: DocumentProcessor {
         }
     }
 
-    fun chooseSaveFile(defaultFileName: String = "Доверенность.docx"): File? {
+    fun chooseSaveFile(defaultFileName: String): File? {
         if (GraphicsEnvironment.isHeadless()) {
             println("Headless environment, skipping file dialog")
             return null
@@ -101,11 +104,12 @@ class JvmDocumentProcessor: DocumentProcessor {
 
     fun processSaveToFile(
         destination: File,
+        documentResourceFile: String,
         headReplacements: Map<String, String>,
         bodyParts: Map<String, List<String>>
     ) {
         destination.parentFile?.mkdirs()
-        val blank = object {}.javaClass.getResourceAsStream("/Доверенность.docx")
+        val blank = object {}.javaClass.getResourceAsStream("/$documentResourceFile")
 
         if (blank == null) {
             println("Form not found")
@@ -195,8 +199,7 @@ class JvmDocumentProcessor: DocumentProcessor {
         val table = document.tables.firstOrNull { t ->
             if (t.rows.isEmpty()) return@firstOrNull false
             val headerRowText = t.rows[0].tableCells.joinToString(" ") { it.text }
-            bodyParts.keys.any { key -> headerRowText.contains(key, ignoreCase = true) } ||
-                    headerRowText.contains("Материальн", ignoreCase = true)
+            bodyParts.keys.any { key -> headerRowText.contains(key, ignoreCase = true) }
         } ?: if (document.tables.size > 1) document.tables[1] else null ?: return
 
         val headerCells = table.rows[0].tableCells

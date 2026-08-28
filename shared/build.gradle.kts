@@ -57,6 +57,8 @@ kotlin {
             implementation(libs.hikaricp)
             implementation(libs.h2)
             implementation(libs.compose.uiToolingPreview)
+            implementation(libs.poi.ooxml)
+            implementation(libs.koin.core)
         }
         jvmMain.dependencies {
             implementation(libs.hikaricp)

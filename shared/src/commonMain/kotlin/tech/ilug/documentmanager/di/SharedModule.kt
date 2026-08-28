@@ -47,14 +47,4 @@ enum class Platform {
 }
 
 expect fun getPlatform(): Platform
-
-interface DocumentProcessor {
-    /**
-     * @param headReplacements Map of placeholder -> value
-     * @param bodyParts Map of columnName -> List of values
-     */
-    fun processSave(headReplacements: Map<String, String>, bodyParts: Map<String, List<String>>)
-    fun processPrint(headReplacements: Map<String, String>, bodyParts: Map<String, List<String>>)
-}
-
 expect fun getDocumentProcessor(): DocumentProcessor

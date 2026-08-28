@@ -572,6 +572,8 @@ private fun PowerOfAttorneyActions(
                 try {
                     val (head, body) = formState.prepareExportData()
                     getDocumentProcessor().processSave(
+                        documentName = "Доверенность",
+                        documentResourceFile = "Доверенность.docx",
                         headReplacements = head,
                         bodyParts = body
                     )
@@ -589,6 +591,8 @@ private fun PowerOfAttorneyActions(
                 try {
                     val (head, body) = formState.prepareExportData()
                     getDocumentProcessor().processPrint(
+                        documentName = "Доверенность",
+                        documentResourceFile = "Доверенность.docx",
                         headReplacements = head,
                         bodyParts = body
                     )
