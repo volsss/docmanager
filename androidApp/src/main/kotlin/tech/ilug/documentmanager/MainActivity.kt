@@ -2,7 +2,6 @@ package tech.ilug.documentmanager
 
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -13,7 +12,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.ui.platform.LocalContext
 import org.koin.android.ext.koin.androidContext
-import org.koin.compose.getKoin
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import tech.ilug.documentmanager.di.sharedModule
@@ -21,9 +19,7 @@ import tech.ilug.documentmanager.ui.App
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(0, 0)
-        )
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(0, 0))
 
         super.onCreate(savedInstanceState)
 
@@ -51,3 +47,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
