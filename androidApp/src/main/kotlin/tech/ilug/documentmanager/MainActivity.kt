@@ -26,19 +26,19 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = LocalContext.current
 
-            if (GlobalContext.getOrNull() == null) {
-                startKoin {
-                    androidContext(this@MainActivity)
-                    modules(sharedModule)
-                }
-            }
-
             val useDynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
             val colorScheme = when {
                 useDynamicColor && isSystemInDarkTheme() -> dynamicDarkColorScheme(context)
                 useDynamicColor -> dynamicLightColorScheme(context)
                 else -> MaterialTheme.colorScheme
+            }
+
+            if (GlobalContext.getOrNull() == null) {
+                startKoin {
+                    androidContext(this@MainActivity)
+                    modules(sharedModule)
+                }
             }
 
             MaterialTheme (colorScheme) {
