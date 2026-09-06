@@ -1,5 +1,8 @@
 package tech.ilug.documentmanager.database
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.jetbrains.exposed.v1.core.Transaction
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -14,9 +17,7 @@ object DatabaseFactory {
     private var initialized = false
 
     fun init(jdbcUrl: String, driver: String, user: String?, password: String?) {
-        if (isInitialized()) {
-            throw Exception("Database already initialized")
-        }
+        if (isInitialized()) throw IllegalStateException("Database already initialized")
 
         db = if (user != null && password != null) {
             Database.connect(jdbcUrl, driver = driver, user = user, password = password)
@@ -24,9 +25,8 @@ object DatabaseFactory {
             Database.connect(jdbcUrl, driver = driver)
         }
         transaction {
-            SchemaUtils.create (
+            SchemaUtils.create(
                 ProjectMetadataTable,
-
                 PowerOfAttorneyTables.ProductsTable,
                 PowerOfAttorneyTables.SuppliersTable,
                 PowerOfAttorneyTables.IndividualsTable,
@@ -36,10 +36,10 @@ object DatabaseFactory {
             )
             if (ProjectMetadataTable.selectAll().empty()) {
                 ProjectMetadataTable.insert {
-                    it[ProjectMetadataTable.projectName] = "Новый проект"
-                    it[ProjectMetadataTable.version] = "1.0"
-                    it[ProjectMetadataTable.creationDate] = LocalDate.now().toString()
-                    it[ProjectMetadataTable.author] = "Пользователь"
+                    it[projectName] = "Новый проект"
+                    it[version] = "1.0"
+                    it[creationDate] = LocalDate.now().toString()
+                    it[author] = "Пользователь"
                 }
             }
         }
@@ -52,4 +52,8 @@ object DatabaseFactory {
     }
 
     fun isInitialized(): Boolean = initialized
+}
+
+suspend fun <T> dbQuery(block: Transaction.() -> T): T = withContext(Dispatchers.IO) {
+    transaction { block() }
 }

@@ -14,7 +14,8 @@ import javax.print.PrintServiceLookup
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
-class JvmDocumentProcessor: DocumentProcessor {
+class JvmDocumentProcessor : DocumentProcessor {
+
     override fun processSave(
         documentName: String,
         documentResourceFile: String,
@@ -33,8 +34,7 @@ class JvmDocumentProcessor: DocumentProcessor {
     ) {
         if (isPrintingAvailable()) {
             try {
-                val tempFile = File.createTempFile("${documentName}_", ".docx")
-                tempFile.deleteOnExit()
+                val tempFile = File.createTempFile("${documentName}_", ".docx").apply { deleteOnExit() }
                 processSaveToFile(tempFile, documentResourceFile, headReplacements, bodyParts)
                 Desktop.getDesktop().print(tempFile)
                 return
@@ -46,58 +46,41 @@ class JvmDocumentProcessor: DocumentProcessor {
     }
 
     fun isPrintingAvailable(): Boolean {
-        if (GraphicsEnvironment.isHeadless()) return false
-        if (!Desktop.isDesktopSupported()) return false
+        if (GraphicsEnvironment.isHeadless() || !Desktop.isDesktopSupported()) return false
         if (!Desktop.getDesktop().isSupported(Desktop.Action.PRINT)) return false
-        return try {
+        return runCatching {
             PrintServiceLookup.lookupDefaultPrintService() != null ||
-                    PrintServiceLookup.lookupPrintServices(null, null).isNotEmpty()
-        } catch (e: Throwable) {
-            false
-        }
+                PrintServiceLookup.lookupPrintServices(null, null).isNotEmpty()
+        }.getOrDefault(false)
     }
 
     fun chooseSaveFile(defaultFileName: String): File? {
-        if (GraphicsEnvironment.isHeadless()) {
-            println("Headless environment, skipping file dialog")
-            return null
-        }
+        if (GraphicsEnvironment.isHeadless()) return null
 
         try {
-            val dialog = FileDialog(null as Frame?, "Сохранить документ", FileDialog.SAVE)
-            dialog.file = defaultFileName
-            dialog.setFilenameFilter { _, name -> name.endsWith(".docx", ignoreCase = true) }
-            dialog.isVisible = true
-
+            val dialog = FileDialog(null as Frame?, "Сохранить документ", FileDialog.SAVE).apply {
+                file = defaultFileName
+                setFilenameFilter { _, name -> name.endsWith(".docx", ignoreCase = true) }
+                isVisible = true
+            }
             val dir = dialog.directory
             val file = dialog.file
             if (dir != null && file != null) {
                 val selected = File(dir, file)
-                return if (!selected.name.endsWith(".docx", ignoreCase = true)) {
-                    File(dir, "$file.docx")
-                } else {
-                    selected
-                }
+                return if (!selected.name.endsWith(".docx", ignoreCase = true)) File(dir, "$file.docx") else selected
             }
         } catch (e: Throwable) {
-            println("FileDialog error: ${e.message}, falling back to JFileChooser")
             try {
                 val chooser = JFileChooser().apply {
                     dialogTitle = "Сохранить документ"
                     selectedFile = File(defaultFileName)
                     fileFilter = FileNameExtensionFilter("Документы Word (*.docx)", "docx")
                 }
-                val result = chooser.showSaveDialog(null)
-                if (result == JFileChooser.APPROVE_OPTION && chooser.selectedFile != null) {
-                    var file = chooser.selectedFile
-                    if (!file.name.endsWith(".docx", ignoreCase = true)) {
-                        file = File(file.parentFile, "${file.name}.docx")
-                    }
-                    return file
+                if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION && chooser.selectedFile != null) {
+                    val file = chooser.selectedFile
+                    return if (!file.name.endsWith(".docx", ignoreCase = true)) File(file.parentFile, "${file.name}.docx") else file
                 }
-            } catch (e2: Throwable) {
-                println("JFileChooser error: ${e2.message}")
-            }
+            } catch (ignored: Throwable) {}
         }
         return null
     }
@@ -109,13 +92,10 @@ class JvmDocumentProcessor: DocumentProcessor {
         bodyParts: Map<String, List<String>>
     ) {
         destination.parentFile?.mkdirs()
-        val blank = object {}.javaClass.getResourceAsStream("/$documentResourceFile")
-
-        if (blank == null) {
-            println("Form not found")
+        val blank = object {}.javaClass.getResourceAsStream("/$documentResourceFile") ?: run {
+            println("Form not found: $documentResourceFile")
             return
         }
-
         blank.use { input ->
             FileOutputStream(destination).use { fos ->
                 processDocument(input, fos, headReplacements, bodyParts)
@@ -129,46 +109,37 @@ class JvmDocumentProcessor: DocumentProcessor {
         headReplacements: Map<String, String>,
         bodyParts: Map<String, List<String>>
     ) {
-        XWPFDocument(input).use { document ->
-            document.paragraphs.forEach { paragraph ->
-                processParagraph(paragraph, headReplacements)
-            }
-
-            document.tables.forEach { table ->
+        XWPFDocument(input).use { doc ->
+            doc.paragraphs.forEach { it.replacePlaceholders(headReplacements) }
+            doc.tables.forEach { table ->
                 table.rows.forEach { row ->
                     row.tableCells.forEach { cell ->
-                        cell.paragraphs.forEach { paragraph ->
-                            processParagraph(paragraph, headReplacements)
-                        }
+                        cell.paragraphs.forEach { it.replacePlaceholders(headReplacements) }
                     }
                 }
             }
-
-            processBodyParts(document, bodyParts)
-
-            document.write(output)
+            processBodyParts(doc, bodyParts)
+            doc.write(output)
         }
     }
 
-    private fun processParagraph(paragraph: XWPFParagraph, replacements: Map<String, String>) {
-        val text = paragraph.paragraphText ?: return
-
-        var updatedText = text
+    private fun XWPFParagraph.replacePlaceholders(replacements: Map<String, String>) {
+        val originalText = paragraphText ?: return
+        var updatedText = originalText
         var matched = false
 
-        replacements.forEach { (key, value) ->
+        for ((key, value) in replacements) {
             val placeholder = if (key.startsWith("{{") && key.endsWith("}}")) key else "{{$key}}"
-            if (updatedText.contains(placeholder)) {
+            if (placeholder in updatedText) {
                 updatedText = updatedText.replace(placeholder, value)
                 matched = true
-            } else if (updatedText.contains(key)) {
+            } else if (key in updatedText) {
                 updatedText = updatedText.replace(key, value)
                 matched = true
             }
         }
 
         if (matched) {
-            val runs = paragraph.runs
             if (runs.isNotEmpty()) {
                 val firstRun = runs[0]
                 val font = firstRun.fontFamily
@@ -176,17 +147,14 @@ class JvmDocumentProcessor: DocumentProcessor {
                 val bold = firstRun.isBold
                 val italic = firstRun.isItalic
 
-                for (i in runs.size - 1 downTo 1) {
-                    paragraph.removeRun(i)
-                }
+                for (i in runs.lastIndex downTo 1) removeRun(i)
                 firstRun.setText(updatedText, 0)
                 if (font != null) firstRun.fontFamily = font
                 if (size != null && size > 0) firstRun.fontSize = size.toInt()
                 firstRun.isBold = bold
                 firstRun.isItalic = italic
             } else {
-                val run = paragraph.createRun()
-                run.setText(updatedText)
+                createRun().setText(updatedText)
             }
         }
     }
@@ -199,51 +167,38 @@ class JvmDocumentProcessor: DocumentProcessor {
         val table = document.tables.firstOrNull { t ->
             if (t.rows.isEmpty()) return@firstOrNull false
             val headerRowText = t.rows[0].tableCells.joinToString(" ") { it.text }
-            bodyParts.keys.any { key -> headerRowText.contains(key, ignoreCase = true) }
-        } ?: if (document.tables.size > 1) document.tables[1] else null ?: return
+            bodyParts.keys.any { headerRowText.contains(it, ignoreCase = true) }
+        } ?: document.tables.getOrNull(1) ?: return
 
         val headerCells = table.rows[0].tableCells
-        val columnData = mutableMapOf<Int, List<String>>()
-
-        for (colIdx in headerCells.indices) {
+        val columnData = headerCells.indices.associateWith { colIdx ->
             val cellText = headerCells[colIdx].text.replace("\r", " ").replace("\n", " ").trim()
             val matchedEntry = bodyParts.entries.firstOrNull { (key, _) ->
                 val cleanKey = key.trim()
                 cellText.contains(cleanKey, ignoreCase = true) ||
-                        cleanKey.contains(cellText, ignoreCase = true) ||
-                        cellText.replace(" ", "").equals(cleanKey.replace(" ", ""), ignoreCase = true)
+                    cleanKey.contains(cellText, ignoreCase = true) ||
+                    cellText.replace(" ", "").equals(cleanKey.replace(" ", ""), ignoreCase = true)
             }
-            if (matchedEntry != null) {
-                columnData[colIdx] = matchedEntry.value
-            } else if (colIdx < bodyParts.size) {
-                columnData[colIdx] = bodyParts.values.elementAt(colIdx)
-            }
+            matchedEntry?.value ?: bodyParts.values.elementAtOrNull(colIdx) ?: emptyList()
         }
 
         val startRowIdx = if (table.rows.size > 2) 2 else table.rows.size
 
         for (rowIndex in 0 until maxRows) {
-            val row = if (rowIndex == 0 && table.rows.size > startRowIdx) {
-                table.getRow(startRowIdx)
-            } else {
-                table.createRow()
-            }
-
+            val row = if (rowIndex == 0 && table.rows.size > startRowIdx) table.getRow(startRowIdx) else table.createRow()
             for (colIdx in headerCells.indices) {
                 val value = columnData[colIdx]?.getOrNull(rowIndex) ?: ""
                 val cell = if (colIdx < row.tableCells.size) row.tableCells[colIdx] else row.addNewTableCell()
                 val paragraph = if (cell.paragraphs.isNotEmpty()) cell.paragraphs[0] else cell.addParagraph()
-                val runs = paragraph.runs
-                if (runs.isNotEmpty()) {
-                    for (r in runs.size - 1 downTo 1) {
-                        paragraph.removeRun(r)
-                    }
-                    runs[0].setText(value, 0)
+                if (paragraph.runs.isNotEmpty()) {
+                    for (r in paragraph.runs.lastIndex downTo 1) paragraph.removeRun(r)
+                    paragraph.runs[0].setText(value, 0)
                 } else {
-                    val run = paragraph.createRun()
-                    run.fontFamily = "Arial"
-                    run.fontSize = 8
-                    run.setText(value)
+                    paragraph.createRun().apply {
+                        fontFamily = "Arial"
+                        fontSize = 8
+                        setText(value)
+                    }
                 }
             }
         }

@@ -43,51 +43,41 @@ fun App() {
     val scope = rememberCoroutineScope()
 
     when (state) {
-        ConnectionState.NONE -> {
-            ConnectionScreen(
-                viewModel = connectionViewModel,
-                onConnect = { url, driver, user, password ->
-                    scope.launch {
-                        withContext(Dispatchers.IO) {
-                            try {
-                                state = ConnectionState.LOADING
-                                DatabaseFactory.init(url, driver, user, password)
-                                settingsViewModel.loadMetadata()
-                                referenceViewModel.loadReferenceItems()
-                                state = ConnectionState.CONNECTED
-                                connectionViewModel.setError(null)
-                            } catch (e: Exception) {
-                                state = ConnectionState.NONE
-                                connectionViewModel.setError(e.message)
-                                e.printStackTrace()
-                            }
+        ConnectionState.NONE -> ConnectionScreen(
+            viewModel = connectionViewModel,
+            onConnect = { url, driver, user, password ->
+                scope.launch {
+                    withContext(Dispatchers.IO) {
+                        try {
+                            state = ConnectionState.LOADING
+                            DatabaseFactory.init(url, driver, user, password)
+                            settingsViewModel.loadMetadata()
+                            referenceViewModel.loadReferenceItems()
+                            state = ConnectionState.CONNECTED
+                            connectionViewModel.setError(null)
+                        } catch (e: Exception) {
+                            state = ConnectionState.NONE
+                            connectionViewModel.setError(e.message)
                         }
                     }
                 }
-            )
-        }
-        ConnectionState.CONNECTED -> {
-            DashboardScreen(
-                dashboardViewModel = dashboardViewModel,
-                settingsViewModel = settingsViewModel,
-                documentViewModel = documentViewModel,
-                referenceViewModel = referenceViewModel,
-                onDisconnect = {
-                    DatabaseFactory.disconnect()
-                    state = ConnectionState.NONE
-                }
-            )
-        }
-        else -> {
-            Box (
-                modifier = Modifier.fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center
-            ) {
-                ContainedLoadingIndicator(
-                    modifier = Modifier.size(128.dp)
-                )
             }
+        )
+        ConnectionState.CONNECTED -> DashboardScreen(
+            dashboardViewModel = dashboardViewModel,
+            settingsViewModel = settingsViewModel,
+            documentViewModel = documentViewModel,
+            referenceViewModel = referenceViewModel,
+            onDisconnect = {
+                DatabaseFactory.disconnect()
+                state = ConnectionState.NONE
+            }
+        )
+        ConnectionState.LOADING -> Box(
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
+            ContainedLoadingIndicator(modifier = Modifier.size(128.dp))
         }
     }
 }

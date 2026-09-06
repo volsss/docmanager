@@ -20,12 +20,10 @@ import tech.ilug.documentmanager.ui.App
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(0, 0))
-
         super.onCreate(savedInstanceState)
 
         setContent {
             val context = LocalContext.current
-
             val useDynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
             val colorScheme = when {
@@ -41,7 +39,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            MaterialTheme (colorScheme) {
+            MaterialTheme(colorScheme) {
                 App()
             }
         }

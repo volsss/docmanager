@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,31 +22,26 @@ import tech.ilug.documentmanager.viewmodel.DocumentViewModel
 import tech.ilug.documentmanager.viewmodel.ReferenceViewModel
 
 @Composable
-fun DocumentScreen (
+fun DocumentScreen(
     documentsViewModel: DocumentViewModel,
     referenceViewModel: ReferenceViewModel
 ) {
-    val type = documentsViewModel.selectedDocumentType.collectAsState()
-    if (type.value?.title == null) {
+    val type by documentsViewModel.selectedDocumentType.collectAsState()
+    if (type?.title == null) {
         Text("Документ", style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(16.dp))
     }
 
-    Column (
+    Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (type.value) {
+        when (type) {
             DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(referenceViewModel)
             else -> {
-                Box (
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ContainedLoadingIndicator(
-                        modifier = Modifier.size(128.dp)
-                    )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    ContainedLoadingIndicator(modifier = Modifier.size(128.dp))
                 }
             }
         }

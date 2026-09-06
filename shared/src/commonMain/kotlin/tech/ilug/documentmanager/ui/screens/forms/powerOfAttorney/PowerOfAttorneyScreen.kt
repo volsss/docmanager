@@ -37,31 +37,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format.char
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import tech.ilug.documentmanager.di.getDocumentProcessor
 import tech.ilug.documentmanager.model.PowerOfAttorney
 import tech.ilug.documentmanager.repository.documents.PowerOfAttorneyRepository
+import tech.ilug.documentmanager.ui.screens.DATE_FORMAT
 import tech.ilug.documentmanager.ui.screens.forms.ReferenceDropdown
 import tech.ilug.documentmanager.viewmodel.ReferenceViewModel
 import kotlin.time.Clock
-
-val DATE_FORMAT = LocalDate.Format {
-    day()
-    char('.')
-    monthNumber()
-    char('.')
-    year()
-}
 
 @Composable
 fun rememberPowerOfAttorneyFormState(): PowerOfAttorneyFormState {
@@ -86,31 +76,23 @@ fun PowerOfAttorneyScreen(
 
     val referencesItems by referenceViewModel.referencesItems.collectAsState()
     val organizations = remember(referencesItems) {
-        (referencesItems?.get(referenceViewModel.organizationsRepository)
-                as? List<PowerOfAttorney.Organization>) ?: emptyList()
+        referencesItems?.get(referenceViewModel.organizationsRepository)?.filterIsInstance<PowerOfAttorney.Organization>().orEmpty()
     }
     val individuals = remember(referencesItems) {
-        (referencesItems?.get(referenceViewModel.individualsRepository)
-                as? List<PowerOfAttorney.Individual>) ?: emptyList()
+        referencesItems?.get(referenceViewModel.individualsRepository)?.filterIsInstance<PowerOfAttorney.Individual>().orEmpty()
     }
     val suppliers = remember(referencesItems) {
-        (referencesItems?.get(referenceViewModel.suppliersRepository)
-                as? List<PowerOfAttorney.Supplier>) ?: emptyList()
+        referencesItems?.get(referenceViewModel.suppliersRepository)?.filterIsInstance<PowerOfAttorney.Supplier>().orEmpty()
     }
     val products = remember(referencesItems) {
-        (referencesItems?.get(referenceViewModel.productsRepository)
-                as? List<PowerOfAttorney.Product>) ?: emptyList()
+        referencesItems?.get(referenceViewModel.productsRepository)?.filterIsInstance<PowerOfAttorney.Product>().orEmpty()
     }
 
     val formState = rememberPowerOfAttorneyFormState()
 
     fun reloadDocuments() {
         scope.launch {
-            try {
-                formState.existingDocuments = powerOfAttorneyRepository.getAllDocuments()
-            } catch (e: Exception) {
-                println("Error loading documents: ${e.message}")
-            }
+            runCatching { formState.existingDocuments = powerOfAttorneyRepository.getAllDocuments() }
         }
     }
 
@@ -151,9 +133,7 @@ fun PowerOfAttorneyScreen(
     ) {
         PowerOfAttorneyBanner(
             formState = formState,
-            onResetForm = {
-                formState.resetForm(organizations, individuals, suppliers, products)
-            }
+            onResetForm = { formState.resetForm(organizations, individuals, suppliers, products) }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -164,17 +144,12 @@ fun PowerOfAttorneyScreen(
             individuals = individuals,
             suppliers = suppliers,
             products = products,
-            onResetForm = {
-                formState.resetForm(organizations, individuals, suppliers, products)
-            }
+            onResetForm = { formState.resetForm(organizations, individuals, suppliers, products) }
         )
 
         Spacer(Modifier.height(8.dp))
 
-        PowerOfAttorneyBodySection(
-            formState = formState,
-            products = products
-        )
+        PowerOfAttorneyBodySection(formState = formState, products = products)
 
         Spacer(Modifier.height(8.dp))
 
@@ -183,10 +158,8 @@ fun PowerOfAttorneyScreen(
             scope = scope,
             repository = powerOfAttorneyRepository,
             products = products,
-            onDocumentChanged = { reloadDocuments() },
-            onResetForm = {
-                formState.resetForm(organizations, individuals, suppliers, products)
-            }
+            onDocumentChanged = ::reloadDocuments,
+            onResetForm = { formState.resetForm(organizations, individuals, suppliers, products) }
         )
     }
 }
@@ -337,12 +310,10 @@ private fun PowerOfAttorneyBodySection(
             style = MaterialTheme.typography.titleMedium
         )
 
-        Column (
-            Modifier.fillMaxSize()
-                .then(
-                    if (windowSizeClass.isWidthAtLeastBreakpoint(840))
-                        Modifier else Modifier.horizontalScroll(rememberScrollState())
-                )
+        Column(
+            Modifier.fillMaxSize().then(
+                if (windowSizeClass.isWidthAtLeastBreakpoint(840)) Modifier else Modifier.horizontalScroll(rememberScrollState())
+            )
         ) {
             formState.bodyItems.forEachIndexed { index, item ->
                 BodyItemRow(
@@ -376,34 +347,26 @@ private fun BodyItemRow(
     onDelete: () -> Unit,
     windowSizeClass: WindowSizeClass
 ) {
+    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(840)
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        fun getModifier(
-            width: Dp = 300.dp,
-            weight: Float = 1f
-        ): Modifier {
-            return Modifier.then(
-                if (windowSizeClass.isWidthAtLeastBreakpoint(840))
-                    Modifier.weight(weight) else Modifier.widthIn(width)
-            )
-        }
-
         Text(
             text = "${index + 1}",
             modifier = Modifier.width(24.dp),
             style = MaterialTheme.typography.bodyMedium
         )
 
-        ReferenceDropdown (
+        ReferenceDropdown(
             label = "Материальные ценности",
             items = products,
             selectedItem = item.product,
             onItemSelected = { onItemChange(item.copy(product = it)) },
             itemLabel = { it.name.ifBlank { "Товар #${it.id}" } },
-            modifier = getModifier(weight = 2f)
+            modifier = if (isWide) Modifier.weight(2f) else Modifier.widthIn(min = 300.dp)
         )
 
         OutlinedTextField(
@@ -411,7 +374,7 @@ private fun BodyItemRow(
             onValueChange = { onItemChange(item.copy(unit = it)) },
             label = { Text("Ед. изм.") },
             singleLine = true,
-            modifier = getModifier(weight = 1f, width = 150.dp)
+            modifier = if (isWide) Modifier.weight(1f) else Modifier.widthIn(min = 150.dp)
         )
 
         OutlinedTextField(
@@ -419,7 +382,7 @@ private fun BodyItemRow(
             onValueChange = { onItemChange(item.copy(count = it)) },
             label = { Text("Количество (прописью)") },
             singleLine = true,
-            modifier = getModifier(weight = 1.5f)
+            modifier = if (isWide) Modifier.weight(1.5f) else Modifier.widthIn(min = 300.dp)
         )
 
         IconButton(onClick = onDelete) {
@@ -449,9 +412,7 @@ private fun DocumentNumberDropdown(
             value = number,
             onValueChange = onNumberChange,
             label = { Text("Номер документа (выберите из списка или введите)") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                 .fillMaxWidth(),
@@ -575,17 +536,15 @@ private fun PowerOfAttorneyActions(
 
             OutlinedButton(
                 onClick = {
-                    val docId = formState.selectedDocumentId
-                    if (docId != null) {
-                        scope.launch {
-                            try {
-                                repository.deleteDocument(docId)
-                                formState.statusMessage = "Документ удален из базы данных"
-                                onResetForm()
-                                onDocumentChanged()
-                            } catch (e: Exception) {
-                                formState.statusMessage = "Ошибка при удалении: ${e.message}"
-                            }
+                    val docId = formState.selectedDocumentId ?: return@OutlinedButton
+                    scope.launch {
+                        try {
+                            repository.deleteDocument(docId)
+                            formState.statusMessage = "Документ удален из базы данных"
+                            onResetForm()
+                            onDocumentChanged()
+                        } catch (e: Exception) {
+                            formState.statusMessage = "Ошибка при удалении: ${e.message}"
                         }
                     }
                 }

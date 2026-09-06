@@ -18,9 +18,9 @@ fun main() = application {
         modules(sharedModule)
     }
 
-    Window (
+    Window(
         onCloseRequest = ::exitApplication,
-        state = rememberWindowState (
+        state = rememberWindowState(
             position = WindowPosition.Aligned(Alignment.Center),
             width = 1000.dp,
             height = 800.dp

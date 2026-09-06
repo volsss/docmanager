@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
 import tech.ilug.documentmanager.model.PowerOfAttorney
-import kotlin.collections.plus
+import tech.ilug.documentmanager.ui.screens.DATE_FORMAT
 
 class PowerOfAttorneyFormState(
     val today: LocalDate,
@@ -146,23 +146,23 @@ class PowerOfAttorneyFormState(
             "{{number}}" to number,
             "{{dischargeDate}}" to dischargeDate,
             "{{endDate}}" to endDate,
-            "{{organizationName}}" to (org?.name ?: ""),
-            "{{organizationConsumer}}" to (org?.consumer ?: ""),
-            "{{organizationPayer}}" to (org?.payer ?: ""),
-            "{{organizationAccount}}" to (org?.account ?: ""),
-            "{{individualJob}}" to (ind?.job ?: ""),
-            "{{individualName}}" to (ind?.name ?: ""),
-            "{{individualSeries}}" to (ind?.series ?: ""),
-            "{{individualNumber}}" to (ind?.number ?: ""),
-            "{{individualIssued}}" to (ind?.issued ?: ""),
-            "{{individualDate}}" to (ind?.date?.toString() ?: ""),
-            "{{supplierName}}" to (sup?.name ?: ""),
+            "{{organizationName}}" to (org?.name.orEmpty()),
+            "{{organizationConsumer}}" to (org?.consumer.orEmpty()),
+            "{{organizationPayer}}" to (org?.payer.orEmpty()),
+            "{{organizationAccount}}" to (org?.account.orEmpty()),
+            "{{individualJob}}" to (ind?.job.orEmpty()),
+            "{{individualName}}" to (ind?.name.orEmpty()),
+            "{{individualSeries}}" to (ind?.series.orEmpty()),
+            "{{individualNumber}}" to (ind?.number.orEmpty()),
+            "{{individualIssued}}" to (ind?.issued.orEmpty()),
+            "{{individualDate}}" to (ind?.date?.toString().orEmpty()),
+            "{{supplierName}}" to (sup?.name.orEmpty()),
             "{{supplierAgreement}}" to supplierAgreement
         )
 
         val body = mapOf(
             "Номер по порядку" to List(bodyItems.size) { idx -> (idx + 1).toString() },
-            "Материальные ценности" to bodyItems.map { it.product?.name ?: "" },
+            "Материальные ценности" to bodyItems.map { it.product?.name.orEmpty() },
             "Единица измерения" to bodyItems.map { it.unit },
             "Количество (прописью)" to bodyItems.map { it.count }
         )

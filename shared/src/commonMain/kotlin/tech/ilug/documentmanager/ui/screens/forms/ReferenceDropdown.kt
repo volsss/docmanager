@@ -1,6 +1,5 @@
 package tech.ilug.documentmanager.ui.screens.forms
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -33,13 +32,12 @@ fun <T> ReferenceDropdown(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = selectedItem?.let(itemLabel) ?: "",
+            value = selectedItem?.let(itemLabel).orEmpty(),
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             singleLine = true
         )
         ExposedDropdownMenu(

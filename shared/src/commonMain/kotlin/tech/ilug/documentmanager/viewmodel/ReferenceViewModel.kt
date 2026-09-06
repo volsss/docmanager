@@ -8,7 +8,7 @@ import tech.ilug.documentmanager.repository.references.OrganizationsRepository
 import tech.ilug.documentmanager.repository.references.ProductsRepository
 import tech.ilug.documentmanager.repository.references.SuppliersRepository
 
-class ReferenceViewModel (
+class ReferenceViewModel(
     val individualsRepository: IndividualsRepository,
     val organizationsRepository: OrganizationsRepository,
     val productsRepository: ProductsRepository,
@@ -26,23 +26,21 @@ class ReferenceViewModel (
         suppliersRepository
     )
 
-    suspend fun removeItem (reference: Reference<out Reference.Item>, item: Reference.Item) {
-        referencesItems.value?.let {
+    suspend fun removeItem(reference: Reference<out Reference.Item>, item: Reference.Item) {
+        referencesItems.value?.let { current ->
             reference.deleteItem(item.id)
-            referencesItems.value = it.toMutableMap().apply {
-                this[reference] = (this[reference] ?: emptyList()).filter { it != item }
-            }
+            referencesItems.value = current + (reference to ((current[reference] ?: emptyList()).filter { it != item }))
         }
     }
 
     suspend fun <T : Reference.Item> newItem(reference: Reference<T>) {
-        referencesItems.value?.let {
-            referencesItems.value = it.toMutableMap().apply {
-                this[reference] = (this[reference] ?: emptyList()) + reference.newItem()
-            }
+        referencesItems.value?.let { current ->
+            val created = reference.newItem()
+            referencesItems.value = current + (reference to ((current[reference] ?: emptyList()) + created))
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     suspend fun saveAll(
         reference: Reference<out Reference.Item>,
         itemId: Int,
@@ -56,15 +54,11 @@ class ReferenceViewModel (
                 newItem
             } else item
         }
-        referencesItems.value?.let {
-            referencesItems.value = it.toMutableMap().apply {
-                this[reference] = updatedItems
-            }
-        }
+        referencesItems.value = (referencesItems.value ?: emptyMap()) + (reference to updatedItems)
     }
 
-    suspend fun loadReferenceItems () {
-        referencesItems.value = references.associateWith { reference -> reference.getItems().toMutableList() }
+    suspend fun loadReferenceItems() {
+        referencesItems.value = references.associateWith { it.getItems() }
     }
 
     fun <T : Reference.Item> selectReference(reference: Reference<T>) {

@@ -6,15 +6,12 @@ import org.jetbrains.exposed.v1.javatime.date
 
 object PowerOfAttorneyTables {
     object HeadersTable : IntIdTable("powerOfAttorneyHeaders") {
-        val organizationId = integer("organizationId")
-            .references(OrganizationsTable.id, onDelete = ReferenceOption.CASCADE)
+        val organizationId = integer("organizationId").references(OrganizationsTable.id, onDelete = ReferenceOption.CASCADE)
         val number = integer("number")
         val dischargeDate = date("dischargeDate")
         val endDate = date("endDate")
-        val individualId = integer("individualId")
-            .references(IndividualsTable.id, onDelete = ReferenceOption.CASCADE)
-        val supplierId = integer("supplierId")
-            .references(SuppliersTable.id, onDelete = ReferenceOption.CASCADE)
+        val individualId = integer("individualId").references(IndividualsTable.id, onDelete = ReferenceOption.CASCADE)
+        val supplierId = integer("supplierId").references(SuppliersTable.id, onDelete = ReferenceOption.CASCADE)
         val supplierAgreement = varchar("supplierAgreement", 256)
     }
 
@@ -45,9 +42,7 @@ object PowerOfAttorneyTables {
     object BodiesTable : IntIdTable("powerOfAttorneyBodies") {
         val count = varchar("count", 64).default("одна")
         val unit = varchar("unit", 256)
-        val headerId = integer("headerId")
-            .references(HeadersTable.id, onDelete = ReferenceOption.CASCADE)
-        val productId = integer("productId")
-            .references(ProductsTable.id, onDelete = ReferenceOption.CASCADE)
+        val headerId = integer("headerId").references(HeadersTable.id, onDelete = ReferenceOption.CASCADE)
+        val productId = integer("productId").references(ProductsTable.id, onDelete = ReferenceOption.CASCADE)
     }
 }

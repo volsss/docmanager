@@ -7,16 +7,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.CoroutineScope
@@ -32,17 +25,13 @@ import tech.ilug.documentmanager.viewmodel.ReferenceViewModel
 val DATE_FORMAT = LocalDate.Format { day(); char('.'); monthNumber(); char('.'); year() }
 
 @Composable
-fun ReferenceScreen (
-    referenceViewModel: ReferenceViewModel
-) {
-    val scope = rememberCoroutineScope ()
-    val reference = referenceViewModel.selectedReference.collectAsState().value!!
-    val referenceItems = referenceViewModel.referencesItems.collectAsState()
-        .value?.get(reference)!!
+fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
+    val scope = rememberCoroutineScope()
+    val reference = referenceViewModel.selectedReference.collectAsState().value ?: return
+    val referenceItems = referenceViewModel.referencesItems.collectAsState().value?.get(reference) ?: emptyList()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    // : Map<itemId, Map<fieldName, fieldValue>>
-    var fieldValues by remember {
+    var fieldValues by remember(referenceItems) {
         mutableStateOf(
             referenceItems.associate { item ->
                 item.id to item.asFields().associate { it.name to it.value }
@@ -51,65 +40,53 @@ fun ReferenceScreen (
     }
 
     fun updateFieldValue(itemId: Int, fieldName: String, newValue: Any) {
-        fieldValues = fieldValues.toMutableMap().apply {
-            this[itemId] = if (this[itemId] != null)
-                this[itemId]!!.toMutableMap().apply { put(fieldName, newValue) }
-            else mutableMapOf()
-        }
+        val currentItemFields = fieldValues[itemId].orEmpty().toMutableMap()
+        currentItemFields[fieldName] = newValue
+        fieldValues = fieldValues + (itemId to currentItemFields)
     }
 
-    Text (
+    Text(
         stringResource(StringRegistry.get(reference.name)),
         style = MaterialTheme.typography.titleLarge
     )
     Spacer(Modifier.height(16.dp))
 
-    Column (
-        Modifier.fillMaxSize()
-            .then(
-                if (windowSizeClass.isWidthAtLeastBreakpoint(840))
-                    Modifier else Modifier.horizontalScroll(rememberScrollState())
-            )
+    Column(
+        Modifier.fillMaxSize().then(
+            if (windowSizeClass.isWidthAtLeastBreakpoint(840)) Modifier else Modifier.horizontalScroll(rememberScrollState())
+        )
     ) {
-        referenceItems.forEach {  item ->
+        referenceItems.forEach { item ->
             ReferenceInput(
-                reference,
-                item,
-                currentValues = fieldValues[item.id] ?: emptyMap(),
+                reference = reference,
+                item = item,
+                currentValues = fieldValues[item.id].orEmpty(),
                 onFieldChange = ::updateFieldValue,
-                referenceViewModel,
-                scope,
-                windowSizeClass
+                referenceViewModel = referenceViewModel,
+                scope = scope,
+                windowSizeClass = windowSizeClass
             )
         }
     }
     Spacer(Modifier.height(16.dp))
 
-    Row (
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Button({
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(onClick = {
             scope.launch {
                 fieldValues.forEach { (itemId, fields) ->
-                    referenceViewModel.saveAll(
-                        reference,
-                        itemId,
-                        fields
-                    )
+                    referenceViewModel.saveAll(reference, itemId, fields)
                 }
             }
         }) { Text("Сохранить") }
 
-        Button({
-            scope.launch {
-                referenceViewModel.newItem(reference)
-            }
+        Button(onClick = {
+            scope.launch { referenceViewModel.newItem(reference) }
         }) { Text("Новое поле") }
     }
 }
 
 @Composable
-fun ReferenceInput (
+fun ReferenceInput(
     reference: Reference<out Reference.Item>,
     item: Reference.Item,
     currentValues: Map<String, Any>,
@@ -118,52 +95,40 @@ fun ReferenceInput (
     scope: CoroutineScope,
     windowSizeClass: WindowSizeClass
 ) {
-    Row (
+    Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(item.id.toString())
         item.asFields().forEach { field ->
-            InputField (
+            InputField(
                 label = stringResource(StringRegistry.get(field.name)),
                 value = currentValues[field.name] ?: field.value,
-                onValueChange = { newValue ->
-                    onFieldChange(item.id, field.name, newValue)
-                },
+                onValueChange = { newValue -> onFieldChange(item.id, field.name, newValue) },
                 windowSizeClass = windowSizeClass
             )
         }
-        IconButton({
-            scope.launch {
-                referenceViewModel.removeItem(reference, item)
-            }
-        }) { Icon(Icons.Filled.Remove, "Удалить") }
+        IconButton(onClick = { scope.launch { referenceViewModel.removeItem(reference, item) } }) {
+            Icon(Icons.Filled.Remove, "Удалить")
+        }
     }
 }
 
 @Composable
-fun RowScope.InputField (
+fun RowScope.InputField(
     label: String,
     value: Any,
     onValueChange: (Any) -> Unit,
     windowSizeClass: WindowSizeClass
 ) {
-    fun getModifier(
-        width: Dp = 300.dp,
-        weight: Float = 1f
-    ): Modifier {
-        return Modifier.then(
-            if (windowSizeClass.isWidthAtLeastBreakpoint(840))
-                Modifier.weight(weight) else Modifier.widthIn(width)
-        )
-    }
+    val modifier = if (windowSizeClass.isWidthAtLeastBreakpoint(840)) Modifier.weight(1f) else Modifier.widthIn(min = 300.dp)
 
     when (value) {
         is String -> {
             OutlinedTextField(
                 label = { Text(label) },
-                modifier = getModifier(),
+                modifier = modifier,
                 value = value,
                 onValueChange = onValueChange
             )
@@ -172,7 +137,7 @@ fun RowScope.InputField (
             var textValue by remember(value) { mutableStateOf(value.toString()) }
             OutlinedTextField(
                 label = { Text(label) },
-                modifier = getModifier(),
+                modifier = modifier,
                 value = textValue,
                 onValueChange = { newText ->
                     textValue = newText
@@ -184,14 +149,11 @@ fun RowScope.InputField (
             var textValue by remember(value) { mutableStateOf(value.format(DATE_FORMAT)) }
             OutlinedTextField(
                 label = { Text(label) },
-                modifier = getModifier(),
+                modifier = modifier,
                 value = textValue,
                 onValueChange = { newText ->
                     textValue = newText
-                    val parsed = runCatching {
-                        LocalDate.parse(newText, DATE_FORMAT)
-                    }.getOrNull()
-                    if (parsed != null) onValueChange(parsed)
+                    runCatching { LocalDate.parse(newText, DATE_FORMAT) }.getOrNull()?.let(onValueChange)
                 }
             )
         }

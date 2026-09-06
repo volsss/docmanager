@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,18 +21,18 @@ import tech.ilug.documentmanager.viewmodel.DocumentViewModel
 import tech.ilug.documentmanager.viewmodel.Tab
 
 @Composable
-fun DocumentsScreen (
+fun DocumentsScreen(
     documentViewModel: DocumentViewModel,
     dashboardViewModel: DashboardViewModel
 ) {
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp)),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         DocumentType.entries.forEach { type ->
-            DocumentRow (
+            DocumentRow(
                 title = type.title,
                 onClick = {
                     documentViewModel.selectDocument(type)
@@ -45,18 +44,18 @@ fun DocumentsScreen (
 }
 
 @Composable
-fun DocumentRow (
+fun DocumentRow(
     title: String,
     onClick: () -> Unit
 ) {
-    Row (
+    Row(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .fillMaxWidth()
-            .clickable(onClick = onClick,role = Role.Button)
-            .padding(vertical = 16.dp, horizontal = 16.dp)
+            .clickable(onClick = onClick, role = Role.Button)
+            .padding(16.dp)
     ) {
-        Text (
+        Text(
             title,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSecondaryContainer

@@ -1,8 +1,10 @@
 package tech.ilug.documentmanager.di
 
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-import tech.ilug.documentmanager.repository.documents.PowerOfAttorneyRepository
 import tech.ilug.documentmanager.repository.ProjectMetadataRepository
+import tech.ilug.documentmanager.repository.documents.PowerOfAttorneyRepository
 import tech.ilug.documentmanager.repository.references.IndividualsRepository
 import tech.ilug.documentmanager.repository.references.OrganizationsRepository
 import tech.ilug.documentmanager.repository.references.ProductsRepository
@@ -14,32 +16,18 @@ import tech.ilug.documentmanager.viewmodel.ReferenceViewModel
 import tech.ilug.documentmanager.viewmodel.SettingsViewModel
 
 val sharedModule = module {
-    single { ProjectMetadataRepository() }
-    single { IndividualsRepository() }
-    single { OrganizationsRepository() }
-    single { ProductsRepository() }
-    single { SuppliersRepository() }
-    factory {
-        PowerOfAttorneyRepository(
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
+    singleOf(::ProjectMetadataRepository)
+    singleOf(::IndividualsRepository)
+    singleOf(::OrganizationsRepository)
+    singleOf(::ProductsRepository)
+    singleOf(::SuppliersRepository)
+    factoryOf(::PowerOfAttorneyRepository)
 
-    single {
-        ReferenceViewModel(
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
-    single { ConnectionViewModel() }
-    single { DashboardViewModel() }
-    single { DocumentViewModel() }
-    factory { SettingsViewModel(get()) }
+    singleOf(::ReferenceViewModel)
+    singleOf(::ConnectionViewModel)
+    singleOf(::DashboardViewModel)
+    singleOf(::DocumentViewModel)
+    factoryOf(::SettingsViewModel)
 }
 
 enum class Platform {

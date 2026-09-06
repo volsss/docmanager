@@ -1,13 +1,9 @@
 package tech.ilug.documentmanager.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -18,28 +14,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import tech.ilug.documentmanager.model.ProjectMetadata
 import tech.ilug.documentmanager.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsScreen (
-    viewModel: SettingsViewModel
-) {
+fun SettingsScreen(viewModel: SettingsViewModel) {
     val metadata by viewModel.metadata.collectAsState()
     val scope = rememberCoroutineScope()
-    var projectName by remember { mutableStateOf(metadata!!.projectName) }
-    var version by remember { mutableStateOf(metadata!!.version) }
-    var author by remember { mutableStateOf(metadata!!.author) }
-    val creationDate = metadata!!.creationDate
+    val current = metadata ?: return
 
-    Column (
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    var projectName by remember(current) { mutableStateOf(current.projectName) }
+    var version by remember(current) { mutableStateOf(current.version) }
+    var author by remember(current) { mutableStateOf(current.author) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Настройки проекта", style = MaterialTheme.typography.headlineSmall)
         OutlinedTextField(
             value = projectName,
@@ -60,7 +50,7 @@ fun SettingsScreen (
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
-            value = creationDate,
+            value = current.creationDate,
             onValueChange = {},
             label = { Text("Дата создания") },
             enabled = false,
@@ -69,7 +59,7 @@ fun SettingsScreen (
         Button(onClick = {
             scope.launch {
                 viewModel.updateMetadata(
-                    metadata!!.copy(
+                    current.copy(
                         projectName = projectName,
                         version = version,
                         author = author
