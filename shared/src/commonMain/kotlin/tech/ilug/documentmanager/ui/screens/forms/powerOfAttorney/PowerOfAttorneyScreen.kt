@@ -1,15 +1,18 @@
 package tech.ilug.documentmanager.ui.screens.forms.powerOfAttorney
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -25,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,7 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DatePeriod
@@ -319,6 +325,8 @@ private fun PowerOfAttorneyBodySection(
     products: List<PowerOfAttorney.Product>,
     modifier: Modifier = Modifier
 ) {
+    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -329,14 +337,23 @@ private fun PowerOfAttorneyBodySection(
             style = MaterialTheme.typography.titleMedium
         )
 
-        formState.bodyItems.forEachIndexed { index, item ->
-            BodyItemRow(
-                index = index,
-                item = item,
-                products = products,
-                onItemChange = { updated -> formState.updateBodyRow(index, updated) },
-                onDelete = { formState.removeBodyRow(index, products.firstOrNull()) }
-            )
+        Column (
+            Modifier.fillMaxSize()
+                .then(
+                    if (windowSizeClass.isWidthAtLeastBreakpoint(840))
+                        Modifier else Modifier.horizontalScroll(rememberScrollState())
+                )
+        ) {
+            formState.bodyItems.forEachIndexed { index, item ->
+                BodyItemRow(
+                    index = index,
+                    item = item,
+                    products = products,
+                    onItemChange = { updated -> formState.updateBodyRow(index, updated) },
+                    onDelete = { formState.removeBodyRow(index, products.firstOrNull()) },
+                    windowSizeClass = windowSizeClass
+                )
+            }
         }
 
         OutlinedButton(
@@ -357,13 +374,23 @@ private fun BodyItemRow(
     products: List<PowerOfAttorney.Product>,
     onItemChange: (PowerOfAttorneyBodyItem) -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    windowSizeClass: WindowSizeClass
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        fun getModifier(
+            width: Dp = 300.dp,
+            weight: Float = 1f
+        ): Modifier {
+            return Modifier.then(
+                if (windowSizeClass.isWidthAtLeastBreakpoint(840))
+                    Modifier.weight(weight) else Modifier.widthIn(width)
+            )
+        }
+
         Text(
             text = "${index + 1}",
             modifier = Modifier.width(24.dp),
@@ -376,7 +403,7 @@ private fun BodyItemRow(
             selectedItem = item.product,
             onItemSelected = { onItemChange(item.copy(product = it)) },
             itemLabel = { it.name.ifBlank { "Товар #${it.id}" } },
-            modifier = Modifier.weight(2f)
+            modifier = getModifier(weight = 2f)
         )
 
         OutlinedTextField(
@@ -384,7 +411,7 @@ private fun BodyItemRow(
             onValueChange = { onItemChange(item.copy(unit = it)) },
             label = { Text("Ед. изм.") },
             singleLine = true,
-            modifier = Modifier.weight(1f)
+            modifier = getModifier(weight = 1f, width = 150.dp)
         )
 
         OutlinedTextField(
@@ -392,7 +419,7 @@ private fun BodyItemRow(
             onValueChange = { onItemChange(item.copy(count = it)) },
             label = { Text("Количество (прописью)") },
             singleLine = true,
-            modifier = Modifier.weight(1.5f)
+            modifier = getModifier(weight = 1.5f)
         )
 
         IconButton(onClick = onDelete) {

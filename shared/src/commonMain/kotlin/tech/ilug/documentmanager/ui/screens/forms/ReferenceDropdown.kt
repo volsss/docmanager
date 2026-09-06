@@ -38,9 +38,8 @@ fun <T> ReferenceDropdown(
             readOnly = true,
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth(),
+            modifier = modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             singleLine = true
         )
         ExposedDropdownMenu(

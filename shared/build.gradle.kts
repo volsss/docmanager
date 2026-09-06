@@ -67,9 +67,6 @@ kotlin {
 
             implementation(libs.koin.core)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
     }
 }
 

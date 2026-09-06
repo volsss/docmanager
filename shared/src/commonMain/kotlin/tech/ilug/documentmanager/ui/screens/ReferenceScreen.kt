@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.CoroutineScope
@@ -148,15 +149,21 @@ fun RowScope.InputField (
     onValueChange: (Any) -> Unit,
     windowSizeClass: WindowSizeClass
 ) {
-    val modifier = Modifier.then(
-        if (windowSizeClass.isWidthAtLeastBreakpoint(840))
-            Modifier.weight(1f) else Modifier.widthIn(400.dp)
-    )
+    fun getModifier(
+        width: Dp = 300.dp,
+        weight: Float = 1f
+    ): Modifier {
+        return Modifier.then(
+            if (windowSizeClass.isWidthAtLeastBreakpoint(840))
+                Modifier.weight(weight) else Modifier.widthIn(width)
+        )
+    }
+
     when (value) {
         is String -> {
             OutlinedTextField(
                 label = { Text(label) },
-                modifier = modifier,
+                modifier = getModifier(),
                 value = value,
                 onValueChange = onValueChange
             )
@@ -165,7 +172,7 @@ fun RowScope.InputField (
             var textValue by remember(value) { mutableStateOf(value.toString()) }
             OutlinedTextField(
                 label = { Text(label) },
-                modifier = modifier,
+                modifier = getModifier(),
                 value = textValue,
                 onValueChange = { newText ->
                     textValue = newText
@@ -177,7 +184,7 @@ fun RowScope.InputField (
             var textValue by remember(value) { mutableStateOf(value.format(DATE_FORMAT)) }
             OutlinedTextField(
                 label = { Text(label) },
-                modifier = modifier,
+                modifier = getModifier(),
                 value = textValue,
                 onValueChange = { newText ->
                     textValue = newText
