@@ -36,18 +36,18 @@ compose.desktop {
                 TargetFormat.Msi,
                 TargetFormat.Deb
             )
-            packageName = "DocumentManager"
+            packageName = "docmanager"
             packageVersion = "1.0.0"
 
             vendor = "ILUG"
-            description = "A scalable document manager for power of attorney"
+            description = "A scalable document manager"
 
             appResourcesRootDir.set(
                 project.layout.projectDirectory.dir("src/main/resources")
             )
 
             windows {
-                menuGroup = "DocumentManager"
+                menuGroup = "docmanager"
                 upgradeUuid = randomUUID().toString()
                 shortcut = true
             }
