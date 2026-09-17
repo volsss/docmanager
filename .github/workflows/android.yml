@@ -41,11 +41,11 @@ jobs:
     - name: Upload Android Artifact
       uses: actions/upload-artifact@v7
       with:
-        name: android-debug-apk
         path: androidApp/build/outputs/apk/debug/*.apk
+        archive: 'false'
 
   build-msi-package:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
@@ -70,5 +70,34 @@ jobs:
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: msi-package
           path: desktopApp/build/compose/binaries/main/msi/*.msi
+          archive: 'false'
+
+  build-deb-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up latest JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build DEB Package
+        run: ./gradlew :desktopApp:packageDeb
+
+      - name: Upload DEB Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/deb/*.deb
+          archive: 'false'
