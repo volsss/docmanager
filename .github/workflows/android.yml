@@ -69,7 +69,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build MSI Package
-        run: ./gradlew :desktopApp:assembleDebug
+        run: ./gradlew :desktopApp:packageMsi
 
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
