@@ -18,7 +18,8 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.stringResource
-import tech.ilug.documentmanager.model.Reference
+import tech.ilug.documentmanager.database.models.references.ReferenceModel
+import tech.ilug.documentmanager.database.repositories.references.ReferenceRepository
 import tech.ilug.documentmanager.ui.StringRegistry
 import tech.ilug.documentmanager.viewmodel.ReferenceViewModel
 
@@ -27,7 +28,7 @@ val DATE_FORMAT = LocalDate.Format { day(); char('.'); monthNumber(); char('.');
 @Composable
 fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
     val scope = rememberCoroutineScope()
-    val reference = referenceViewModel.selectedReference.collectAsState().value ?: return
+    val reference = referenceViewModel.selectedReferenceRepository.collectAsState().value ?: return
     val referenceItems = referenceViewModel.referencesItems.collectAsState().value?.get(reference) ?: emptyList()
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
@@ -58,7 +59,7 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
     ) {
         referenceItems.forEach { item ->
             ReferenceInput(
-                reference = reference,
+                referenceRepository = reference,
                 item = item,
                 currentValues = fieldValues[item.id].orEmpty(),
                 onFieldChange = ::updateFieldValue,
@@ -87,8 +88,8 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
 
 @Composable
 fun ReferenceInput(
-    reference: Reference<out Reference.Item>,
-    item: Reference.Item,
+    referenceRepository: ReferenceRepository<out ReferenceModel>,
+    item: ReferenceModel,
     currentValues: Map<String, Any>,
     onFieldChange: (itemId: Int, fieldName: String, newValue: Any) -> Unit,
     referenceViewModel: ReferenceViewModel,
@@ -109,7 +110,7 @@ fun ReferenceInput(
                 windowSizeClass = windowSizeClass
             )
         }
-        IconButton(onClick = { scope.launch { referenceViewModel.removeItem(reference, item) } }) {
+        IconButton(onClick = { scope.launch { referenceViewModel.removeItem(referenceRepository, item) } }) {
             Icon(Icons.Filled.Remove, "Удалить")
         }
     }

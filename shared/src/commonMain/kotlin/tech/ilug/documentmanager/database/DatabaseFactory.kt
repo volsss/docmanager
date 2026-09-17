@@ -9,7 +9,8 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import tech.ilug.documentmanager.database.document.PowerOfAttorneyTables
+import tech.ilug.documentmanager.database.tables.PowerOfAttorneyTables
+import tech.ilug.documentmanager.database.tables.MetadataTable
 import java.time.LocalDate
 
 object DatabaseFactory {
@@ -26,7 +27,7 @@ object DatabaseFactory {
         }
         transaction {
             SchemaUtils.create(
-                ProjectMetadataTable,
+                MetadataTable,
                 PowerOfAttorneyTables.ProductsTable,
                 PowerOfAttorneyTables.SuppliersTable,
                 PowerOfAttorneyTables.IndividualsTable,
@@ -34,9 +35,9 @@ object DatabaseFactory {
                 PowerOfAttorneyTables.BodiesTable,
                 PowerOfAttorneyTables.HeadersTable,
             )
-            if (ProjectMetadataTable.selectAll().empty()) {
-                ProjectMetadataTable.insert {
-                    it[projectName] = "Новый проект"
+            if (MetadataTable.selectAll().empty()) {
+                MetadataTable.insert {
+                    it[name] = "Новый проект"
                     it[version] = "1.0"
                     it[creationDate] = LocalDate.now().toString()
                     it[author] = "Пользователь"

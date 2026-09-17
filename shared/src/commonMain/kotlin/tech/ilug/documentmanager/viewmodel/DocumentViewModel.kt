@@ -2,7 +2,7 @@ package tech.ilug.documentmanager.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import tech.ilug.documentmanager.model.DocumentType
+import tech.ilug.documentmanager.database.models.documents.DocumentType
 
 class DocumentViewModel {
     val selectedDocumentType: StateFlow<DocumentType?>

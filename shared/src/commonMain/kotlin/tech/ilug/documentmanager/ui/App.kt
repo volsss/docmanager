@@ -58,6 +58,7 @@ fun App() {
                         } catch (e: Exception) {
                             state = ConnectionState.NONE
                             connectionViewModel.setError(e.message)
+                            e.printStackTrace()
                         }
                     }
                 }

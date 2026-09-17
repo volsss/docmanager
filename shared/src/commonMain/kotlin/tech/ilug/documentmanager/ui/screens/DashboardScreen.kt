@@ -41,7 +41,7 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(projectMetadata?.projectName ?: "Название проекта") },
+                title = { Text(projectMetadata?.name ?: "Название проекта") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,

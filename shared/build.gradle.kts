@@ -52,20 +52,14 @@ kotlin {
             implementation(libs.exposed.migration.core)
             implementation(libs.exposed.migration.jdbc)
             implementation(libs.kotlinx.serializationJson)
+            implementation(libs.poi.ooxml)
+            implementation(libs.hikaricp)
+            implementation(libs.koin.core)
+            implementation(libs.h2)
+            implementation(libs.postgresql)
         }
         androidMain.dependencies {
-            implementation(libs.hikaricp)
-            implementation(libs.h2)
             implementation(libs.compose.uiToolingPreview)
-            implementation(libs.poi.ooxml)
-            implementation(libs.koin.core)
-        }
-        jvmMain.dependencies {
-            implementation(libs.hikaricp)
-            implementation(libs.h2)
-            implementation(libs.poi.ooxml)
-
-            implementation(libs.koin.core)
         }
     }
 }

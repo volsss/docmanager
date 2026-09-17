@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Document</title>
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5/dist/themes/core.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5/dist/themes/addons/vue.min.css">
+  <link
+          rel="stylesheet"
+          href="//cdn.jsdelivr.net/npm/prism-themes@1/themes/prism-one-light.min.css"
+  />
+</head>
+<body class="sidebar-toggle-chevron sidebar-group-box sidebar-chevron-right">
+<div id="app"></div>
+<script>
+  window.$docsify = {
+    name: 'DocManager',
+    auto2top: true,
+    loadSidebar: true,
+    subMaxLevel: 2,
+    search: {
+      placeholder: 'Поиск',
+      noData: 'Ничего не найдено',
+      depth: 3,
+    },
+    pagination: {
+      previousText: 'НАЗАД',
+      nextText: 'ВПЕРЁД',
+      crossChapter: true,
+      crossChapterText: true,
+    },
+  }
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+  :root {
+    --font-family      : 'Cascadia Code', monospace;
+    --font-family-mono : 'Cascadia Code', monospace;
+  }
+</style>
+
+<script src="//cdn.jsdelivr.net/npm/docsify@5"></script>
+<script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-kotlin.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify@5/dist/plugins/search.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import tech.ilug.documentmanager.model.DocumentType
+import tech.ilug.documentmanager.database.models.documents.DocumentType
 import tech.ilug.documentmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScreen
 import tech.ilug.documentmanager.viewmodel.DocumentViewModel
 import tech.ilug.documentmanager.viewmodel.ReferenceViewModel

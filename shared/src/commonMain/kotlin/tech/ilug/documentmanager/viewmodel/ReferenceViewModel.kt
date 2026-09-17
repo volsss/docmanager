@@ -2,11 +2,12 @@ package tech.ilug.documentmanager.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import tech.ilug.documentmanager.model.Reference
-import tech.ilug.documentmanager.repository.references.IndividualsRepository
-import tech.ilug.documentmanager.repository.references.OrganizationsRepository
-import tech.ilug.documentmanager.repository.references.ProductsRepository
-import tech.ilug.documentmanager.repository.references.SuppliersRepository
+import tech.ilug.documentmanager.database.models.references.ReferenceModel
+import tech.ilug.documentmanager.database.repositories.references.ReferenceRepository
+import tech.ilug.documentmanager.database.repositories.references.IndividualsRepository
+import tech.ilug.documentmanager.database.repositories.references.OrganizationsRepository
+import tech.ilug.documentmanager.database.repositories.references.ProductsRepository
+import tech.ilug.documentmanager.database.repositories.references.SuppliersRepository
 
 class ReferenceViewModel(
     val individualsRepository: IndividualsRepository,
@@ -14,10 +15,10 @@ class ReferenceViewModel(
     val productsRepository: ProductsRepository,
     val suppliersRepository: SuppliersRepository
 ) {
-    val selectedReference: StateFlow<Reference<out Reference.Item>?>
-        field = MutableStateFlow<Reference<out Reference.Item>?>(null)
-    val referencesItems: StateFlow<Map<Reference<out Reference.Item>, List<Reference.Item>>?>
-        field = MutableStateFlow<Map<Reference<out Reference.Item>, List<Reference.Item>>?>(null)
+    val selectedReferenceRepository: StateFlow<ReferenceRepository<out ReferenceModel>?>
+        field = MutableStateFlow<ReferenceRepository<out ReferenceModel>?>(null)
+    val referencesItems: StateFlow<Map<ReferenceRepository<out ReferenceModel>, List<ReferenceModel>>?>
+        field = MutableStateFlow<Map<ReferenceRepository<out ReferenceModel>, List<ReferenceModel>>?>(null)
 
     val references = listOf(
         individualsRepository,
@@ -26,42 +27,42 @@ class ReferenceViewModel(
         suppliersRepository
     )
 
-    suspend fun removeItem(reference: Reference<out Reference.Item>, item: Reference.Item) {
+    suspend fun removeItem(referenceRepository: ReferenceRepository<out ReferenceModel>, item: ReferenceModel) {
         referencesItems.value?.let { current ->
-            reference.deleteItem(item.id)
-            referencesItems.value = current + (reference to ((current[reference] ?: emptyList()).filter { it != item }))
+            referenceRepository.deleteItem(item.id)
+            referencesItems.value = current + (referenceRepository to ((current[referenceRepository] ?: emptyList()).filter { it != item }))
         }
     }
 
-    suspend fun <T : Reference.Item> newItem(reference: Reference<T>) {
+    suspend fun <T : ReferenceModel> newItem(referenceRepository: ReferenceRepository<T>) {
         referencesItems.value?.let { current ->
-            val created = reference.newItem()
-            referencesItems.value = current + (reference to ((current[reference] ?: emptyList()) + created))
+            val created = referenceRepository.newItem()
+            referencesItems.value = current + (referenceRepository to ((current[referenceRepository] ?: emptyList()) + created))
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     suspend fun saveAll(
-        reference: Reference<out Reference.Item>,
+        referenceRepository: ReferenceRepository<out ReferenceModel>,
         itemId: Int,
         fields: Map<String, Any>
     ) {
-        val currentItems = referencesItems.value?.get(reference) ?: return
+        val currentItems = referencesItems.value?.get(referenceRepository) ?: return
         val updatedItems = currentItems.map { item ->
             if (item.id == itemId) {
                 val newItem = item.copyWithFields(fields)
-                (reference as Reference<Reference.Item>).updateItem(newItem)
+                (referenceRepository as ReferenceRepository<ReferenceModel>).updateItem(newItem)
                 newItem
             } else item
         }
-        referencesItems.value = (referencesItems.value ?: emptyMap()) + (reference to updatedItems)
+        referencesItems.value = (referencesItems.value ?: emptyMap()) + (referenceRepository to updatedItems)
     }
 
     suspend fun loadReferenceItems() {
         referencesItems.value = references.associateWith { it.getItems() }
     }
 
-    fun <T : Reference.Item> selectReference(reference: Reference<T>) {
-        selectedReference.value = reference
+    fun <T : ReferenceModel> selectReference(referenceRepository: ReferenceRepository<T>) {
+        selectedReferenceRepository.value = referenceRepository
     }
 }

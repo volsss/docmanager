@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import tech.ilug.documentmanager.model.DocumentType
+import tech.ilug.documentmanager.database.models.documents.DocumentType
 import tech.ilug.documentmanager.viewmodel.DashboardViewModel
 import tech.ilug.documentmanager.viewmodel.DocumentViewModel
 import tech.ilug.documentmanager.viewmodel.Tab

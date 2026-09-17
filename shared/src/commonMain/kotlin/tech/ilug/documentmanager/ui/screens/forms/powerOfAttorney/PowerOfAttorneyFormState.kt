@@ -4,7 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
-import tech.ilug.documentmanager.model.PowerOfAttorney
+import tech.ilug.documentmanager.database.models.documents.PowerOfAttorney
+import tech.ilug.documentmanager.database.models.references.Individual
+import tech.ilug.documentmanager.database.models.references.Organization
+import tech.ilug.documentmanager.database.models.references.Product
+import tech.ilug.documentmanager.database.models.references.Supplier
 import tech.ilug.documentmanager.ui.screens.DATE_FORMAT
 
 class PowerOfAttorneyFormState(
@@ -18,9 +22,9 @@ class PowerOfAttorneyFormState(
     var number by mutableStateOf("1")
     var dischargeDate by mutableStateOf(DATE_FORMAT.format(today))
     var endDate by mutableStateOf(DATE_FORMAT.format(defaultEndDate))
-    var selectedOrganization by mutableStateOf<PowerOfAttorney.Organization?>(null)
-    var selectedIndividual by mutableStateOf<PowerOfAttorney.Individual?>(null)
-    var selectedSupplier by mutableStateOf<PowerOfAttorney.Supplier?>(null)
+    var selectedOrganization by mutableStateOf<Organization?>(null)
+    var selectedIndividual by mutableStateOf<Individual?>(null)
+    var selectedSupplier by mutableStateOf<Supplier?>(null)
     var supplierAgreement by mutableStateOf("")
 
     var bodyItems by mutableStateOf(listOf(PowerOfAttorneyBodyItem()))
@@ -29,10 +33,10 @@ class PowerOfAttorneyFormState(
     val isEditing: Boolean get() = selectedDocumentId != null
 
     fun resetForm(
-        organizations: List<PowerOfAttorney.Organization> = emptyList(),
-        individuals: List<PowerOfAttorney.Individual> = emptyList(),
-        suppliers: List<PowerOfAttorney.Supplier> = emptyList(),
-        products: List<PowerOfAttorney.Product> = emptyList()
+        organizations: List<Organization> = emptyList(),
+        individuals: List<Individual> = emptyList(),
+        suppliers: List<Supplier> = emptyList(),
+        products: List<Product> = emptyList()
     ) {
         selectedDocumentId = null
         val nextNumber = if (existingDocuments.isNotEmpty()) {
@@ -51,10 +55,10 @@ class PowerOfAttorneyFormState(
 
     fun populateFromDocument(
         doc: PowerOfAttorney,
-        organizations: List<PowerOfAttorney.Organization>,
-        individuals: List<PowerOfAttorney.Individual>,
-        suppliers: List<PowerOfAttorney.Supplier>,
-        products: List<PowerOfAttorney.Product>
+        organizations: List<Organization>,
+        individuals: List<Individual>,
+        suppliers: List<Supplier>,
+        products: List<Product>
     ) {
         selectedDocumentId = doc.header.id
         number = doc.header.number.toString()
@@ -77,7 +81,7 @@ class PowerOfAttorneyFormState(
         }
     }
 
-    fun addBodyRow(product: PowerOfAttorney.Product?) {
+    fun addBodyRow(product: Product?) {
         bodyItems = bodyItems + PowerOfAttorneyBodyItem(product = product)
     }
 
@@ -87,7 +91,7 @@ class PowerOfAttorneyFormState(
         }
     }
 
-    fun removeBodyRow(index: Int, defaultProduct: PowerOfAttorney.Product?) {
+    fun removeBodyRow(index: Int, defaultProduct: Product?) {
         bodyItems = if (bodyItems.size > 1) {
             bodyItems.filterIndexed { i, _ -> i != index }
         } else {
@@ -107,7 +111,7 @@ class PowerOfAttorneyFormState(
 
     fun toPowerOfAttorney(
         headerId: Int = selectedDocumentId ?: 0,
-        defaultProduct: PowerOfAttorney.Product? = null
+        defaultProduct: Product? = null
     ): PowerOfAttorney? {
         val org = selectedOrganization ?: return null
         val ind = selectedIndividual ?: return null
@@ -130,7 +134,7 @@ class PowerOfAttorneyFormState(
                 count = item.count,
                 unit = item.unit,
                 header = header,
-                product = item.product ?: defaultProduct ?: PowerOfAttorney.Product(name = "Товар")
+                product = item.product ?: defaultProduct ?: Product(name = "Товар")
             )
         }
 

@@ -25,7 +25,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
     val scope = rememberCoroutineScope()
     val current = metadata ?: return
 
-    var projectName by remember(current) { mutableStateOf(current.projectName) }
+    var projectName by remember(current) { mutableStateOf(current.name) }
     var version by remember(current) { mutableStateOf(current.version) }
     var author by remember(current) { mutableStateOf(current.author) }
 
@@ -60,7 +60,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
             scope.launch {
                 viewModel.updateMetadata(
                     current.copy(
-                        projectName = projectName,
+                        name = projectName,
                         version = version,
                         author = author
                     )

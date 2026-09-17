@@ -46,8 +46,12 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import tech.ilug.documentmanager.di.getDocumentProcessor
-import tech.ilug.documentmanager.model.PowerOfAttorney
-import tech.ilug.documentmanager.repository.documents.PowerOfAttorneyRepository
+import tech.ilug.documentmanager.database.models.documents.PowerOfAttorney
+import tech.ilug.documentmanager.database.models.references.Individual
+import tech.ilug.documentmanager.database.models.references.Organization
+import tech.ilug.documentmanager.database.models.references.Product
+import tech.ilug.documentmanager.database.models.references.Supplier
+import tech.ilug.documentmanager.database.repositories.documents.PowerOfAttorneyRepository
 import tech.ilug.documentmanager.ui.screens.DATE_FORMAT
 import tech.ilug.documentmanager.ui.screens.forms.ReferenceDropdown
 import tech.ilug.documentmanager.viewmodel.ReferenceViewModel
@@ -76,16 +80,16 @@ fun PowerOfAttorneyScreen(
 
     val referencesItems by referenceViewModel.referencesItems.collectAsState()
     val organizations = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.organizationsRepository)?.filterIsInstance<PowerOfAttorney.Organization>().orEmpty()
+        referencesItems?.get(referenceViewModel.organizationsRepository)?.filterIsInstance<Organization>().orEmpty()
     }
     val individuals = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.individualsRepository)?.filterIsInstance<PowerOfAttorney.Individual>().orEmpty()
+        referencesItems?.get(referenceViewModel.individualsRepository)?.filterIsInstance<Individual>().orEmpty()
     }
     val suppliers = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.suppliersRepository)?.filterIsInstance<PowerOfAttorney.Supplier>().orEmpty()
+        referencesItems?.get(referenceViewModel.suppliersRepository)?.filterIsInstance<Supplier>().orEmpty()
     }
     val products = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.productsRepository)?.filterIsInstance<PowerOfAttorney.Product>().orEmpty()
+        referencesItems?.get(referenceViewModel.productsRepository)?.filterIsInstance<Product>().orEmpty()
     }
 
     val formState = rememberPowerOfAttorneyFormState()
@@ -206,10 +210,10 @@ private fun PowerOfAttorneyBanner(
 @Composable
 private fun PowerOfAttorneyHeaderSection(
     formState: PowerOfAttorneyFormState,
-    organizations: List<PowerOfAttorney.Organization>,
-    individuals: List<PowerOfAttorney.Individual>,
-    suppliers: List<PowerOfAttorney.Supplier>,
-    products: List<PowerOfAttorney.Product>,
+    organizations: List<Organization>,
+    individuals: List<Individual>,
+    suppliers: List<Supplier>,
+    products: List<Product>,
     onResetForm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -295,7 +299,7 @@ private fun PowerOfAttorneyHeaderSection(
 @Composable
 private fun PowerOfAttorneyBodySection(
     formState: PowerOfAttorneyFormState,
-    products: List<PowerOfAttorney.Product>,
+    products: List<Product>,
     modifier: Modifier = Modifier
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -342,7 +346,7 @@ private fun PowerOfAttorneyBodySection(
 private fun BodyItemRow(
     index: Int,
     item: PowerOfAttorneyBodyItem,
-    products: List<PowerOfAttorney.Product>,
+    products: List<Product>,
     onItemChange: (PowerOfAttorneyBodyItem) -> Unit,
     onDelete: () -> Unit,
     windowSizeClass: WindowSizeClass
@@ -466,7 +470,7 @@ private fun PowerOfAttorneyActions(
     formState: PowerOfAttorneyFormState,
     scope: CoroutineScope,
     repository: PowerOfAttorneyRepository,
-    products: List<PowerOfAttorney.Product>,
+    products: List<Product>,
     onDocumentChanged: () -> Unit,
     onResetForm: () -> Unit,
     modifier: Modifier = Modifier
