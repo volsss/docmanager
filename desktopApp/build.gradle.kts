@@ -18,12 +18,6 @@ dependencies {
     implementation(libs.compose.uiToolingPreview)
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xexplicit-backing-fields")
-    }
-}
-
 compose.desktop {
     application {
         mainClass = "tech.ilug.documentmanager.MainKt"
