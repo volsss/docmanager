@@ -67,7 +67,7 @@ jobs:
       - name: Naming Artifacts
         run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
       - name: Removing quarantine attribute
-        run: xattr -d com.apple.quarantine desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
@@ -101,7 +101,7 @@ jobs:
       - name: Naming Artifacts
         run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
       - name: Removing quarantine attribute
-        run: xattr -d com.apple.quarantine desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg || true
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:

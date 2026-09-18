@@ -34,6 +34,7 @@ compose.desktop {
             targetFormats (
                 TargetFormat.Dmg,
                 TargetFormat.Msi,
+                TargetFormat.Exe,
                 TargetFormat.Deb
             )
             packageName = "docmanager"
@@ -58,6 +59,9 @@ compose.desktop {
             macOS {
                 bundleID = this@nativeDistributions.packageName
                 minimumSystemVersion = "12.0"
+                signing {
+                    sign.set(true)
+                }
                 iconFile.set(
                     project.layout.projectDirectory.file(
                         "src/main/resources/icon.icns"
