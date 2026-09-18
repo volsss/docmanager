@@ -57,7 +57,7 @@ compose.desktop {
                 )
             }
             macOS {
-                bundleID = this@nativeDistributions.packageName
+                bundleID = "ru.example.docmanager"
                 minimumSystemVersion = "12.0"
                 signing {
                     sign.set(true)

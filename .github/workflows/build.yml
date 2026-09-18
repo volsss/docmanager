@@ -33,11 +33,11 @@ jobs:
       - name: Build Android App (Debug)
         run: ./gradlew :androidApp:assembleDebug
       - name: Naming Artifacts
-        run: mv androidApp/build/outputs/apk/debug/*.apk androidApp/build/outputs/apk/debug/${{ env.app_name }}_${{ github.run_number }}_Android-Debug.apk
+        run: mv androidApp/build/outputs/apk/debug/*.apk androidApp/build/outputs/apk/debug/${{ env.app_name }}_${{ runner.os }}-Android-Debug_${{ github.run_number }}.apk
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}_${{ github.run_number }}_Android-Debug.apk
+          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}_${{ runner.os }}-Android-Debug_${{ github.run_number }}.apk
           archive: 'false'
 
   dmg-arm:
@@ -65,13 +65,13 @@ jobs:
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Removing quarantine attribute
-        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
           archive: 'false'
 
   dmg-intel:
@@ -99,13 +99,13 @@ jobs:
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Removing quarantine attribute
-        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg || true
+        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg || true
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
           archive: 'false'
 
   deb:
@@ -133,11 +133,11 @@ jobs:
       - name: Build DEB Package
         run: ./gradlew :desktopApp:packageDeb
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/deb/*.deb desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.deb
+        run: mv desktopApp/build/compose/binaries/main/deb/*.deb desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.deb
       - name: Upload DEB Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.deb
+          path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.deb
           archive: 'false'
 
   msi:
@@ -165,11 +165,11 @@ jobs:
       - name: Build MSI Package
         run: ./gradlew :desktopApp:packageMsi
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.msi
+        run: mv desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.msi
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.msi
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.msi
           archive: 'false'
 
   exe:
@@ -197,11 +197,11 @@ jobs:
       - name: Build EXE Package
         run: ./gradlew :desktopApp:packageExe
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/exe/*.exe desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.exe
+        run: mv desktopApp/build/compose/binaries/main/exe/*.exe desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.exe
       - name: Upload EXE Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.exe
+          path: desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.exe
           archive: 'false'
 
   distributable-exe:
@@ -231,5 +231,5 @@ jobs:
       - name: Upload EXE Distributable Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}
+          name: ${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}
           path: desktopApp/build/compose/binaries/main/app/
