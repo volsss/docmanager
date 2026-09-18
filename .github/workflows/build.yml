@@ -1,0 +1,157 @@
+name: Build
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-android-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Set up latest JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build Android App (Debug)
+        run: ./gradlew :androidApp:assembleDebug
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: androidApp/build/outputs/apk/debug/*.apk
+          archive: 'false'
+
+  build-dmg-package:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Set up latest JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build DMG Package
+        run: ./gradlew :desktopApp:packageDmg
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/dmg/*.dmg
+          archive: 'false'
+
+  build-deb-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Set up latest JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build DEB Package
+        run: ./gradlew :desktopApp:packageDeb
+      - name: Upload DEB Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/deb/*.deb
+          archive: 'false'
+
+  build-msi-package:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Set up latest JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build MSI Package
+        run: ./gradlew :desktopApp:packageMsi
+      - name: Upload MSI Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/msi/*.msi
+          archive: 'false'
+
+  build-exe-distributable:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Set up latest JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build EXE Distributable
+        run: ./gradlew :desktopApp:createDistributable
+      - name: Upload EXE Distributable Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: docmanager-distributable
+          path: desktopApp/build/compose/binaries/main/app/
