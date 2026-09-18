@@ -61,6 +61,8 @@ compose.desktop {
                 minimumSystemVersion = "12.0"
                 signing {
                     sign.set(true)
+                    prefix.set("ru.example.docmanager")
+                    identity.set("-")
                 }
                 iconFile.set(
                     project.layout.projectDirectory.file(
