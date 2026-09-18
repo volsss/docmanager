@@ -41,12 +41,11 @@ import ru.example.docmanager.di.getPlatform
 import ru.example.docmanager.viewmodel.ConnectionViewModel
 
 object DefaultValues {
-    const val JVM_JDBC = "jdbc:h2:~/documents;MODE=MySQL"
+    const val JVM_JDBC = "jdbc:h2:~/ru.example.docmanager/documents;MODE=MySQL"
     const val ANDROID_JDBC = "jdbc:h2:/data/data/ru.example.docmanager/documents;MODE=MySQL"
     const val POSTGRES_JDBC = "jdbc:postgresql://localhost:5432/documents"
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ConnectionScreen(
     viewModel: ConnectionViewModel,

@@ -52,6 +52,7 @@ compose.desktop {
             }
             macOS {
                 bundleID = this@nativeDistributions.packageName
+                minimumSystemVersion = "12.0"
             }
         }
     }
