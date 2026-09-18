@@ -49,10 +49,27 @@ compose.desktop {
                 menuGroup = "docmanager"
                 upgradeUuid = randomUUID().toString()
                 shortcut = true
+                iconFile.set(
+                    project.layout.projectDirectory.file(
+                        "src/main/resources/icon.ico"
+                    )
+                )
             }
             macOS {
                 bundleID = this@nativeDistributions.packageName
                 minimumSystemVersion = "12.0"
+                iconFile.set(
+                    project.layout.projectDirectory.file(
+                        "src/main/resources/icon.icns"
+                    )
+                )
+            }
+            linux {
+                iconFile.set(
+                    project.layout.projectDirectory.file(
+                        "src/main/resources/icon.png"
+                    )
+                )
             }
         }
     }

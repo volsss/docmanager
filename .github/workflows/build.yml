@@ -66,6 +66,8 @@ jobs:
         run: ./gradlew :desktopApp:packageDmg
       - name: Naming Artifacts
         run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+      - name: Removing quarantine attribute
+        run: xattr -d com.apple.quarantine desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
@@ -98,6 +100,8 @@ jobs:
         run: ./gradlew :desktopApp:packageDmg
       - name: Naming Artifacts
         run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
+      - name: Removing quarantine attribute
+        run: xattr -d com.apple.quarantine desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
@@ -136,7 +140,7 @@ jobs:
           path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.deb
           archive: 'false'
 
-  build-msi-package:
+  msi:
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
@@ -168,7 +172,39 @@ jobs:
           path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.msi
           archive: 'false'
 
-  build-exe-distributable:
+  exe:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Set up latest JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build EXE Package
+        run: ./gradlew :desktopApp:packageExe
+      - name: Naming Artifacts
+        run: mv desktopApp/build/compose/binaries/main/exe/*.exe desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.exe
+      - name: Upload EXE Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ github.run_number }}_${{ runner.os }}-${{ runner.arch }}.exe
+          archive: 'false'
+
+  distributable-exe:
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
