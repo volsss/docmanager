@@ -33,11 +33,11 @@ jobs:
       - name: Build Android App (Debug)
         run: ./gradlew :androidApp:assembleDebug
       - name: Naming Artifacts
-        run: mv androidApp/build/outputs/apk/debug/*.apk androidApp/build/outputs/apk/debug/${{ env.app_name }}_${{ runner.os }}-Android-Debug_${{ github.run_number }}.apk
+        run: mv androidApp/build/outputs/apk/debug/*.apk androidApp/build/outputs/apk/debug/${{ env.app_name }}_Android-Debug_${{ github.run_number }}.apk
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}_${{ runner.os }}-Android-Debug_${{ github.run_number }}.apk
+          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}_Android-Debug_${{ github.run_number }}.apk
           archive: 'false'
 
   dmg-arm:
@@ -64,12 +64,10 @@ jobs:
         run: chmod +x gradlew
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
-      - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
-      - name: Removing quarantine attribute
-        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Ad-Hoc Signature
-        run: codesign --force --deep --sign - desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
+        run: codesign --force --deep --sign - desktopApp/build/compose/binaries/main/app/${{ env.app_name }}.app
+      - name: Create DMG
+        run: hdiutil create -format UDZO -srcfolder desktopApp/build/compose/binaries/main/app/${{ env.app_name }}.app desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
@@ -100,12 +98,10 @@ jobs:
         run: chmod +x gradlew
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
-      - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
-      - name: Removing quarantine attribute
-        run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg || true
       - name: Ad-Hoc Signature
-        run: codesign --force --deep --sign - desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
+        run: codesign --force --deep --sign - desktopApp/build/compose/binaries/main/app/${{ env.app_name }}.app
+      - name: Create DMG
+        run: hdiutil create -format UDZO -srcfolder desktopApp/build/compose/binaries/main/app/${{ env.app_name }}.app desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
