@@ -18,4 +18,4 @@
     - [Начало](lab3/index.md)
     - [Практическое задание 3](lab3/practice.md)
 
-* [GitHub](https://github.com/volsss/docmanager-guide)
+* [GitHub](https://github.com/volsss/docmanager)
