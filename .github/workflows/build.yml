@@ -68,6 +68,8 @@ jobs:
         run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Removing quarantine attribute
         run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
+      - name: Ad-Hoc Signature
+        run: codesign --force --deep --sign - desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
@@ -102,6 +104,8 @@ jobs:
         run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Removing quarantine attribute
         run: xattr -c desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg || true
+      - name: Ad-Hoc Signature
+        run: codesign --force --deep --sign - desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
