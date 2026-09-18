@@ -1,4 +1,4 @@
-rootProject.name = "DocumentManager"
+rootProject.name = "docmanager"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

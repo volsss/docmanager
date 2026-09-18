@@ -20,7 +20,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "tech.ilug.documentmanager.MainKt"
+        mainClass = "ru.example.docmanager.MainKt"
 
         buildTypes.release.proguard {
             configurationFiles.from(project.file("proguard-rules.pro"))
@@ -37,9 +37,8 @@ compose.desktop {
                 TargetFormat.Deb
             )
             packageName = "docmanager"
-            packageVersion = "1.0.0"
+            packageVersion = "1.1.0"
 
-            vendor = "ILUG"
             description = "A scalable document manager"
 
             appResourcesRootDir.set(

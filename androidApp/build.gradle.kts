@@ -25,15 +25,15 @@ dependencies {
 }
 
 android {
-    namespace = "tech.ilug.documentmanager"
+    namespace = "ru.example.docmanager"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "tech.ilug.documentmanager"
+        applicationId = "ru.example.docmanager"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
     }
     packaging {
         resources {

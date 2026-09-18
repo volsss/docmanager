@@ -11,12 +11,8 @@ plugins {
 kotlin {
     jvm ()
 
-    compilerOptions {
-        freeCompilerArgs.add("-Xexplicit-backing-fields")
-    }
-
     android {
-       namespace = "tech.ilug.documentmanager.shared"
+       namespace = "ru.example.docmanager.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     

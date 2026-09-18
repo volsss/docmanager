@@ -9,7 +9,7 @@
 -keepattributes *Annotation*,InnerClasses,Signature,EnclosingMethod,SourceFile,LineNumberTable,RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations
 
 # Keep application code
--keep class tech.ilug.documentmanager.** { *; }
+-keep class ru.example.docmanager.** { *; }
 
 # Keep Compose & Skiko
 -keep class androidx.compose.** { *; }
@@ -30,10 +30,6 @@
 -keep class org.apache.xmlbeans.** { *; }
 -keep class org.openxmlformats.schemas.** { *; }
 -keep class schemaorg_apache_xmlbeans.** { *; }
-
-# Keep Apache PDFBox
--keep class org.apache.pdfbox.** { *; }
--keep class org.apache.fontbox.** { *; }
 
 # Keep Database drivers and ORM (Exposed, HikariCP, PostgreSQL, H2)
 -keep class org.jetbrains.exposed.** { *; }
