@@ -58,7 +58,6 @@ compose.desktop {
             }
             macOS {
                 bundleID = "ru.example.docmanager"
-                minimumSystemVersion = "12.0"
                 iconFile.set(
                     project.layout.projectDirectory.file(
                         "src/main/resources/icon.icns"
