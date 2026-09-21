@@ -224,6 +224,24 @@ class Dog : Animal()
 
 ## Коллекции
 
+```mermaid
+graph TD;
+    A[Iterable]-->B[Collection];
+    
+    A-->G[MutableIterable];
+    G-->H[MutableCollection];
+    
+    B-->C[List];
+    C-->E[MutableList];
+    H-->E;
+    
+    B-->D[Set];
+    D-->F[MutableSet];
+    H-->F;
+    
+    I[Map]-->J[MutableMap];
+```
+
 Для хранения нескольких значений **Kotlin** предоставляет коллекции. Наиболее 
 часто используются `List`, `Set` и `Map`.
 
