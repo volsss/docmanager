@@ -5,7 +5,8 @@ on:
   pull_request:
     branches: [ "master" ]
 env:
-  app_name: docmanager
+  app_name: "docmanager"
+  app_version: "1.1.0"
 
 jobs:
   android:
@@ -32,12 +33,18 @@ jobs:
         run: chmod +x gradlew
       - name: Build Android App (Debug)
         run: ./gradlew :androidApp:assembleDebug
+      - name: Generate file name
+        run: |
+          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.apk" >> $GITHUB_ENV
+        env:
+          RUNNER_OS: android
+          RUNNER_ARCH: debug
       - name: Naming Artifacts
-        run: mv androidApp/build/outputs/apk/debug/*.apk androidApp/build/outputs/apk/debug/${{ env.app_name }}_Android-Debug_${{ github.run_number }}.apk
+        run: mv androidApp/build/outputs/apk/debug/*.apk androidApp/build/outputs/apk/debug/${{ env.FILE_NAME }}
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}_Android-Debug_${{ github.run_number }}.apk
+          path: androidApp/build/outputs/apk/debug/${{ env.FILE_NAME }}
           archive: 'false'
 
   dmg-arm:
@@ -64,12 +71,18 @@ jobs:
         run: chmod +x gradlew
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
+      - name: Generate file name
+        run: |
+          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.dmg" >> $GITHUB_ENV
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
+        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
           archive: 'false'
 
   dmg-intel:
@@ -96,12 +109,18 @@ jobs:
         run: chmod +x gradlew
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
+      - name: Generate file name
+        run: |
+          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.dmg" >> $GITHUB_ENV
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
+        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.dmg
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
           archive: 'false'
 
   deb:
@@ -128,12 +147,18 @@ jobs:
         run: chmod +x gradlew
       - name: Build DEB Package
         run: ./gradlew :desktopApp:packageDeb
+      - name: Generate file name
+        run: |
+          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.deb" >> $GITHUB_ENV
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/deb/*.deb desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.deb
+        run: mv desktopApp/build/compose/binaries/main/deb/*.deb desktopApp/build/compose/binaries/main/deb/${{ env.FILE_NAME }}
       - name: Upload DEB Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.deb
+          path: desktopApp/build/compose/binaries/main/deb/${{ env.FILE_NAME }}
           archive: 'false'
 
   msi:
@@ -160,16 +185,22 @@ jobs:
         run: chmod +x gradlew
       - name: Build MSI Package
         run: ./gradlew :desktopApp:packageMsi
+      - name: Generate file name
+        run: |
+          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.msi" >> $GITHUB_ENV
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.msi
+        run: mv desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.msi
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
           archive: 'false'
 
-  exe:
-    runs-on: windows-latest
+  msi-arm:
+    runs-on: windows-11-arm
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -190,14 +221,20 @@ jobs:
             ${{ runner.os }}-konan-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build EXE Package
-        run: ./gradlew :desktopApp:packageExe
+      - name: Build MSI Package
+        run: ./gradlew :desktopApp:packageMsi
+      - name: Generate file name
+        run: |
+          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.msi" >> $GITHUB_ENV
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
       - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/exe/*.exe desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.exe
-      - name: Upload EXE Artifact
+        run: mv desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
+      - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/exe/${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}_${{ github.run_number }}.exe
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
           archive: 'false'
 
   distributable-exe:
@@ -224,8 +261,14 @@ jobs:
         run: chmod +x gradlew
       - name: Build EXE Distributable
         run: ./gradlew :desktopApp:createDistributable
+      - name: Generate file name
+        run: |
+          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}" >> $GITHUB_ENV
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
       - name: Upload EXE Distributable Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.app_name }}_${{ runner.os }}-${{ runner.arch }}-Dist_${{ github.run_number }}
+          name: ${env.FILE_NAME}
           path: desktopApp/build/compose/binaries/main/app/
