@@ -9,7 +9,7 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain (21)
+    jvm ()
 
     android {
        namespace = "ru.example.docmanager.shared"
