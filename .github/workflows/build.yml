@@ -280,9 +280,9 @@ jobs:
           Write-Host 'No explicit Java vendor declaration found in Gradle/Kotlin/properties/version files.'
           }
 
-          - name: Verify ARM64 Java
-            shell: pwsh
-            run: java -version
+      - name: Verify ARM64 Java
+        shell: pwsh
+        run: java -version
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
