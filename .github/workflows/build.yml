@@ -1,9 +1,11 @@
 name: Build
+
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
+
 env:
   app_name: "docmanager"
   app_version: "1.1.0"
@@ -14,261 +16,307 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-      - name: Set up latest JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: latest
           cache: gradle
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
       - name: Cache Kotlin Native Compiler
         uses: actions/cache@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       - name: Build Android App (Debug)
         run: ./gradlew :androidApp:assembleDebug
-      - name: Generate file name
+
+      - name: Name Android Artifact
+        shell: bash
         run: |
-          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.apk" >> $GITHUB_ENV
-        env:
-          RUNNER_OS: android
-          RUNNER_ARCH: debug
-      - name: Naming Artifacts
-        run: mv androidApp/build/outputs/apk/debug/*.apk androidApp/build/outputs/apk/debug/${{ env.FILE_NAME }}
+          set -euo pipefail
+          apk="$(find androidApp/build/outputs/apk/debug -maxdepth 1 -type f -name '*.apk' | head -n 1)"
+          test -n "$apk" || { echo "No APK found"; exit 1; }
+          mv "$apk" "androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-android-debug.apk"
+
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: androidApp/build/outputs/apk/debug/${{ env.FILE_NAME }}
-          archive: 'false'
+          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-android-debug.apk
+          archive: false
+          if-no-files-found: error
 
   dmg-arm:
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-      - name: Set up latest JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: latest
           cache: gradle
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
       - name: Cache Kotlin Native Compiler
         uses: actions/cache@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
-      - name: Generate file name
+
+      - name: Name DMG Artifact
+        shell: bash
         run: |
-          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.dmg" >> $GITHUB_ENV
-        env:
-          RUNNER_OS: ${{ runner.os }}
-          RUNNER_ARCH: ${{ runner.arch }}
-      - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
+          set -euo pipefail
+          dmg="$(find desktopApp/build/compose/binaries/main/dmg -maxdepth 1 -type f -name '*.dmg' | head -n 1)"
+          test -n "$dmg" || { echo "No DMG found"; exit 1; }
+          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-macos-arm64.dmg"
+
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
-          archive: 'false'
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-macos-arm64.dmg
+          archive: false
+          if-no-files-found: error
 
-  dmg-intel:
+  dmg:
     runs-on: macos-26-intel
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-      - name: Set up latest JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: latest
           cache: gradle
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
       - name: Cache Kotlin Native Compiler
         uses: actions/cache@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       - name: Build DMG Package
         run: ./gradlew :desktopApp:packageDmg
-      - name: Generate file name
+
+      - name: Name DMG Artifact
+        shell: bash
         run: |
-          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.dmg" >> $GITHUB_ENV
-        env:
-          RUNNER_OS: ${{ runner.os }}
-          RUNNER_ARCH: ${{ runner.arch }}
-      - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/dmg/*.dmg desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
+          set -euo pipefail
+          dmg="$(find desktopApp/build/compose/binaries/main/dmg -maxdepth 1 -type f -name '*.dmg' | head -n 1)"
+          test -n "$dmg" || { echo "No DMG found"; exit 1; }
+          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-macos-x64.dmg"
+
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.FILE_NAME }}
-          archive: 'false'
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-macos-x64.dmg
+          archive: false
+          if-no-files-found: error
 
   deb:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-      - name: Set up latest JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: latest
           cache: gradle
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
       - name: Cache Kotlin Native Compiler
         uses: actions/cache@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
       - name: Build DEB Package
         run: ./gradlew :desktopApp:packageDeb
-      - name: Generate file name
+
+      - name: Name DEB Artifact
+        shell: bash
         run: |
-          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.deb" >> $GITHUB_ENV
-        env:
-          RUNNER_OS: ${{ runner.os }}
-          RUNNER_ARCH: ${{ runner.arch }}
-      - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/deb/*.deb desktopApp/build/compose/binaries/main/deb/${{ env.FILE_NAME }}
+          set -euo pipefail
+          deb="$(find desktopApp/build/compose/binaries/main/deb -maxdepth 1 -type f -name '*.deb' | head -n 1)"
+          test -n "$deb" || { echo "No DEB found"; exit 1; }
+          mv "$deb" "desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-linux-x64.deb"
+
       - name: Upload DEB Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/deb/${{ env.FILE_NAME }}
-          archive: 'false'
+          path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-linux-x64.deb
+          archive: false
+          if-no-files-found: error
 
   msi:
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-      - name: Set up latest JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: latest
           cache: gradle
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
       - name: Cache Kotlin Native Compiler
         uses: actions/cache@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+
       - name: Build MSI Package
-        run: ./gradlew :desktopApp:packageMsi
-      - name: Generate file name
+        shell: pwsh
+        run: .\\gradlew.bat :desktopApp:packageMsi
+
+      - name: Name MSI Artifact
+        shell: pwsh
         run: |
-          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.msi" >> $GITHUB_ENV
-        env:
-          RUNNER_OS: ${{ runner.os }}
-          RUNNER_ARCH: ${{ runner.arch }}
-      - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
+          $source = Get-ChildItem "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File |
+            Select-Object -First 1
+          if (-not $source) { throw "No MSI found" }
+          $target = "${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-windows-x64.msi"
+          Rename-Item -LiteralPath $source.FullName -NewName $target
+
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
-          archive: 'false'
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-windows-x64.msi
+          archive: false
+          if-no-files-found: error
 
   msi-arm:
     runs-on: windows-11-arm
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-      - name: Set up latest JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: latest
           cache: gradle
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
       - name: Cache Kotlin Native Compiler
         uses: actions/cache@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+
       - name: Build MSI Package
-        run: ./gradlew :desktopApp:packageMsi
-      - name: Generate file name
+        shell: pwsh
+        run: .\\gradlew.bat :desktopApp:packageMsi
+
+      - name: Name MSI Artifact
+        shell: pwsh
         run: |
-          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}.msi" >> $GITHUB_ENV
-        env:
-          RUNNER_OS: ${{ runner.os }}
-          RUNNER_ARCH: ${{ runner.arch }}
-      - name: Naming Artifacts
-        run: mv desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
+          $source = Get-ChildItem "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File |
+            Select-Object -First 1
+          if (-not $source) { throw "No MSI found" }
+          $target = "${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-windows-arm64.msi"
+          Rename-Item -LiteralPath $source.FullName -NewName $target
+
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/msi/${{ env.FILE_NAME }}
-          archive: 'false'
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-windows-arm64.msi
+          archive: false
+          if-no-files-found: error
 
   distributable-exe:
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-      - name: Set up latest JDK
+
+      - name: Set up JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: latest
           cache: gradle
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
+
       - name: Cache Kotlin Native Compiler
         uses: actions/cache@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
             ${{ runner.os }}-konan-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+
       - name: Build EXE Distributable
-        run: ./gradlew :desktopApp:createDistributable
-      - name: Generate file name
-        run: |
-          echo "FILE_NAME=${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-${env.RUNNER_OS,,}-${env.RUNNER_ARCH,,}" >> $GITHUB_ENV
-        env:
-          RUNNER_OS: ${{ runner.os }}
-          RUNNER_ARCH: ${{ runner.arch }}
+        shell: pwsh
+        run: .\\gradlew.bat :desktopApp:createDistributable
+
       - name: Upload EXE Distributable Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${env.FILE_NAME}
+          name: ${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-windows-x64-distributable
           path: desktopApp/build/compose/binaries/main/app/
+          if-no-files-found: error
