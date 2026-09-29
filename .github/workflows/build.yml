@@ -246,9 +246,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
 
-      # Amazon Corretto does not publish a Windows ARM64 JDK.
-      # Use a native ARM64 JDK for this runner and remove the vendor lock
-      # from the project's Gradle toolchain only for this CI build.
       - name: Set up ARM64 JDK
         uses: actions/setup-java@v6
         with:
@@ -257,23 +254,35 @@ jobs:
           architecture: aarch64
           cache: gradle
 
-      - name: Relax Corretto-only toolchain on ARM64
+      - name: Locate Java toolchain vendor constraint
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $files = git grep -l -E 'JvmVendorSpec\.AMAZON' -- '*.gradle' '*.gradle.kts' '*.kt' 2>$null
-          if (-not $files) {
-            throw 'Could not find JvmVendorSpec.AMAZON in the checked-out project. Update the Gradle toolchain configuration to allow the ARM64 JDK instead.'
+          $patterns = @(
+          'JvmVendorSpec',
+          'AMAZON',
+          'Amazon Corretto',
+          'javaVendor',
+          'toolchain.*vendor',
+          'vendor.*toolchain'
+          )
+          
+          $roots = @('*.gradle', '*.gradle.kts', '*.kt', '*.kts', '*.properties', '*.toml')
+          $hits = foreach ($root in $roots) {
+          Get-ChildItem -Path . -Filter $root -File -Recurse -ErrorAction SilentlyContinue |
+           Where-Object { $_.FullName -notmatch '\\(build|\.gradle|\.git|\.idea)\\' } |
+           Select-String -Pattern $patterns -CaseSensitive:$false -ErrorAction SilentlyContinue
           }
           
-          foreach ($file in $files) {
-            $content = Get-Content -LiteralPath $file -Raw
-            $updated = $content -replace 'JvmVendorSpec\.AMAZON', 'JvmVendorSpec.ANY'
-            Set-Content -LiteralPath $file -Value $updated -Encoding utf8NoBOM
-            Write-Host "Relaxed toolchain vendor in $file"
+          if ($hits) {
+          $hits | ForEach-Object { "{0}:{1}: {2}" -f $_.Path, $_.LineNumber, $_.Line.Trim() }
+          } else {
+          Write-Host 'No explicit Java vendor declaration found in Gradle/Kotlin/properties/version files.'
           }
-          
-          java -version
+
+          - name: Verify ARM64 Java
+            shell: pwsh
+            run: java -version
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6

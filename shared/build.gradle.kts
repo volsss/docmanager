@@ -9,7 +9,7 @@ plugins {
 }
 
 kotlin {
-    jvm ()
+    jvmToolchain (21)
 
     android {
        namespace = "ru.example.docmanager.shared"
@@ -17,7 +17,7 @@ kotlin {
        minSdk = libs.versions.android.minSdk.get().toInt()
     
        compilerOptions {
-           jvmTarget = JvmTarget.JVM_11
+           jvmTarget = JvmTarget.JVM_21
        }
        androidResources {
            enable = true
