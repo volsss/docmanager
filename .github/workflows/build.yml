@@ -246,12 +246,34 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
 
-      - name: Set up JDK
+      # Amazon Corretto does not publish a Windows ARM64 JDK.
+      # Use a native ARM64 JDK for this runner and remove the vendor lock
+      # from the project's Gradle toolchain only for this CI build.
+      - name: Set up ARM64 JDK
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: latest
+          java-version: 21
+          architecture: aarch64
           cache: gradle
+
+      - name: Relax Corretto-only toolchain on ARM64
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = git grep -l -E 'JvmVendorSpec\.AMAZON' -- '*.gradle' '*.gradle.kts' '*.kt' 2>$null
+          if (-not $files) {
+            throw 'Could not find JvmVendorSpec.AMAZON in the checked-out project. Update the Gradle toolchain configuration to allow the ARM64 JDK instead.'
+          }
+          
+          foreach ($file in $files) {
+            $content = Get-Content -LiteralPath $file -Raw
+            $updated = $content -replace 'JvmVendorSpec\.AMAZON', 'JvmVendorSpec.ANY'
+            Set-Content -LiteralPath $file -Value $updated -Encoding utf8NoBOM
+            Write-Host "Relaxed toolchain vendor in $file"
+          }
+          
+          java -version
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
