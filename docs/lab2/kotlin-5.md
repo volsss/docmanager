@@ -90,27 +90,25 @@ config:
 ---
 treeView-beta
     my-project/
-        🛠️ gradlew
-        🛠️ gradlew.bat
+        🛠️ gradlew ## Инструмент Gradle Wrapper для Linux и macOS
+        🛠️ gradlew.bat ## Инструмент Gradle Wrapper для Windows
         ⚙️ settings.gradle.kts ## описывает структуру Gradle build
-        ⚙️ build.gradle.kts ## Gradle build script
-        ⚙️ gradle.properties
+        ⚙️ build.gradle.kts ## Скрипт сборки Gradle
+        ⚙️ gradle.properties ## Конфигурация Gradle
         gradle/
             wrapper/
-                🛠️ gradle-wrapper.jar
-                ⚙️ gradle-wrapper.properties
+                🛠️ gradle-wrapper.jar ## Сам Gradle Wrapper
+                ⚙️ gradle-wrapper.properties ## Конфигурация Gradle Wrapper
         app/
-            ⚙️ build.gradle.kts
-            src/ ## исходный Kotlin-код
-                main/
-                    kotlin/
-                        org/example/
-                            Main.kt :::highlight ## Точка входа
+            ⚙️ build.gradle.kts ## Скрипт сборки Gradle для модуля app/
+            src/
+                main/kotlin/ ## Исходный Kotlin-код
+                    org/example/
+                        Main.kt :::highlight ## Точка входа
                     resources/
-                test/
-                    kotlin/
-                        org/example/
-                            🧪 MainTest.kt
+                test/kotlin/ ## Тестовый Kotlin-код
+                    org/example/
+                        🧪 MainTest.kt ## Точка входа для тестов
 ```
 
 Такая структура основана на стандартной модели **Gradle**-проектов и 
