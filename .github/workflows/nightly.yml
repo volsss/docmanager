@@ -1,0 +1,352 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  app_name: "docmanager"
+  app_version: "1.1.0"
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: nightly-${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            nightly-${{ runner.os }}-${{ runner.arch }}-konan-
+            nightly-${{ runner.os }}-konan-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Android App (Debug)
+        run: ./gradlew :androidApp:assembleDebug
+
+      - name: Name Android Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="$(find androidApp/build/outputs/apk/debug -maxdepth 1 -type f -name '*.apk' | head -n 1)"
+          test -n "$apk" || { echo "No APK found"; exit 1; }
+          mv "$apk" "androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-android-debug.apk"
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-android-debug.apk
+          archive: false
+          if-no-files-found: error
+
+  dmg-arm:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: nightly-${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            nightly-${{ runner.os }}-${{ runner.arch }}-konan-
+            nightly-${{ runner.os }}-konan-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build DMG Package
+        run: ./gradlew :desktopApp:packageDmg
+
+      - name: Name DMG Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          dmg="$(find desktopApp/build/compose/binaries/main/dmg -maxdepth 1 -type f -name '*.dmg' | head -n 1)"
+          test -n "$dmg" || { echo "No DMG found"; exit 1; }
+          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-macos-arm64.dmg"
+
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-macos-arm64.dmg
+          archive: false
+          if-no-files-found: error
+
+  dmg:
+    runs-on: macos-26-intel
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: nightly-${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            nightly-${{ runner.os }}-${{ runner.arch }}-konan-
+            nightly-${{ runner.os }}-konan-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build DMG Package
+        run: ./gradlew :desktopApp:packageDmg
+
+      - name: Name DMG Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          dmg="$(find desktopApp/build/compose/binaries/main/dmg -maxdepth 1 -type f -name '*.dmg' | head -n 1)"
+          test -n "$dmg" || { echo "No DMG found"; exit 1; }
+          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-macos-x64.dmg"
+
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-macos-x64.dmg
+          archive: false
+          if-no-files-found: error
+
+  deb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: nightly-${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            nightly-${{ runner.os }}-${{ runner.arch }}-konan-
+            nightly-${{ runner.os }}-konan-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build DEB Package
+        run: ./gradlew :desktopApp:packageDeb
+
+      - name: Name DEB Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          deb="$(find desktopApp/build/compose/binaries/main/deb -maxdepth 1 -type f -name '*.deb' | head -n 1)"
+          test -n "$deb" || { echo "No DEB found"; exit 1; }
+          mv "$deb" "desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-linux-x64.deb"
+
+      - name: Upload DEB Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-linux-x64.deb
+          archive: false
+          if-no-files-found: error
+
+  msi:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: nightly-${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            nightly-${{ runner.os }}-${{ runner.arch }}-konan-
+            nightly-${{ runner.os }}-konan-
+
+      - name: Build MSI Package
+        shell: pwsh
+        run: .\\gradlew.bat :desktopApp:packageMsi
+
+      - name: Name MSI Artifact
+        shell: pwsh
+        run: |
+          $source = Get-ChildItem "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File |
+            Select-Object -First 1
+          if (-not $source) { throw "No MSI found" }
+          $target = "${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-windows-x64.msi"
+          Rename-Item -LiteralPath $source.FullName -NewName $target
+
+      - name: Upload MSI Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-windows-x64.msi
+          archive: false
+          if-no-files-found: error
+
+  msi-arm:
+    runs-on: windows-11-arm
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up ARM64 JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+          architecture: aarch64
+          cache: gradle
+
+      - name: Locate Java toolchain vendor constraint
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $patterns = @(
+          'JvmVendorSpec',
+          'AMAZON',
+          'Amazon Corretto',
+          'javaVendor',
+          'toolchain.*vendor',
+          'vendor.*toolchain'
+          )
+          
+          $roots = @('*.gradle', '*.gradle.kts', '*.kt', '*.kts', '*.properties', '*.toml')
+          $hits = foreach ($root in $roots) {
+          Get-ChildItem -Path . -Filter $root -File -Recurse -ErrorAction SilentlyContinue |
+           Where-Object { $_.FullName -notmatch '\\(build|\.gradle|\.git|\.idea)\\' } |
+           Select-String -Pattern $patterns -CaseSensitive:$false -ErrorAction SilentlyContinue
+          }
+          
+          if ($hits) {
+          $hits | ForEach-Object { "{0}:{1}: {2}" -f $_.Path, $_.LineNumber, $_.Line.Trim() }
+          } else {
+          Write-Host 'No explicit Java vendor declaration found in Gradle/Kotlin/properties/version files.'
+          }
+
+      - name: Verify ARM64 Java
+        shell: pwsh
+        run: java -version
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: nightly-${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            nightly-${{ runner.os }}-${{ runner.arch }}-konan-
+            nightly-${{ runner.os }}-konan-
+
+      - name: Build MSI Package
+        shell: pwsh
+        run: .\\gradlew.bat :desktopApp:packageMsi
+
+      - name: Name MSI Artifact
+        shell: pwsh
+        run: |
+          $source = Get-ChildItem "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File |
+            Select-Object -First 1
+          if (-not $source) { throw "No MSI found" }
+          $target = "${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-windows-arm64.msi"
+          Rename-Item -LiteralPath $source.FullName -NewName $target
+
+      - name: Upload MSI Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-windows-arm64.msi
+          archive: false
+          if-no-files-found: error
+
+  distributable-exe:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: nightly-${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            nightly-${{ runner.os }}-${{ runner.arch }}-konan-
+            nightly-${{ runner.os }}-konan-
+
+      - name: Build EXE Distributable
+        shell: pwsh
+        run: .\\gradlew.bat :desktopApp:createDistributable
+
+      - name: Upload EXE Distributable Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.app_name }}-${{ env.app_version }}+${{ github.run_number }}-nightly-windows-x64-distributable
+          path: desktopApp/build/compose/binaries/main/app/
+          if-no-files-found: error
