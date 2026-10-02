@@ -15,6 +15,8 @@
     - [Теория Kotlin: Часть 1](lab2/kotlin-1.md)
     - [Теория Kotlin: Часть 2](lab2/kotlin-2.md)
     - [Теория Kotlin: Часть 3](lab2/kotlin-3.md)
+    - [Теория Kotlin: Часть 4](lab2/kotlin-4.md)
+    - [Теория Kotlin: Часть 5](lab2/kotlin-5.md)
     - [Практическое задание 2](lab2/practice.md)
 
 ---
