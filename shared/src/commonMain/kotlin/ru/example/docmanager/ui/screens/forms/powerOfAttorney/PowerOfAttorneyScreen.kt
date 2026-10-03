@@ -3,7 +3,6 @@ package ru.example.docmanager.ui.screens.forms.powerOfAttorney
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,13 +40,11 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
 import ru.example.docmanager.di.getDocumentProcessor
-import ru.example.docmanager.database.models.documents.PowerOfAttorney
 import ru.example.docmanager.database.models.references.Individual
 import ru.example.docmanager.database.models.references.Organization
 import ru.example.docmanager.database.models.references.Product
 import ru.example.docmanager.database.models.references.Supplier
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
-import ru.example.docmanager.ui.screens.DATE_FORMAT
 import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
 import ru.example.docmanager.ui.screens.forms.ReferenceDropdown
 import ru.example.docmanager.viewmodel.ReferenceViewModel

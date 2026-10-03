@@ -13,7 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import ru.example.docmanager.database.models.documents.Document
-import ru.example.docmanager.ui.screens.DATE_FORMAT
+import ru.example.docmanager.ui.Utils
 import kotlin.collections.forEach
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +66,7 @@ fun <T: Document> DocumentNumberDropdown(
                         text = {
                             Column {
                                 Text(
-                                    "№ ${doc.header.number} от ${DATE_FORMAT.format(doc.header.dischargeDate)}",
+                                    "№ ${doc.header.number} от ${Utils.DATE_FORMAT.format(doc.header.dischargeDate)}",
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }

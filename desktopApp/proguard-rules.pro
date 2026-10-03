@@ -16,9 +16,8 @@
 -keep class org.jetbrains.compose.** { *; }
 -keep class org.jetbrains.skiko.** { *; }
 
-# Keep Coroutines & Serialization
+# Keep Coroutines
 -keep class kotlinx.coroutines.** { *; }
--keep class kotlinx.serialization.** { *; }
 -keep class kotlinx.datetime.** { *; }
 
 # Keep Koin

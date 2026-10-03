@@ -16,14 +16,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
-import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.database.models.references.Reference
 import ru.example.docmanager.database.repositories.references.ReferenceRepository
 import ru.example.docmanager.ui.StringRegistry
+import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.viewmodel.ReferenceViewModel
-
-val DATE_FORMAT = LocalDate.Format { day(); char('.'); monthNumber(); char('.'); year() }
 
 @Composable
 fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
@@ -38,12 +36,6 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
                 item.id to item.toMap()
             }
         )
-    }
-
-    fun updateFieldValue(itemId: Int, fieldName: String, newValue: Any) {
-        val currentItemFields = fieldValues[itemId].orEmpty().toMutableMap()
-        currentItemFields[fieldName] = newValue
-        fieldValues = fieldValues + (itemId to currentItemFields)
     }
 
     Text(
@@ -62,7 +54,11 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
                 referenceRepository = reference,
                 item = item,
                 currentValues = fieldValues[item.id].orEmpty(),
-                onFieldChange = ::updateFieldValue,
+                onFieldChange = { itemId, fieldName, newValue ->
+                    val currentItemFields = fieldValues[itemId].orEmpty().toMutableMap()
+                    currentItemFields[fieldName] = newValue
+                    fieldValues = fieldValues + (itemId to currentItemFields)
+                },
                 referenceViewModel = referenceViewModel,
                 scope = scope,
                 windowSizeClass = windowSizeClass
@@ -106,11 +102,23 @@ fun ReferenceInput(
             InputField(
                 label = stringResource(StringRegistry.get(name)),
                 value = currentValues[name] ?: value,
-                onValueChange = { newValue -> onFieldChange(item.id, name, newValue) },
+                onValueChange = { newValue ->
+                    onFieldChange(
+                        item.id,
+                        name,
+                        newValue
+                    )
+                },
                 windowSizeClass = windowSizeClass
             )
         }
-        IconButton(onClick = { scope.launch { referenceViewModel.removeItem(referenceRepository, item) } }) {
+        IconButton(
+            onClick = {
+                scope.launch {
+                    referenceViewModel.removeItem(referenceRepository, item)
+                }
+            }
+        ) {
             Icon(Icons.Filled.Remove, "Удалить")
         }
     }
@@ -123,7 +131,8 @@ fun RowScope.InputField(
     onValueChange: (Any) -> Unit,
     windowSizeClass: WindowSizeClass
 ) {
-    val modifier = if (windowSizeClass.isWidthAtLeastBreakpoint(840)) Modifier.weight(1f) else Modifier.widthIn(min = 300.dp)
+    val modifier = if (windowSizeClass.isWidthAtLeastBreakpoint(840))
+        Modifier.weight(1f) else Modifier.widthIn(min = 300.dp)
 
     when (value) {
         is String -> {
@@ -135,7 +144,9 @@ fun RowScope.InputField(
             )
         }
         is Int -> {
-            var textValue by remember(value) { mutableStateOf(value.toString()) }
+            var textValue by remember(value) {
+                mutableStateOf(value.toString())
+            }
             OutlinedTextField(
                 label = { Text(label) },
                 modifier = modifier,
@@ -147,14 +158,18 @@ fun RowScope.InputField(
             )
         }
         is LocalDate -> {
-            var textValue by remember(value) { mutableStateOf(value.format(DATE_FORMAT)) }
+            var textValue by remember(value) {
+                mutableStateOf(value.format(Utils.DATE_FORMAT))
+            }
             OutlinedTextField(
                 label = { Text(label) },
                 modifier = modifier,
                 value = textValue,
                 onValueChange = { newText ->
                     textValue = newText
-                    runCatching { LocalDate.parse(newText, DATE_FORMAT) }.getOrNull()?.let(onValueChange)
+                    runCatching {
+                        LocalDate.parse(newText, Utils.DATE_FORMAT)
+                    }.getOrNull()?.let(onValueChange)
                 }
             )
         }

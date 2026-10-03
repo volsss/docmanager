@@ -26,7 +26,6 @@ import ru.example.docmanager.viewmodel.ReferenceViewModel
 import ru.example.docmanager.viewmodel.SettingsViewModel
 import ru.example.docmanager.viewmodel.Tab
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DashboardScreen(
     dashboardViewModel: DashboardViewModel,

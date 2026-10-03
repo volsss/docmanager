@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -38,13 +37,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.example.docmanager.di.Platform
 import ru.example.docmanager.di.getPlatform
+import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.viewmodel.ConnectionViewModel
-
-object DefaultValues {
-    const val JVM_JDBC = "jdbc:h2:~/ru.example.docmanager/documents;MODE=MySQL"
-    const val ANDROID_JDBC = "jdbc:h2:/data/data/ru.example.docmanager/documents;MODE=MySQL"
-    const val POSTGRES_JDBC = "jdbc:postgresql://localhost:5432/documents"
-}
 
 @Composable
 fun ConnectionScreen(
@@ -77,6 +71,7 @@ fun ConnectionScreen(
             ) {
                 OutlinedTextField(
                     value = jdbcUrl,
+                    readOnly = driver == Utils.H2_DRIVER,
                     onValueChange = { jdbcUrl = it },
                     label = { Text("JDBC URL*") },
                     supportingText = { Text("*обязательно для заполнения") },
@@ -89,11 +84,11 @@ fun ConnectionScreen(
                     selectedItem = driver,
                     onItemSelected = {
                         driver = it
-                        if (driver == "org.postgresql.Driver")
-                            jdbcUrl = DefaultValues.POSTGRES_JDBC
-                        if (driver == "org.h2.Driver")
-                            jdbcUrl = if (platform == Platform.JVM) DefaultValues.JVM_JDBC
-                            else DefaultValues.ANDROID_JDBC
+                        if (driver == Utils.POSTGRES_DRIVER)
+                            jdbcUrl = Utils.DEFAULT_POSTGRES_JDBC
+                        if (driver == Utils.H2_DRIVER)
+                            jdbcUrl = if (platform == Platform.JVM) Utils.JVM_H2_JDBC
+                            else Utils.ANDROID_H2_JDBC
                     }
                 )
 
@@ -134,7 +129,7 @@ fun ConnectionScreen(
                             viewModel.setError("URL не может быть пустым")
                             return@Button
                         }
-                        if (driver == "org.postgresql.Driver" && (user.isBlank() || password.isBlank())) {
+                        if (driver == Utils.POSTGRES_DRIVER && (user.isBlank() || password.isBlank())) {
                             viewModel.setError("Пользователь и пароль не могут быть пустыми для PostgreSQL")
                             return@Button
                         }
@@ -184,14 +179,14 @@ fun DriverDropDown(
             DropdownMenuItem(
                 text = { Text("H2") },
                 onClick = {
-                    onItemSelected("org.h2.Driver")
+                    onItemSelected(Utils.H2_DRIVER)
                     expanded = false
                 }
             )
             DropdownMenuItem(
-                text = { Text("PostgreSQL") },
+                text = { Text(Utils.POSTGRES_DRIVER) },
                 onClick = {
-                    onItemSelected("org.postgresql.Driver")
+                    onItemSelected("")
                     expanded = false
                 }
             )

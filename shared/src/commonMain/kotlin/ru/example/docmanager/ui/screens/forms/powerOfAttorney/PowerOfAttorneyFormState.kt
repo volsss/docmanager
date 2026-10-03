@@ -4,13 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
-import ru.example.docmanager.database.models.documents.Document
 import ru.example.docmanager.database.models.documents.PowerOfAttorney
 import ru.example.docmanager.database.models.references.Individual
 import ru.example.docmanager.database.models.references.Organization
 import ru.example.docmanager.database.models.references.Product
 import ru.example.docmanager.database.models.references.Supplier
-import ru.example.docmanager.ui.screens.DATE_FORMAT
+import ru.example.docmanager.ui.Utils
 
 class PowerOfAttorneyFormState(
     val today: LocalDate,
@@ -21,8 +20,8 @@ class PowerOfAttorneyFormState(
     var numberDropdownExpanded by mutableStateOf(false)
 
     var number by mutableStateOf("1")
-    var dischargeDate by mutableStateOf(DATE_FORMAT.format(today))
-    var endDate by mutableStateOf(DATE_FORMAT.format(defaultEndDate))
+    var dischargeDate by mutableStateOf(Utils.DATE_FORMAT.format(today))
+    var endDate by mutableStateOf(Utils.DATE_FORMAT.format(defaultEndDate))
     var selectedOrganization by mutableStateOf<Organization?>(null)
     var selectedIndividual by mutableStateOf<Individual?>(null)
     var selectedSupplier by mutableStateOf<Supplier?>(null)
@@ -44,8 +43,8 @@ class PowerOfAttorneyFormState(
             (existingDocuments.maxOfOrNull { it.header.number } ?: 0) + 1
         } else 1
         number = nextNumber.toString()
-        dischargeDate = DATE_FORMAT.format(today)
-        endDate = DATE_FORMAT.format(defaultEndDate)
+        dischargeDate = Utils.DATE_FORMAT.format(today)
+        endDate = Utils.DATE_FORMAT.format(defaultEndDate)
         selectedOrganization = organizations.firstOrNull()
         selectedIndividual = individuals.firstOrNull()
         selectedSupplier = suppliers.firstOrNull()
@@ -63,8 +62,8 @@ class PowerOfAttorneyFormState(
     ) {
         selectedDocumentId = doc.header.id
         number = doc.header.number.toString()
-        dischargeDate = DATE_FORMAT.format(doc.header.dischargeDate)
-        endDate = DATE_FORMAT.format(doc.header.endDate)
+        dischargeDate = Utils.DATE_FORMAT.format(doc.header.dischargeDate)
+        endDate = Utils.DATE_FORMAT.format(doc.header.endDate)
         selectedOrganization = organizations.firstOrNull { it.id == doc.header.organization.id } ?: doc.header.organization
         selectedIndividual = individuals.firstOrNull { it.id == doc.header.individual.id } ?: doc.header.individual
         selectedSupplier = suppliers.firstOrNull { it.id == doc.header.supplier.id } ?: doc.header.supplier
@@ -101,12 +100,12 @@ class PowerOfAttorneyFormState(
     }
 
     fun parseDischargeDate(): LocalDate {
-        return runCatching { DATE_FORMAT.parse(dischargeDate) }
+        return runCatching { Utils.DATE_FORMAT.parse(dischargeDate) }
             .getOrElse { runCatching { LocalDate.parse(dischargeDate) }.getOrElse { today } }
     }
 
     fun parseEndDate(): LocalDate {
-        return runCatching { DATE_FORMAT.parse(endDate) }
+        return runCatching { Utils.DATE_FORMAT.parse(endDate) }
             .getOrElse { runCatching { LocalDate.parse(endDate) }.getOrElse { defaultEndDate } }
     }
 

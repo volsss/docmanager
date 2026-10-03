@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.todayIn
+import ru.example.docmanager.ui.Utils
 import kotlin.time.Clock
 
 data class Individual(
@@ -30,6 +31,8 @@ data class Individual(
         series = (fields["individualSeries"] ?: series) as String,
         number = (fields["individualNumber"] ?: number) as String,
         issued = (fields["individualIssued"] ?: issued) as String,
-        date = (fields["individualDate"] ?: date) as LocalDate,
+        date = (Utils.DATE_FORMAT.parseOrNull(
+            fields["individualDate"] as CharSequence
+        ) ?: date),
     )
 }
