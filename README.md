@@ -59,6 +59,16 @@
 - - [X] Any
 - - [X] Extension functions
 - - [X] Extension functions
+- [ ] **V. Пятая часть**
+- - [ ] enum class
+- - [ ] sealed class и sealed interface
+- - [ ] Nothing
+- - [ ] Generics
+- - [ ] object
+- - [ ] companion object
+- - [ ] operator
+- - [ ] Делегирование
+- - [ ] Coroutines
 
 ### Gradle:
 - [ ] **I. Первая часть**
