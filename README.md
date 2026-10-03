@@ -20,11 +20,9 @@
   - Hot reload: `./gradlew :desktopApp:hotRun --auto`
   - Обычное: `./gradlew :desktopApp:run`
 
----
-
 ## Документация
 
-### Kotlin todo:
+### Kotlin:
 - [X] **I. Первая часть**
 - - [X] Точка входа
 - - [X] Скрипты
@@ -61,19 +59,19 @@
 - - [X] Extension functions
 - - [X] Extension functions
 
-### Gradle todo:
+### Gradle:
 - [ ] **I. Первая часть**
 - [ ] **II. Вторая часть**
 
-### Android todo:
+### Android:
 - [ ] **I. Первая часть**
 - [ ] **II. Вторая часть**
 
-### Compose todo:
+### Compose:
 - [ ] **I. Первая часть**
 - [ ] **II. Вторая часть**
 
-### Docmanager App:
+### docmanager App:
 - [ ] **I. Первая часть**
 - [ ] **II. Вторая часть**
 - [ ] **III. Третья часть**
@@ -81,6 +79,7 @@
 - [ ] **V. Пятая часть**
 - [ ] **VI. Шестая часть**
 
+---
 
 ### Литература
 
