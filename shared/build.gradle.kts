@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -47,7 +46,6 @@ kotlin {
             implementation(libs.exposed.javatime)
             implementation(libs.exposed.migration.core)
             implementation(libs.exposed.migration.jdbc)
-            implementation(libs.kotlinx.serializationJson)
             implementation(libs.poi.ooxml)
             implementation(libs.hikaricp)
             implementation(libs.koin.core)
