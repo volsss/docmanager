@@ -1,30 +1,33 @@
 <!-- docs/_sidebar.md -->
 
 - [Главная](/)
-
 ---
-
-- [Лабораторная работа 1](lab1/index.md)
-    - [Установка IDE](lab1/getting-started.md)
-    - [Настройка IDE и плагинов](lab1/install-plugins.md)
-    - [Практическое задание 1](lab1/practice.md)
-
+- [✅ Лабораторная работа 1](lab1/index.md)
+  - [Установка IDE](lab1/getting-started.md)
+  - [Настройка IDE и плагинов](lab1/install-plugins.md)
+  - [Практическое задание ](lab1/practice.md)
 ---
-
-- [Лабораторная работа 2](lab2/index.md)
-    - [Теория Kotlin: Часть 1](lab2/kotlin-1.md)
-    - [Теория Kotlin: Часть 2](lab2/kotlin-2.md)
-    - [Теория Kotlin: Часть 3](lab2/kotlin-3.md)
-    - [Теория Kotlin: Часть 4](lab2/kotlin-4.md)
-    - [Теория Kotlin: Часть 5](lab2/kotlin-5.md)
-    - [Теория Gradle: Часть 1](lab2/gradle-1.md)
-    - [Теория Gradle: Часть 2](lab2/gradle-2.md)
-    - [Теория Корутин](lab2/corutines.md)
-    - [Практическое задание 2](lab2/practice.md)
-
+- [✅ Лабораторная работа 2](lab2/index.md)
+  - [Теория Kotlin: Часть 1](lab2/kotlin-1.md)
+  - [Теория Kotlin: Часть 2](lab2/kotlin-2.md)
+  - [Практическое задание ](lab2/practice.md)
 ---
-
 - [Лабораторная работа 3](lab3/index.md)
-    - [Практическое задание 3](lab3/practice.md)
-
+  - [Теория Kotlin: Часть 3](lab3/kotlin-3.md)
+  - [Теория Kotlin: Часть 4](lab3/kotlin-4.md)
+  - [⚠️ Практическое задание ](lab3/practice.md)
+---
+- [Лабораторная работа 4](lab4/index.md)
+  - [Теория Kotlin: Часть 5](lab4/kotlin-5.md)
+  - [⚠️ Практическое задание ](lab4/practice.md)
+---
+- [⚠️ Лабораторная работа 5](lab5/index.md)
+  - [Теория Gradle: Часть 1](lab5/gradle-1.md)
+  - [Теория Gradle: Часть 2](lab5/gradle-2.md)
+  - [Практическое задание ](lab5/practice.md)
+---
+- [Лабораторная работа 6](lab6/index.md)
+  - [Теория Корутин](lab6/corutines.md)
+  - [⚠️ Практическое задание ](lab6/practice.md)
+---
 * [GitHub](https://github.com/volsss/docmanager)
