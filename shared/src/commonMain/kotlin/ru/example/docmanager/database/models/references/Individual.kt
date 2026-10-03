@@ -22,7 +22,7 @@ data class Individual(
         "individualSeries" to series,
         "individualNumber" to number,
         "individualIssued" to issued,
-        "individualDate" to date.format(LocalDate.Formats.ISO),
+        "individualDate" to date.format(Utils.DATE_FORMAT),
     )
 
     override fun copyWithFields(fields: Map<String, Any>) = copy(
