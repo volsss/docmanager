@@ -16,9 +16,9 @@ class PowerOfAttorney(
 
     data class Header(
         override val id: Int,
-        override var organization: Organization,
         override var number: Int,
         override var dischargeDate: LocalDate,
+        var organization: Organization,
         var endDate: LocalDate,
         var individual: Individual,
         var supplier: Supplier,

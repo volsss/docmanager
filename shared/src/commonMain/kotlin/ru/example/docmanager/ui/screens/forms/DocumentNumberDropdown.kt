@@ -62,18 +62,12 @@ fun <T: Document> DocumentNumberDropdown(
                 )
             } else {
                 existingDocuments.forEach { doc ->
-                    val orgName = doc.header.organization.name.ifBlank { "Организация #${doc.header.organization.id}" }
                     DropdownMenuItem(
                         text = {
                             Column {
                                 Text(
                                     "№ ${doc.header.number} от ${DATE_FORMAT.format(doc.header.dischargeDate)}",
                                     style = MaterialTheme.typography.bodyMedium
-                                )
-                                Text(
-                                    orgName,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         },

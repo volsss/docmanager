@@ -7,6 +7,7 @@ import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame
 import java.awt.GraphicsEnvironment
+import java.awt.print.PrinterJob
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
