@@ -1,8 +1,8 @@
 package ru.example.docmanager.database.repositories.documents
 
-import ru.example.docmanager.database.models.documents.DocumentModel
+import ru.example.docmanager.database.models.documents.Document
 
-interface DocumentRepository<T: DocumentModel> {
+interface DocumentRepository<T: Document> {
     suspend fun createDocument(document: T)
     suspend fun updateDocument(document: T)
     suspend fun deleteDocument(id: Int)

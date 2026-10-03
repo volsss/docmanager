@@ -1,5 +1,6 @@
 package ru.example.docmanager.database.models.documents
 
-interface DocumentModel {
+interface Document {
+    val header: DocumentHeader
     fun replacements(): Map<String, String>
 }

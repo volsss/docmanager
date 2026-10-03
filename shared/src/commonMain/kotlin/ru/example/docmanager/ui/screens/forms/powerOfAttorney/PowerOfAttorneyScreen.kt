@@ -53,6 +53,7 @@ import ru.example.docmanager.database.models.references.Product
 import ru.example.docmanager.database.models.references.Supplier
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.ui.screens.DATE_FORMAT
+import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
 import ru.example.docmanager.ui.screens.forms.ReferenceDropdown
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 import kotlin.time.Clock
@@ -303,6 +304,7 @@ private fun PowerOfAttorneyBodySection(
     modifier: Modifier = Modifier
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(840)
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -316,7 +318,7 @@ private fun PowerOfAttorneyBodySection(
 
         Column(
             Modifier.fillMaxSize().then(
-                if (windowSizeClass.isWidthAtLeastBreakpoint(840)) Modifier else Modifier.horizontalScroll(rememberScrollState())
+                if (isWide) Modifier else Modifier.horizontalScroll(rememberScrollState())
             )
         ) {
             formState.bodyItems.forEachIndexed { index, item ->
@@ -395,76 +397,6 @@ private fun BodyItemRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DocumentNumberDropdown(
-    number: String,
-    onNumberChange: (String) -> Unit,
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    existingDocuments: List<PowerOfAttorney>,
-    onNewDocumentClick: () -> Unit,
-    onDocumentSelected: (PowerOfAttorney) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = onExpandedChange,
-        modifier = modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = number,
-            onValueChange = onNumberChange,
-            label = { Text("Номер документа (выберите из списка или введите)") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
-                .fillMaxWidth(),
-            singleLine = true
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Создать новый документ") },
-                onClick = {
-                    onNewDocumentClick()
-                    onExpandedChange(false)
-                }
-            )
-            if (existingDocuments.isEmpty()) {
-                DropdownMenuItem(
-                    text = { Text("Нет сохраненных документов в базе") },
-                    onClick = {},
-                    enabled = false
-                )
-            } else {
-                existingDocuments.forEach { doc ->
-                    val orgName = doc.header.organization.name.ifBlank { "Организация #${doc.header.organization.id}" }
-                    DropdownMenuItem(
-                        text = {
-                            Column {
-                                Text(
-                                    "№ ${doc.header.number} от ${DATE_FORMAT.format(doc.header.dischargeDate)}",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Text(
-                                    orgName,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        },
-                        onClick = { onDocumentSelected(doc) }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PowerOfAttorneyActions(
     formState: PowerOfAttorneyFormState,

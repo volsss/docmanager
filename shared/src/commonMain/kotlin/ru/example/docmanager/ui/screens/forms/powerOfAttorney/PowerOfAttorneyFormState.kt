@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
+import ru.example.docmanager.database.models.documents.Document
 import ru.example.docmanager.database.models.documents.PowerOfAttorney
 import ru.example.docmanager.database.models.references.Individual
 import ru.example.docmanager.database.models.references.Organization

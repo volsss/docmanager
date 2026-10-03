@@ -8,22 +8,22 @@ import ru.example.docmanager.database.models.references.Product
 import ru.example.docmanager.database.models.references.Supplier
 
 class PowerOfAttorney(
-    val header: Header,
+    override val header: Header,
     val body: List<Body>
-) : DocumentModel {
+) : Document {
 
     override fun replacements(): Map<String, String> = header.replacements()
 
     data class Header(
-        val id: Int,
-        var organization: Organization,
-        var number: Int,
-        var dischargeDate: LocalDate,
+        override val id: Int,
+        override var organization: Organization,
+        override var number: Int,
+        override var dischargeDate: LocalDate,
         var endDate: LocalDate,
         var individual: Individual,
         var supplier: Supplier,
         var supplierAgreement: String
-    ): DocumentHeaderModel {
+    ): DocumentHeader {
         override fun replacements(): Map<String, String> = mapOf(
             "number" to number.toString(),
             "dischargeDate" to dischargeDate.format(LocalDate.Formats.ISO),
