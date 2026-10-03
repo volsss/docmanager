@@ -2,7 +2,7 @@ package ru.example.docmanager.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import ru.example.docmanager.database.models.references.ReferenceModel
+import ru.example.docmanager.database.models.references.Reference
 import ru.example.docmanager.database.repositories.references.ReferenceRepository
 import ru.example.docmanager.database.repositories.references.IndividualsRepository
 import ru.example.docmanager.database.repositories.references.OrganizationsRepository
@@ -15,10 +15,10 @@ class ReferenceViewModel(
     val productsRepository: ProductsRepository,
     val suppliersRepository: SuppliersRepository
 ) {
-    val selectedReferenceRepository: StateFlow<ReferenceRepository<out ReferenceModel>?>
-        field = MutableStateFlow<ReferenceRepository<out ReferenceModel>?>(null)
-    val referencesItems: StateFlow<Map<ReferenceRepository<out ReferenceModel>, List<ReferenceModel>>?>
-        field = MutableStateFlow<Map<ReferenceRepository<out ReferenceModel>, List<ReferenceModel>>?>(null)
+    val selectedReferenceRepository: StateFlow<ReferenceRepository<out Reference>?>
+        field = MutableStateFlow<ReferenceRepository<out Reference>?>(null)
+    val referencesItems: StateFlow<Map<ReferenceRepository<out Reference>, List<Reference>>?>
+        field = MutableStateFlow<Map<ReferenceRepository<out Reference>, List<Reference>>?>(null)
 
     val references = listOf(
         individualsRepository,
@@ -27,23 +27,23 @@ class ReferenceViewModel(
         suppliersRepository
     )
 
-    suspend fun removeItem(referenceRepository: ReferenceRepository<out ReferenceModel>, item: ReferenceModel) {
+    suspend fun removeItem(referenceRepository: ReferenceRepository<out Reference>, item: Reference) {
         referencesItems.value?.let { current ->
             referenceRepository.deleteItem(item.id)
             referencesItems.value = current + (referenceRepository to ((current[referenceRepository] ?: emptyList()).filter { it != item }))
         }
     }
 
-    suspend fun <T : ReferenceModel> newItem(referenceRepository: ReferenceRepository<T>) {
+    suspend fun <T : Reference> newItem(referenceRepository: ReferenceRepository<T>) {
         referencesItems.value?.let { current ->
-            val created = referenceRepository.newItem()
+            val created = referenceRepository.createItem()
             referencesItems.value = current + (referenceRepository to ((current[referenceRepository] ?: emptyList()) + created))
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     suspend fun saveAll(
-        referenceRepository: ReferenceRepository<out ReferenceModel>,
+        referenceRepository: ReferenceRepository<out Reference>,
         itemId: Int,
         fields: Map<String, Any>
     ) {
@@ -51,7 +51,7 @@ class ReferenceViewModel(
         val updatedItems = currentItems.map { item ->
             if (item.id == itemId) {
                 val newItem = item.copyWithFields(fields)
-                (referenceRepository as ReferenceRepository<ReferenceModel>).updateItem(newItem)
+                (referenceRepository as ReferenceRepository<Reference>).updateItem(newItem)
                 newItem
             } else item
         }
@@ -62,7 +62,7 @@ class ReferenceViewModel(
         referencesItems.value = references.associateWith { it.getItems() }
     }
 
-    fun <T : ReferenceModel> selectReference(referenceRepository: ReferenceRepository<T>) {
+    fun <T : Reference> selectReference(referenceRepository: ReferenceRepository<T>) {
         selectedReferenceRepository.value = referenceRepository
     }
 }

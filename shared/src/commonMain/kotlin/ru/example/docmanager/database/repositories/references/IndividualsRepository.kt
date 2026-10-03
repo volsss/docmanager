@@ -32,7 +32,7 @@ class IndividualsRepository : ReferenceRepository<Individual>("individuals") {
         IndividualsTable.selectAll().map { it.toIndividual() }
     }
 
-    override suspend fun newItem(): Individual = createItem(Individual())
+    override suspend fun createItem(): Individual = createItem(Individual())
 
     override suspend fun createItem(item: Individual): Individual = dbQuery {
         val newId = IndividualsTable.insertAndGetId {
@@ -43,7 +43,8 @@ class IndividualsRepository : ReferenceRepository<Individual>("individuals") {
             it[issued] = item.issued
             it[date] = item.date.toJavaLocalDate()
         }.value
-        item.copy(id = newId)
+        item.id = newId
+        item
     }
 
     override suspend fun updateItem(item: Individual): Unit = dbQuery {

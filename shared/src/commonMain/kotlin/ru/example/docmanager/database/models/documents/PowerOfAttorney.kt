@@ -12,7 +12,7 @@ class PowerOfAttorney(
     val body: List<Body>
 ) : Document {
 
-    override fun replacements(): Map<String, String> = header.replacements()
+    override fun toMap(): Map<String, String> = header.toMap()
 
     data class Header(
         override val id: Int,
@@ -24,12 +24,14 @@ class PowerOfAttorney(
         var supplier: Supplier,
         var supplierAgreement: String
     ): DocumentHeader {
-        override fun replacements(): Map<String, String> = mapOf(
+        override fun toMap(): Map<String, String> = mapOf(
             "number" to number.toString(),
             "dischargeDate" to dischargeDate.format(LocalDate.Formats.ISO),
             "endDate" to endDate.format(LocalDate.Formats.ISO),
             "supplierAgreement" to supplierAgreement,
-        ) + organization.replacements() + individual.replacements() + supplier.replacements()
+        ) + organization.toMap() +
+                individual.toMap() +
+                supplier.toMap()
     }
 
     data class Body (

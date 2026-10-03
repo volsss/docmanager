@@ -25,11 +25,12 @@ class SuppliersRepository : ReferenceRepository<Supplier>("suppliers") {
         SuppliersTable.selectAll().map { it.toSupplier() }
     }
 
-    override suspend fun newItem(): Supplier = createItem(Supplier())
+    override suspend fun createItem(): Supplier = createItem()
 
     override suspend fun createItem(item: Supplier): Supplier = dbQuery {
-        val newId = SuppliersTable.insertAndGetId { it[name] = item.name }.value
-        item.copy(id = newId)
+        val newId = SuppliersTable.insertAndGetId { it[name] = "" }.value
+        item.id = newId
+        item
     }
 
     override suspend fun updateItem(item: Supplier): Unit = dbQuery {

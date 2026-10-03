@@ -28,7 +28,7 @@ class OrganizationsRepository : ReferenceRepository<Organization>("organizations
         OrganizationsTable.selectAll().map { it.toOrganization() }
     }
 
-    override suspend fun newItem(): Organization = createItem(Organization())
+    override suspend fun createItem(): Organization = createItem(Organization())
 
     override suspend fun createItem(item: Organization): Organization = dbQuery {
         val newId = OrganizationsTable.insertAndGetId {
@@ -37,7 +37,8 @@ class OrganizationsRepository : ReferenceRepository<Organization>("organizations
             it[payer] = item.payer
             it[account] = item.account
         }.value
-        item.copy(id = newId)
+        item.id = newId
+        item
     }
 
     override suspend fun updateItem(item: Organization): Unit = dbQuery {

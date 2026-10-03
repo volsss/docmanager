@@ -25,11 +25,12 @@ class ProductsRepository : ReferenceRepository<Product>("products") {
         ProductsTable.selectAll().map { it.toProduct() }
     }
 
-    override suspend fun newItem(): Product = createItem(Product())
+    override suspend fun createItem(): Product = createItem(Product())
 
     override suspend fun createItem(item: Product): Product = dbQuery {
         val newId = ProductsTable.insertAndGetId { it[name] = item.name }.value
-        item.copy(id = newId)
+        item.id = newId
+        item
     }
 
     override suspend fun updateItem(item: Product): Unit = dbQuery {

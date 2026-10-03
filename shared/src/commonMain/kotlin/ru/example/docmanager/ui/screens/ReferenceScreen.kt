@@ -18,7 +18,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.database.models.references.ReferenceModel
+import ru.example.docmanager.database.models.references.Reference
 import ru.example.docmanager.database.repositories.references.ReferenceRepository
 import ru.example.docmanager.ui.StringRegistry
 import ru.example.docmanager.viewmodel.ReferenceViewModel
@@ -35,7 +35,7 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
     var fieldValues by remember(referenceItems) {
         mutableStateOf(
             referenceItems.associate { item ->
-                item.id to item.asFields().associate { it.name to it.value }
+                item.id to item.toMap()
             }
         )
     }
@@ -88,8 +88,8 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
 
 @Composable
 fun ReferenceInput(
-    referenceRepository: ReferenceRepository<out ReferenceModel>,
-    item: ReferenceModel,
+    referenceRepository: ReferenceRepository<out Reference>,
+    item: Reference,
     currentValues: Map<String, Any>,
     onFieldChange: (itemId: Int, fieldName: String, newValue: Any) -> Unit,
     referenceViewModel: ReferenceViewModel,
@@ -102,11 +102,11 @@ fun ReferenceInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(item.id.toString())
-        item.asFields().forEach { field ->
+        item.toMap().forEach { (name, value) ->
             InputField(
-                label = stringResource(StringRegistry.get(field.name)),
-                value = currentValues[field.name] ?: field.value,
-                onValueChange = { newValue -> onFieldChange(item.id, field.name, newValue) },
+                label = stringResource(StringRegistry.get(name)),
+                value = currentValues[name] ?: value,
+                onValueChange = { newValue -> onFieldChange(item.id, name, newValue) },
                 windowSizeClass = windowSizeClass
             )
         }
