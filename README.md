@@ -51,9 +51,9 @@
 - - [X] Тип функции
 - - [X] Функции высшего порядка
 - - [X] Trailing lambda
-- - [ ] Function references
-- - [ ] Неиспользуемые параметры
 - - [X] Коллекции и лямбды
+- - [ ] Неиспользуемые параметры
+- - [X] Function references
 - - [X] Цепочки операций
 - - [ ] Any
 - - [X] Extension functions

@@ -370,6 +370,270 @@ println(numbers.average()) // 25.0
 
 Это особенно удобно при решении практических задач.
 
+## Неиспользуемые параметры
+
+TODO
+
+## Function references
+
+Иногда необходимо передать в другую функцию уже существующую функцию.
+
+Для этого в **Kotlin** используется оператор `::`, ссылка на функцию.
+
+Например, создадим обычную функцию:
+
+```kotlin
+fun isEven(number: Int): Boolean {
+    return number % 2 == 0
+}
+```
+
+Мы можем передать её в `filter`:
+
+```kotlin
+val numbers = listOf(1, 2, 3, 4, 5, 6)
+
+val evenNumbers = numbers.filter(::isEven)
+
+println(evenNumbers)
+```
+
+Результат:
+
+```
+[2, 4, 6]
+```
+
+Здесь `::isEven` означает ссылку на функцию `isEven`. Это не вызов функции.
+
+Сравните:
+
+```kotlin
+isEven(4)
+```
+
+Здесь функция вызывается и возвращает:
+
+```
+true
+```
+
+А `::isEven` создаёт ссылку на саму функцию, которую можно передать дальше.
+
+### Сравнение лямбды и ссылки на функцию
+
+Один и тот же код можно записать двумя способами.
+
+С помощью лямбды:
+
+```kotlin
+val evenNumbers = numbers.filter {
+    it % 2 == 0
+}
+```
+
+С помощью ссылки на существующую функцию:
+
+```kotlin
+fun isEven(number: Int): Boolean {
+    return number % 2 == 0
+}
+
+val evenNumbers = numbers.filter(::isEven)
+```
+
+Первый вариант непосредственно описывает действие.
+
+Второй вариант говорит:
+
+> Используй уже существующую функцию `isEven`.
+
+Это особенно удобно, когда функция уже существует и её сигнатура подходит ожидаемому типу.
+
+### Тип ссылки на функцию
+
+Ссылка `::isEven` в данном примере имеет тип:
+
+```kotlin
+(Int) -> Boolean
+```
+
+То есть:
+
+- `(Int)` - параметр типа `Int`
+- `-> Boolean` - результат типа `Boolean`
+
+Можно сохранить ссылку в переменную:
+
+```kotlin
+fun square(number: Int): Int {
+    return number * number
+}
+
+val operation: (Int) -> Int = ::square
+
+println(operation(5)) // 25
+```
+
+Теперь `operation` содержит ссылку на функцию `square`.
+
+### Ссылка на функцию с несколькими параметрами
+
+Это работает и для нескольких параметров:
+
+```kotlin
+fun sum(a: Int, b: Int): Int {
+return a + b
+}
+
+val operation: (Int, Int) -> Int = ::sum
+
+println(operation(2, 3)) // 5
+```
+
+Тип:
+
+```kotlin
+(Int, Int) -> Int
+```
+
+означает:
+
+* два параметра типа `Int`
+* результат типа `Int`
+
+### Ссылки на методы
+
+Оператор `::` можно использовать не только с обычными функциями, но и с методами.
+
+Например:
+
+```kotlin
+class User(
+    val name: String
+) {
+    fun sayHello() {
+        println("Hello, $name!")
+    }
+}
+```
+
+Для конкретного объекта можно получить ссылку на его метод:
+
+```kotlin
+val user = User("Alex")
+
+val action = user::sayHello
+
+action()
+```
+
+Здесь:
+
+```
+user::sayHello
+```
+
+означает ссылку на метод конкретного объекта `user`.
+
+Такую ссылку называют `bound callable reference`.
+
+### Ссылка на метод класса
+
+Можно также получить ссылку на метод самого класса:
+
+```kotlin
+class Calculator {
+    fun square(number: Int): Int {
+        return number * number
+    }
+}
+```
+
+Ссылка:
+
+```kotlin
+val operation = Calculator::square
+```
+
+В этом случае объект `Calculator` ещё не выбран.
+
+Тип ссылки будет включать сам объект как дополнительный параметр:
+
+```kotlin
+Calculator.(Int) -> Int
+```
+
+На практике такие ссылки встречаются реже на начальном уровне, поэтому 
+достаточно понимать основную идею:
+
+`::` позволяет ссылаться на уже существующую функцию или метод и 
+передавать эту ссылку как значение.
+
+<iframe src="https://pl.kotl.in/qF9leLhmJ" height="290"></iframe>
+
+### Ссылка на конструктор
+
+Оператор `::` также используется для ссылки на конструктор.
+
+Например:
+
+```kotlin
+data class User(
+    val name: String,
+    val age: Int
+)
+```
+
+Можно получить ссылку:
+
+```kotlin
+val createUser = ::User
+```
+
+Теперь:
+
+```kotlin
+val user = createUser("Alex", 25)
+
+println(user)
+```
+
+Получается:
+
+```
+User(name=Alex, age=25)
+```
+
+### Callable references
+
+`::` — не только для функций. 
+
+Оператор `::` является более общим механизмом `callable references`.
+
+С его помощью можно ссылаться на:
+
+* функции;
+* методы;
+* свойства;
+* конструкторы;
+* некоторые другие вызываемые сущности.
+
+Например:
+
+```kotlin
+data class User(
+    val name: String,
+    val age: Int
+)
+
+val getName = User::name
+```
+
+Здесь `User::name` — ссылка на свойство `name`.
+
+<iframe src="https://pl.kotl.in/WcFITCsz_" height="280"></iframe>
+
 ## Цепочки операций
 
 Операции над коллекциями можно объединять:
