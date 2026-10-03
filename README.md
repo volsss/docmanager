@@ -59,20 +59,30 @@
 - - [X] Any
 - - [X] Extension functions
 - - [X] Extension functions
-- [ ] **V. Пятая часть**
-- - [ ] enum class
-- - [ ] sealed class и sealed interface
-- - [ ] Nothing
-- - [ ] Generics
-- - [ ] object
-- - [ ] companion object
-- - [ ] operator
-- - [ ] Делегирование
-- - [ ] Coroutines
+- [X] **V. Пятая часть**
+- - [X] enum class
+- - [X] sealed class и sealed interface
+- - [X] Nothing
+- - [X] Generics
+- - [X] object
+- - [X] companion object
+- - [X] operator
+- - [X] Делегирование
 
 ### Gradle:
 - [ ] **I. Первая часть**
 - [ ] **II. Вторая часть**
+
+### Coroutines
+- [X] suspend
+- [X] runBlocking
+- [X] launch
+- [X] Job
+- [X] async
+- [X] CoroutineScope
+- [X] Dispatchers
+- [X] try-catch
+- [X] supervisorScope
 
 ### Android:
 - [ ] **I. Первая часть**
