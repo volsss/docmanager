@@ -41,6 +41,7 @@ class ReferenceViewModel(
         }
     }
 
+    // TODO: RETHINK THIS
     @Suppress("UNCHECKED_CAST")
     suspend fun saveAll(
         referenceRepository: ReferenceRepository<out Reference>,
