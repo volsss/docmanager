@@ -16,7 +16,7 @@ class ReferenceViewModel(
 ) {
     val formState = ReferenceState()
 
-    private val repositories: Map<ReferenceType, ReferenceRepository<out Reference>> = mapOf(
+    private val repositories = mapOf(
         ReferenceType.INDIVIDUAL to individualsRepository,
         ReferenceType.ORGANIZATION to organizationsRepository,
         ReferenceType.PRODUCT to productsRepository,
