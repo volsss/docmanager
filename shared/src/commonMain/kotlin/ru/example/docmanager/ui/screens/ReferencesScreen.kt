@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.ui.StringRegistry
+import ru.example.docmanager.database.models.references.ReferenceType
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 import ru.example.docmanager.viewmodel.Tab
@@ -25,9 +25,9 @@ fun ReferencesScreen(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        referenceViewModel.references.forEach { reference ->
+        ReferenceType.entries.forEach { reference ->
             DocumentRow(
-                title = stringResource(StringRegistry.get(reference.name)),
+                title = stringResource(reference.stringResource),
                 onClick = {
                     referenceViewModel.selectReference(reference)
                     dashboardViewModel.selectTab(Tab.REFERENCE)

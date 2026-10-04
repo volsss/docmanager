@@ -2,7 +2,7 @@ package ru.example.docmanager.database.repositories.references
 
 import ru.example.docmanager.database.models.references.Reference
 
-abstract class ReferenceRepository<T : Reference>(
+abstract class ReferenceRepository<T: Reference>(
     val name: String
 ) {
     abstract suspend fun getItem(id: Int): T

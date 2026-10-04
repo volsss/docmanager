@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.database.models.documents.DocumentType
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.DocumentViewModel
@@ -33,7 +34,7 @@ fun DocumentsScreen(
     ) {
         DocumentType.entries.forEach { type ->
             DocumentRow(
-                title = type.title,
+                title = stringResource(type.stringResource),
                 onClick = {
                     documentViewModel.selectDocument(type)
                     dashboardViewModel.selectTab(Tab.DOCUMENT)

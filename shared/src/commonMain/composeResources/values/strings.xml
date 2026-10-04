@@ -18,4 +18,6 @@
 
     <string name="suppliers">Поставщики</string>
     <string name="supplierName">Название</string>
+
+    <string name="power_of_attorney">Доверенность</string>
 </resources>

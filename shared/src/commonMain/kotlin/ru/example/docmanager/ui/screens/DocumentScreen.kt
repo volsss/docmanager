@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.database.models.documents.DocumentType
 import ru.example.docmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScreen
 import ru.example.docmanager.viewmodel.DocumentViewModel
@@ -29,10 +30,8 @@ fun DocumentScreen(
     referenceViewModel: ReferenceViewModel
 ) {
     val type by documentsViewModel.selectedDocumentType.collectAsState()
-    if (type?.title == null) {
-        Text("Документ", style = MaterialTheme.typography.titleLarge)
-        Spacer(Modifier.height(16.dp))
-    }
+    Text(stringResource(type.stringResource), style = MaterialTheme.typography.titleLarge)
+    Spacer(Modifier.height(16.dp))
 
     Column(
         modifier = Modifier.fillMaxSize(),

@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.example.docmanager.database.models.documents.DocumentType
 
 class DocumentViewModel {
-    val selectedDocumentType: StateFlow<DocumentType?>
-        field = MutableStateFlow<DocumentType?>(null)
+    val selectedDocumentType: StateFlow<DocumentType>
+        field = MutableStateFlow(DocumentType.POWER_OF_ATTORNEY)
 
     fun selectDocument(documentType: DocumentType) {
         selectedDocumentType.value = documentType

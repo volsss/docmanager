@@ -43,6 +43,7 @@ import ru.example.docmanager.di.getDocumentProcessor
 import ru.example.docmanager.database.models.references.Individual
 import ru.example.docmanager.database.models.references.Organization
 import ru.example.docmanager.database.models.references.Product
+import ru.example.docmanager.database.models.references.ReferenceType
 import ru.example.docmanager.database.models.references.Supplier
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
@@ -71,18 +72,18 @@ fun PowerOfAttorneyScreen(
         )
     }
 
-    val referencesItems by referenceViewModel.referencesItems.collectAsState()
+    val referencesItems = referenceViewModel.formState.itemsByType
     val organizations = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.organizationsRepository)?.filterIsInstance<Organization>().orEmpty()
+        referencesItems[ReferenceType.ORGANIZATION]?.filterIsInstance<Organization>().orEmpty()
     }
     val individuals = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.individualsRepository)?.filterIsInstance<Individual>().orEmpty()
+        referencesItems[ReferenceType.INDIVIDUAL]?.filterIsInstance<Individual>().orEmpty()
     }
     val suppliers = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.suppliersRepository)?.filterIsInstance<Supplier>().orEmpty()
+        referencesItems[ReferenceType.SUPPLIER]?.filterIsInstance<Supplier>().orEmpty()
     }
     val products = remember(referencesItems) {
-        referencesItems?.get(referenceViewModel.productsRepository)?.filterIsInstance<Product>().orEmpty()
+        referencesItems[ReferenceType.PRODUCT]?.filterIsInstance<Product>().orEmpty()
     }
 
     val formState = rememberPowerOfAttorneyFormState()
@@ -94,7 +95,7 @@ fun PowerOfAttorneyScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (referenceViewModel.referencesItems.value == null) {
+        if (referenceViewModel.formState.itemsByType.isEmpty()) {
             referenceViewModel.loadReferenceItems()
         }
         reloadDocuments()

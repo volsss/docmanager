@@ -1,0 +1,71 @@
+package ru.example.docmanager.viewmodel
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import ru.example.docmanager.database.models.references.Reference
+import ru.example.docmanager.database.models.references.ReferenceType
+
+class ReferenceState {
+    var selectedReference by mutableStateOf(ReferenceType.INDIVIDUAL)
+    var itemsByType by mutableStateOf<Map<ReferenceType, List<Reference>>>(emptyMap())
+    var fieldValues by mutableStateOf<Map<Int, Map<String, Any>>>(emptyMap())
+    var statusMessage by mutableStateOf<String?>(null)
+
+    val currentItems: List<Reference>
+        get() = itemsByType[selectedReference].orEmpty()
+
+    fun selectReference(referenceType: ReferenceType) {
+        selectedReference = referenceType
+        syncFieldValues()
+        statusMessage = null
+    }
+
+    fun setItems(referenceType: ReferenceType, items: List<Reference>) {
+        itemsByType = itemsByType + (referenceType to items)
+        if (referenceType == selectedReference) {
+            syncFieldValues()
+        }
+    }
+
+    fun setAllItems(items: Map<ReferenceType, List<Reference>>) {
+        itemsByType = items
+        syncFieldValues()
+    }
+
+    fun updateField(itemId: Int, fieldName: String, value: Any) {
+        val currentFields = fieldValues[itemId].orEmpty()
+        fieldValues = fieldValues + (itemId to (currentFields + (fieldName to value)))
+    }
+
+    fun addItem(referenceType: ReferenceType, item: Reference) {
+        val updatedItems = itemsByType[referenceType].orEmpty() + item
+        setItems(referenceType, updatedItems)
+    }
+
+    fun removeItem(referenceType: ReferenceType, item: Reference) {
+        val updatedItems = itemsByType[referenceType].orEmpty().filterNot { it.id == item.id }
+        setItems(referenceType, updatedItems)
+        fieldValues = fieldValues - item.id
+    }
+
+    fun replaceItem(referenceType: ReferenceType, item: Reference) {
+        val updatedItems = itemsByType[referenceType].orEmpty().map { current ->
+            if (current.id == item.id) item else current
+        }
+        setItems(referenceType, updatedItems)
+    }
+
+    fun buildUpdatedItems(): List<Reference> {
+        return currentItems.map { item ->
+            val fields = fieldValues[item.id].orEmpty()
+            item.copyWithFields(fields)
+        }
+    }
+
+    private fun syncFieldValues() {
+        fieldValues = currentItems.associate { item ->
+            item.id to item.toMap()
+        }
+    }
+}

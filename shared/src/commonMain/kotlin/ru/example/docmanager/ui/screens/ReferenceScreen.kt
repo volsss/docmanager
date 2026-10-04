@@ -18,7 +18,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.database.repositories.references.ReferenceRepository
+import ru.example.docmanager.database.models.references.ReferenceType
 import ru.example.docmanager.ui.StringRegistry
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.viewmodel.ReferenceViewModel
@@ -26,70 +26,85 @@ import ru.example.docmanager.viewmodel.ReferenceViewModel
 @Composable
 fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
     val scope = rememberCoroutineScope()
-    val reference = referenceViewModel.selectedReferenceRepository.collectAsState().value ?: return
-    val referenceItems = referenceViewModel.referencesItems.collectAsState().value?.get(reference) ?: emptyList()
+    val formState = referenceViewModel.formState
+    val referenceType = formState.selectedReference
+    val referenceItems = formState.currentItems
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    var fieldValues by remember(referenceItems) {
-        mutableStateOf(
-            referenceItems.associate { item ->
-                item.id to item.toMap()
-            }
-        )
+    LaunchedEffect(Unit) {
+        if (formState.itemsByType.isEmpty()) {
+            referenceViewModel.loadReferenceItems()
+        }
     }
 
     Text(
-        stringResource(StringRegistry.get(reference.name)),
+        stringResource(referenceType.stringResource),
         style = MaterialTheme.typography.titleLarge
     )
+    formState.statusMessage?.let { message ->
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = message,
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+
     Spacer(Modifier.height(16.dp))
 
     Column(
         Modifier.fillMaxSize().then(
-            if (windowSizeClass.isWidthAtLeastBreakpoint(840)) Modifier else Modifier.horizontalScroll(rememberScrollState())
+            if (windowSizeClass.isWidthAtLeastBreakpoint(840))
+                Modifier
+            else Modifier.horizontalScroll(rememberScrollState())
         )
     ) {
         referenceItems.forEach { item ->
             ReferenceInput(
-                referenceRepository = reference,
                 item = item,
-                currentValues = fieldValues[item.id].orEmpty(),
-                onFieldChange = { itemId, fieldName, newValue ->
-                    val currentItemFields = fieldValues[itemId].orEmpty().toMutableMap()
-                    currentItemFields[fieldName] = newValue
-                    fieldValues = fieldValues + (itemId to currentItemFields)
+                currentValues = formState.fieldValues[item.id].orEmpty(),
+                onFieldChange = formState::updateField,
+                onRemove = {
+                    scope.launch {
+                        referenceViewModel.deleteItem(item)
+                    }
                 },
-                referenceViewModel = referenceViewModel,
-                scope = scope,
                 windowSizeClass = windowSizeClass
             )
         }
     }
+
     Spacer(Modifier.height(16.dp))
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button(onClick = {
-            scope.launch {
-                fieldValues.forEach { (itemId, fields) ->
-                    referenceViewModel.saveAll(reference, itemId, fields)
+        Button(
+            onClick = {
+                scope.launch {
+                    referenceViewModel.saveAll()
                 }
             }
-        }) { Text("Сохранить") }
+        ) {
+            Text("Сохранить")
+        }
 
-        Button(onClick = {
-            scope.launch { referenceViewModel.newItem(reference) }
-        }) { Text("Новое поле") }
+        Button(
+            onClick = {
+                scope.launch {
+                    referenceViewModel.createItem()
+                }
+            }
+        ) {
+            Text("Новое поле")
+        }
     }
 }
 
 @Composable
 fun ReferenceInput(
-    referenceRepository: ReferenceRepository<out Reference>,
     item: Reference,
     currentValues: Map<String, Any>,
     onFieldChange: (itemId: Int, fieldName: String, newValue: Any) -> Unit,
-    referenceViewModel: ReferenceViewModel,
-    scope: CoroutineScope,
+    onRemove: () -> Unit,
     windowSizeClass: WindowSizeClass
 ) {
     Row(
@@ -98,6 +113,7 @@ fun ReferenceInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(item.id.toString())
+
         item.toMap().forEach { (name, value) ->
             InputField(
                 label = stringResource(StringRegistry.get(name)),
@@ -112,13 +128,8 @@ fun ReferenceInput(
                 windowSizeClass = windowSizeClass
             )
         }
-        IconButton(
-            onClick = {
-                scope.launch {
-                    referenceViewModel.removeItem(referenceRepository, item)
-                }
-            }
-        ) {
+
+        IconButton(onClick = onRemove) {
             Icon(Icons.Filled.Remove, "Удалить")
         }
     }
