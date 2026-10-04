@@ -17,8 +17,18 @@ env:
   app_version: "1.1.0"
 
 jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.vars.outputs.sha_short }}
+    steps:
+      - name: Calculate Short SHA
+        id: vars
+        run: echo "sha_short=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
   android:
     runs-on: ubuntu-latest
+    needs: init
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -49,25 +59,23 @@ jobs:
         run: ./gradlew :androidApp:assembleDebug
 
       - name: Name Android Artifact
-        id: vars
         shell: bash
         run: |
           set -euo pipefail
           apk="$(find androidApp/build/outputs/apk/debug -maxdepth 1 -type f -name '*.apk' | head -n 1)"
           test -n "$apk" || { echo "No APK found"; exit 1; }
-          sha_short="${GITHUB_SHA::7}"
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          mv "$apk" "androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}-$sha_short-android-debug.apk"
+          mv "$apk" "androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-android-debug.apk"
 
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}-${{ steps.vars.outputs.sha_short }}-android-debug.apk
+          path: androidApp/build/outputs/apk/debug/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-android-debug.apk
           archive: false
           if-no-files-found: error
 
   dmg-arm:
     runs-on: macos-latest
+    needs: init
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -98,25 +106,23 @@ jobs:
         run: ./gradlew :desktopApp:packageDmg
 
       - name: Name DMG Artifact
-        id: vars
         shell: bash
         run: |
           set -euo pipefail
           dmg="$(find desktopApp/build/compose/binaries/main/dmg -maxdepth 1 -type f -name '*.dmg' | head -n 1)"
           test -n "$dmg" || { echo "No DMG found"; exit 1; }
-          sha_short="${GITHUB_SHA::7}"
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-$sha_short-macos-arm64.dmg"
+          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-macos-arm64.dmg"
 
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-${{ steps.vars.outputs.sha_short }}-macos-arm64.dmg
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-macos-arm64.dmg
           archive: false
           if-no-files-found: error
 
   dmg:
     runs-on: macos-26-intel
+    needs: init
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -147,25 +153,23 @@ jobs:
         run: ./gradlew :desktopApp:packageDmg
 
       - name: Name DMG Artifact
-        id: vars
         shell: bash
         run: |
           set -euo pipefail
           dmg="$(find desktopApp/build/compose/binaries/main/dmg -maxdepth 1 -type f -name '*.dmg' | head -n 1)"
           test -n "$dmg" || { echo "No DMG found"; exit 1; }
-          sha_short="${GITHUB_SHA::7}"
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-$sha_short-macos-x64.dmg"
+          mv "$dmg" "desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-macos-x64.dmg"
 
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-${{ steps.vars.outputs.sha_short }}-macos-x64.dmg
+          path: desktopApp/build/compose/binaries/main/dmg/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-macos-x64.dmg
           archive: false
           if-no-files-found: error
 
   deb:
     runs-on: ubuntu-latest
+    needs: init
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -196,25 +200,23 @@ jobs:
         run: ./gradlew :desktopApp:packageDeb
 
       - name: Name DEB Artifact
-        id: vars
         shell: bash
         run: |
           set -euo pipefail
           deb="$(find desktopApp/build/compose/binaries/main/deb -maxdepth 1 -type f -name '*.deb' | head -n 1)"
           test -n "$deb" || { echo "No DEB found"; exit 1; }
-          sha_short="${GITHUB_SHA::7}"
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          mv "$deb" "desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}-$sha_short-linux-x64.deb"
+          mv "$deb" "desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-linux-x64.deb"
 
       - name: Upload DEB Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}-${{ steps.vars.outputs.sha_short }}-linux-x64.deb
+          path: desktopApp/build/compose/binaries/main/deb/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-linux-x64.deb
           archive: false
           if-no-files-found: error
 
   msi:
     runs-on: windows-latest
+    needs: init
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -243,32 +245,30 @@ jobs:
         run: .\gradlew.bat :desktopApp:packageMsi
 
       - name: Name MSI Artifact
-        id: vars
         shell: pwsh
         run: |
           $source = Get-ChildItem "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File |
             Select-Object -First 1
           if (-not $source) { throw "No MSI found" }
-          $shortSha = "${{ github.sha }}".Substring(0, 7)
-          "sha_short=$shortSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           $appName = @"
           ${{ env.app_name }}
           "@.Trim()
           $appVersion = @"
           ${{ env.app_version }}
           "@.Trim()
-          $target = "$appName-$appVersion-$shortSha-windows-x64.msi"
+          $target = "$appName-$appVersion-${{ needs.init.outputs.sha_short }}-windows-x64.msi"
           Rename-Item -LiteralPath $source.FullName -NewName $target
 
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}-${{ steps.vars.outputs.sha_short }}-windows-x64.msi
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-windows-x64.msi
           archive: false
           if-no-files-found: error
 
   msi-arm:
     runs-on: windows-11-arm
+    needs: init
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -328,32 +328,30 @@ jobs:
         run: .\gradlew.bat :desktopApp:packageMsi
 
       - name: Name MSI Artifact
-        id: vars
         shell: pwsh
         run: |
           $source = Get-ChildItem "desktopApp/build/compose/binaries/main/msi" -Filter "*.msi" -File |
             Select-Object -First 1
           if (-not $source) { throw "No MSI found" }
-          $shortSha = "${{ github.sha }}".Substring(0, 7)
-          "sha_short=$shortSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           $appName = @"
           ${{ env.app_name }}
           "@.Trim()
           $appVersion = @"
           ${{ env.app_version }}
           "@.Trim()
-          $target = "$appName-$appVersion-$shortSha-windows-arm64.msi"
+          $target = "$appName-$appVersion-${{ needs.init.outputs.sha_short }}-windows-arm64.msi"
           Rename-Item -LiteralPath $source.FullName -NewName $target
 
       - name: Upload MSI Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}-${{ steps.vars.outputs.sha_short }}-windows-arm64.msi
+          path: desktopApp/build/compose/binaries/main/msi/${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-windows-arm64.msi
           archive: false
           if-no-files-found: error
 
   distributable-exe:
     runs-on: windows-latest
+    needs: init
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -381,15 +379,9 @@ jobs:
         shell: pwsh
         run: .\gradlew.bat :desktopApp:createDistributable
 
-      - name: Set Short SHA on Windows (PowerShell)
-        id: vars
-        run: |
-          $shortSha = "${{ github.sha }}".Substring(0, 7)
-          "sha_short=$shortSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-
       - name: Upload EXE Distributable Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.app_name }}-${{ env.app_version }}-${{ steps.vars.outputs.sha_short }}-windows-x64-distributable
+          name: ${{ env.app_name }}-${{ env.app_version }}-${{ needs.init.outputs.sha_short }}-windows-x64-distributable
           path: desktopApp/build/compose/binaries/main/app/
           if-no-files-found: error
