@@ -100,7 +100,6 @@ fun PowerOfAttorneyScreen(
         }
         reloadDocuments()
     }
-
     LaunchedEffect(organizations) {
         if (formState.selectedOrganization == null && organizations.isNotEmpty()) {
             formState.selectedOrganization = organizations.first()
@@ -169,8 +168,6 @@ private fun PowerOfAttorneyBanner(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Text("Доверенность", style = MaterialTheme.typography.titleLarge)
-
         formState.statusMessage?.let { msg ->
             Text(
                 text = msg,
