@@ -34,7 +34,7 @@ class PowerOfAttorneyRepository(
             it[supplierId] = document.header.supplier.id
             it[supplierAgreement] = document.header.supplierAgreement
         }.value
-        document.body.forEach { body ->
+        document.body.items.forEach { body ->
             BodiesTable.insert {
                 it[count] = body.count
                 it[unit] = body.unit
@@ -55,7 +55,7 @@ class PowerOfAttorneyRepository(
             it[supplierAgreement] = document.header.supplierAgreement
         }
         BodiesTable.deleteWhere { BodiesTable.headerId eq document.header.id }
-        document.body.forEach { body ->
+        document.body.items.forEach { body ->
             BodiesTable.insert {
                 it[count] = body.count
                 it[unit] = body.unit
@@ -97,9 +97,9 @@ class PowerOfAttorneyRepository(
             supplierAgreement = headerRow[HeadersTable.supplierAgreement]
         )
 
-        val bodyList = bodyRows.map { row ->
+        val bodyItemList = bodyRows.map { row ->
             val product = productsRepository.getItem(row[BodiesTable.productId])
-            PowerOfAttorney.Body(
+            PowerOfAttorney.BodyItem(
                 id = row[BodiesTable.id].value,
                 count = row[BodiesTable.count],
                 unit = row[BodiesTable.unit],
@@ -108,6 +108,8 @@ class PowerOfAttorneyRepository(
             )
         }
 
-        return PowerOfAttorney(header = header, body = bodyList)
+        val body = PowerOfAttorney.Body(bodyItemList)
+
+        return PowerOfAttorney(header = header, body = body)
     }
 }

@@ -3,21 +3,13 @@ package ru.example.docmanager.ui.screens.references
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.format
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.ui.StringRegistry
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 

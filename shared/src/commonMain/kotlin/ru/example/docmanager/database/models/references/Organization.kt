@@ -1,5 +1,7 @@
 package ru.example.docmanager.database.models.references
 
+import ru.example.docmanager.database.models.FieldType
+
 data class Organization(
     override var id: Int = -1,
     val name: String = "",
@@ -7,17 +9,17 @@ data class Organization(
     val payer: String = "",
     val account: String = ""
 ) : Reference(id) {
-    override fun toMap(): Map<String, String> = mapOf(
-        "organizationName" to name,
-        "organizationConsumer" to consumer,
-        "organizationPayer" to payer,
-        "organizationAccount" to account,
+    override fun toMap() = mapOf(
+        FieldType.ORGANIZATION_NAME to name,
+        FieldType.ORGANIZATION_CONSUMER to consumer,
+        FieldType.ORGANIZATION_PAYER to payer,
+        FieldType.ORGANIZATION_ACCOUNT to account,
     )
 
-    override fun copyWithFields(fields: Map<String, Any>) = copy(
-        name = (fields["organizationName"] ?: name) as String,
-        consumer = (fields["organizationConsumer"] ?: consumer) as String,
-        payer = (fields["organizationPayer"] ?: payer) as String,
-        account = (fields["organizationAccount"] ?: account) as String
+    override fun copyWithFields(fields: Map<FieldType, String>) = copy(
+        name = (fields[FieldType.ORGANIZATION_NAME] ?: name),
+        consumer = (fields[FieldType.ORGANIZATION_CONSUMER] ?: consumer),
+        payer = (fields[FieldType.ORGANIZATION_PAYER] ?: payer),
+        account = (fields[FieldType.ORGANIZATION_ACCOUNT] ?: account)
     )
 }

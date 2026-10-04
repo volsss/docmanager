@@ -67,8 +67,8 @@ class PowerOfAttorneyFormState(
             it.id == document.header.supplier.id
         } as Supplier? ?: document.header.supplier
         supplierAgreement = document.header.supplierAgreement
-        bodyItems = if (document.body.isNotEmpty()) {
-            document.body.map { body ->
+        bodyItems = if (document.body.items.isNotEmpty()) {
+            document.body.items.map { body ->
                 PowerOfAttorneyBodyItem(
                     id = body.id,
                     product = references[ReferenceType.PRODUCT]?.firstOrNull {
@@ -83,7 +83,7 @@ class PowerOfAttorneyFormState(
         }
     }
 
-    override fun toDocument(headerId: Int): PowerOfAttorney? {
+    override fun toDocument(): PowerOfAttorney? {
         val org = selectedOrganization ?: return null
         val ind = selectedIndividual ?: return null
         val sup = selectedSupplier ?: return null
@@ -95,7 +95,7 @@ class PowerOfAttorneyFormState(
             .getOrElse { runCatching { LocalDate.parse(endDate) }.getOrElse { defaultEndDate } }
 
         val header = PowerOfAttorney.Header(
-            id = headerId,
+            id = selectedDocumentId ?: return null,
             organization = org,
             number = number.toIntOrNull() ?: 0,
             dischargeDate = dis,
@@ -105,10 +105,10 @@ class PowerOfAttorneyFormState(
             supplierAgreement = supplierAgreement
         )
 
-        val bodyList = bodyItems.fastFilteredMap(
+        val bodyItemList = bodyItems.fastFilteredMap(
             { it.product != null },
         ) { item ->
-            PowerOfAttorney.Body(
+            PowerOfAttorney.BodyItem(
                 id = 0,
                 count = item.count,
                 unit = item.unit,
@@ -117,39 +117,8 @@ class PowerOfAttorneyFormState(
             )
         }
 
-        return PowerOfAttorney(header, bodyList)
-    }
+        val body = PowerOfAttorney.Body(bodyItemList)
 
-    override fun prepareExportData(): Pair<Map<String, String>, Map<String, List<String>>> {
-        val org = selectedOrganization
-        val ind = selectedIndividual
-        val sup = selectedSupplier
-
-        val head = mapOf(
-            "{{number}}" to number,
-            "{{dischargeDate}}" to dischargeDate,
-            "{{endDate}}" to endDate,
-            "{{organizationName}}" to (org?.name.orEmpty()),
-            "{{organizationConsumer}}" to (org?.consumer.orEmpty()),
-            "{{organizationPayer}}" to (org?.payer.orEmpty()),
-            "{{organizationAccount}}" to (org?.account.orEmpty()),
-            "{{individualJob}}" to (ind?.job.orEmpty()),
-            "{{individualName}}" to (ind?.name.orEmpty()),
-            "{{individualSeries}}" to (ind?.series.orEmpty()),
-            "{{individualNumber}}" to (ind?.number.orEmpty()),
-            "{{individualIssued}}" to (ind?.issued.orEmpty()),
-            "{{individualDate}}" to (ind?.date?.toString().orEmpty()),
-            "{{supplierName}}" to (sup?.name.orEmpty()),
-            "{{supplierAgreement}}" to supplierAgreement
-        )
-
-        val body = mapOf(
-            "Номер по порядку" to List(bodyItems.size) { idx -> (idx + 1).toString() },
-            "Материальные ценности" to bodyItems.map { it.product?.name.orEmpty() },
-            "Единица измерения" to bodyItems.map { it.unit },
-            "Количество (прописью)" to bodyItems.map { it.count }
-        )
-
-        return head to body
+        return PowerOfAttorney(header, body)
     }
 }

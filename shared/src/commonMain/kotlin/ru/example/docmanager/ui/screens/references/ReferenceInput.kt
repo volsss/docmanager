@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,14 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.ui.StringRegistry
+import ru.example.docmanager.database.models.FieldType
 import ru.example.docmanager.ui.Utils
 
 @Composable
 fun ReferenceInput(
     item: Reference,
-    currentValues: Map<String, Any>,
-    onFieldChange: (itemId: Int, fieldName: String, newValue: Any) -> Unit,
+    currentValues: Map<FieldType, String>,
+    onFieldChange: (itemId: Int, fieldType: FieldType, newValue: String) -> Unit,
     onRemove: () -> Unit,
     windowSizeClass: WindowSizeClass
 ) {
@@ -36,18 +37,18 @@ fun ReferenceInput(
     ) {
         Text(item.id.toString())
 
-        item.toMap().forEach { (name, value) ->
-            InputField(
-                label = stringResource(StringRegistry.get(name)),
-                value = currentValues[name] ?: value,
+        item.toMap().forEach { (type, value) ->
+            OutlinedTextField(
+                label = { Text(stringResource(type.stringResource)) },
+                modifier = if (isWide) Modifier.weight(1f) else Modifier.widthIn(min = 300.dp),
+                value = currentValues[type] ?: value,
                 onValueChange = { newValue ->
                     onFieldChange(
                         item.id,
-                        name,
+                        type,
                         newValue
                     )
-                },
-                modifier = if (isWide) Modifier.weight(1f) else Modifier.widthIn(min = 300.dp)
+                }
             )
         }
 

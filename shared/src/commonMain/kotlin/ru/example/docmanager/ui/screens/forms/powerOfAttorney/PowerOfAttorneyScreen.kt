@@ -15,10 +15,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.individual
+import docmanager.shared.generated.resources.organization
+import docmanager.shared.generated.resources.product
+import docmanager.shared.generated.resources.supplier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import org.jetbrains.compose.resources.stringResource
+import ru.example.docmanager.database.models.FieldType
 import ru.example.docmanager.database.models.references.*
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.di.getDocumentProcessor
@@ -119,7 +126,6 @@ fun PowerOfAttorneyScreen(
             formState = formState,
             scope = scope,
             repository = powerOfAttorneyRepository,
-            products = products,
             onDocumentChanged = ::reloadDocuments,
             onResetForm = { formState.resetForm(referencesItems) }
         )
@@ -199,7 +205,7 @@ private fun PowerOfAttorneyHeaderSection(
         OutlinedTextField(
             value = formState.dischargeDate,
             onValueChange = { formState.dischargeDate = it },
-            label = { Text("Дата выписки (ДД.ММ.ГГГГ)") },
+            label = { Text(stringResource(FieldType.DISCHARGE_DATE.stringResource)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -207,45 +213,45 @@ private fun PowerOfAttorneyHeaderSection(
         OutlinedTextField(
             value = formState.endDate,
             onValueChange = { formState.endDate = it },
-            label = { Text("Дата окончания (ДД.ММ.ГГГГ)") },
+            label = { Text(stringResource(FieldType.END_DATE.stringResource)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
         ReferenceDropdown(
-            label = "Организация",
+            label = stringResource(Res.string.organization),
             items = organizations,
             selectedItem = formState.selectedOrganization,
             onItemSelected = { formState.selectedOrganization = it },
-            itemLabel = { it.name.ifBlank { "Организация #${it.id}" } },
+            itemLabel = { it.name.ifBlank { "№ ${it.id}" } },
             modifier = Modifier.fillMaxWidth()
         )
 
         ReferenceDropdown(
-            label = "Физ. лицо",
+            label = stringResource(Res.string.individual),
             items = individuals,
             selectedItem = formState.selectedIndividual,
             onItemSelected = { formState.selectedIndividual = it },
             itemLabel = {
                 val parts = listOfNotNull(it.name.ifBlank { null }, it.job.ifBlank { null })
-                if (parts.isNotEmpty()) parts.joinToString(" - ") else "Физ. лицо #${it.id}"
+                if (parts.isNotEmpty()) parts.joinToString(" - ") else "№ ${it.id}"
             },
             modifier = Modifier.fillMaxWidth()
         )
 
         ReferenceDropdown(
-            label = "На получение от (Поставщик)",
+            label = stringResource(Res.string.supplier),
             items = suppliers,
             selectedItem = formState.selectedSupplier,
             onItemSelected = { formState.selectedSupplier = it },
-            itemLabel = { it.name.ifBlank { "Поставщик #${it.id}" } },
+            itemLabel = { it.name.ifBlank { "№ ${it.id}" } },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
             value = formState.supplierAgreement,
             onValueChange = { formState.supplierAgreement = it },
-            label = { Text("Материальных ценностей по") },
+            label = { Text(stringResource(FieldType.SUPPLIER_AGREEMENT.stringResource)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -266,7 +272,7 @@ private fun PowerOfAttorneyBodySection(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Тело документа (Материальные ценности)",
+            text = "Тело документа",
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.titleMedium
         )
@@ -320,11 +326,11 @@ private fun BodyItemRow(
         )
 
         ReferenceDropdown(
-            label = "Материальные ценности",
+            label = stringResource(Res.string.product),
             items = products,
             selectedItem = item.product,
             onItemSelected = { onItemChange(item.copy(product = it)) },
-            itemLabel = { it.name.ifBlank { "Товар #${it.id}" } },
+            itemLabel = { it.name.ifBlank { "№ ${it.id}" } },
             modifier = if (isWide) Modifier.weight(2f) else Modifier.widthIn(min = 300.dp)
         )
 
@@ -355,7 +361,6 @@ private fun PowerOfAttorneyActions(
     formState: PowerOfAttorneyFormState,
     scope: CoroutineScope,
     repository: PowerOfAttorneyRepository,
-    products: List<Product>,
     onDocumentChanged: () -> Unit,
     onResetForm: () -> Unit,
     modifier: Modifier = Modifier
@@ -368,9 +373,7 @@ private fun PowerOfAttorneyActions(
     ) {
         Button(
             onClick = {
-                val document = formState.toDocument(
-                    headerId = formState.selectedDocumentId ?: 0
-                )
+                val document = formState.toDocument()
                 if (document == null) {
                     formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
                     return@Button
@@ -398,9 +401,7 @@ private fun PowerOfAttorneyActions(
         if (formState.isEditing) {
             OutlinedButton(
                 onClick = {
-                    val document = formState.toDocument(
-                        headerId = 0
-                    )
+                    val document = formState.toDocument()
                     if (document == null) {
                         formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
                         return@OutlinedButton
@@ -443,12 +444,15 @@ private fun PowerOfAttorneyActions(
         Button(
             onClick = {
                 try {
-                    val (head, body) = formState.prepareExportData()
+                    val document = formState.toDocument()
+                    if (document == null) {
+                        formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
+                        return@Button
+                    }
                     getDocumentProcessor().processSave(
                         documentName = "Доверенность",
                         documentResourceFile = "Доверенность.docx",
-                        headReplacements = head,
-                        bodyParts = body
+                        document = document
                     )
                     formState.statusMessage = "Документ сохранен в файл"
                 } catch (e: Exception) {
@@ -462,12 +466,15 @@ private fun PowerOfAttorneyActions(
         Button(
             onClick = {
                 try {
-                    val (head, body) = formState.prepareExportData()
+                    val document = formState.toDocument()
+                    if (document == null) {
+                        formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
+                        return@Button
+                    }
                     getDocumentProcessor().processPrint(
                         documentName = "Доверенность",
                         documentResourceFile = "Доверенность.docx",
-                        headReplacements = head,
-                        bodyParts = body
+                        document = document
                     )
                     formState.statusMessage = "Запрос на печать документа отправлен"
                 } catch (e: Exception) {

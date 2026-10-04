@@ -1,4 +1,10 @@
 <resources>
+    <string name="number">Номер</string>
+    <string name="dischargeDate">Дата</string>
+    <string name="endDate">Дата окончания</string>
+    <string name="supplierAgreement">Договор поставки</string>
+
+    <string name="individual">Физическое лицо</string>
     <string name="individuals">Физические лица</string>
     <string name="individualJob">Должность</string>
     <string name="individualName">ФИО</string>
@@ -7,15 +13,18 @@
     <string name="individualIssued">Выдан</string>
     <string name="individualDate">Дата выдачи</string>
 
+    <string name="organization">Организация</string>
     <string name="organizations">Организации</string>
     <string name="organizationName">Название</string>
     <string name="organizationConsumer">Потребитель</string>
     <string name="organizationPayer">Плательщик</string>
     <string name="organizationAccount">Счет</string>
 
+    <string name="product">Материальная ценность</string>
     <string name="products">Материальные ценности</string>
     <string name="productName">Название</string>
 
+    <string name="supplier">Поставщик</string>
     <string name="suppliers">Поставщики</string>
     <string name="supplierName">Название</string>
 

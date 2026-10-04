@@ -1,17 +1,17 @@
 package ru.example.docmanager.di
 
+import ru.example.docmanager.database.models.documents.Document
+
 interface DocumentProcessor {
     fun processSave(
         documentName: String,
         documentResourceFile: String,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     )
 
     fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     )
 }

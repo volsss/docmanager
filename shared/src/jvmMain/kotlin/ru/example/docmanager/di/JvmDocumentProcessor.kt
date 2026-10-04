@@ -2,6 +2,8 @@ package ru.example.docmanager.di
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
+import ru.example.docmanager.database.models.documents.Document
+import ru.example.docmanager.database.models.documents.HasBody
 import ru.example.docmanager.di.DocumentProcessor
 import java.awt.Desktop
 import java.awt.FileDialog
@@ -22,30 +24,28 @@ class JvmDocumentProcessor : DocumentProcessor {
     override fun processSave(
         documentName: String,
         documentResourceFile: String,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     ) {
         val destination = chooseSaveFile("$documentName.docx") ?: return
-        processSaveToFile(destination, documentResourceFile, headReplacements, bodyParts)
+        processSaveToFile(destination, documentResourceFile, document)
     }
 
     override fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     ) {
         if (isPrintingAvailable()) {
             try {
                 val tempFile = File.createTempFile("${documentName}_", ".docx").apply { deleteOnExit() }
-                processSaveToFile(tempFile, documentResourceFile, headReplacements, bodyParts)
+                processSaveToFile(tempFile, documentResourceFile, document)
                 Desktop.getDesktop().print(tempFile)
                 return
             } catch (e: Exception) {
                 println("Printing failed: ${e.message}, falling back to saving to file")
             }
         }
-        processSave(documentName, documentResourceFile, headReplacements, bodyParts)
+        processSave(documentName, documentResourceFile, document)
     }
 
     fun isPrintingAvailable(): Boolean {
@@ -91,8 +91,7 @@ class JvmDocumentProcessor : DocumentProcessor {
     fun processSaveToFile(
         destination: File,
         documentResourceFile: String,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     ) {
         destination.parentFile?.mkdirs()
         val blank = object {}.javaClass.getResourceAsStream("/$documentResourceFile") ?: run {
@@ -101,7 +100,7 @@ class JvmDocumentProcessor : DocumentProcessor {
         }
         blank.use { input ->
             FileOutputStream(destination).use { fos ->
-                processDocument(input, fos, headReplacements, bodyParts)
+                processDocument(input, fos, document)
             }
         }
     }
@@ -109,10 +108,10 @@ class JvmDocumentProcessor : DocumentProcessor {
     fun processDocument(
         input: InputStream,
         output: OutputStream,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     ) {
         XWPFDocument(input).use { doc ->
+            val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
             doc.paragraphs.forEach { it.replacePlaceholders(headReplacements) }
             doc.tables.forEach { table ->
                 table.rows.forEach { row ->
@@ -121,7 +120,10 @@ class JvmDocumentProcessor : DocumentProcessor {
                     }
                 }
             }
-            processBodyParts(doc, bodyParts)
+            if (document is HasBody<*, *>) {
+                val bodyParts = document.body.toMapByColumns()
+                processBodyParts(doc, bodyParts)
+            }
             doc.write(output)
         }
     }

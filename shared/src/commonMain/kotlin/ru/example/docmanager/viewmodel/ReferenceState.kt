@@ -4,12 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import ru.example.docmanager.database.models.references.Reference
+import ru.example.docmanager.database.models.FieldType
 import ru.example.docmanager.database.models.references.ReferenceType
 
 class ReferenceState {
     var selectedReference by mutableStateOf(ReferenceType.INDIVIDUAL)
     var itemsByType by mutableStateOf<Map<ReferenceType, List<Reference>>>(emptyMap())
-    var fieldValues by mutableStateOf<Map<Int, Map<String, Any>>>(emptyMap())
+    var fieldValues by mutableStateOf<Map<Int, Map<FieldType, String>>>(emptyMap())
     var statusMessage by mutableStateOf<String?>(null)
 
     val currentItems: List<Reference>
@@ -33,9 +34,9 @@ class ReferenceState {
         syncFieldValues()
     }
 
-    fun updateField(itemId: Int, fieldName: String, value: Any) {
+    fun updateField(itemId: Int, fieldType: FieldType, value: String) {
         val currentFields = fieldValues[itemId].orEmpty()
-        fieldValues = fieldValues + (itemId to (currentFields + (fieldName to value)))
+        fieldValues = fieldValues + (itemId to (currentFields + (fieldType to value)))
     }
 
     fun addItem(referenceType: ReferenceType, item: Reference) {

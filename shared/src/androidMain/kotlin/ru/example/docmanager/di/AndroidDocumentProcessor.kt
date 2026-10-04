@@ -11,6 +11,8 @@ import android.widget.Toast
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.koin.core.context.GlobalContext
+import ru.example.docmanager.database.models.documents.Document
+import ru.example.docmanager.database.models.documents.HasBody
 import ru.example.docmanager.di.DocumentProcessor
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -33,11 +35,12 @@ class AndroidDocumentProcessor : DocumentProcessor {
     override fun processSave(
         documentName: String,
         documentResourceFile: String,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     ) {
         val fileName = if (documentName.endsWith(".docx", ignoreCase = true)) documentName else "$documentName.docx"
         val context = getContext()
+        val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
+        val bodyParts = if (document is HasBody<*, *>) document.body.toMapByColumns() else null
 
         val generatedBytes = generateDocumentBytes(documentResourceFile, headReplacements, bodyParts)
         if (generatedBytes == null || generatedBytes.isEmpty()) {
@@ -101,10 +104,9 @@ class AndroidDocumentProcessor : DocumentProcessor {
     override fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        document: Document
     ) {
-        processSave(documentName, documentResourceFile, headReplacements, bodyParts)
+        processSave(documentName, documentResourceFile, document)
     }
 
     private fun loadResource(context: Context?, documentResourceFile: String): InputStream? {
@@ -138,7 +140,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
     fun generateDocumentBytes(
         documentResourceFile: String,
         headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        bodyParts: Map<String, List<String>>?
     ): ByteArray? {
         val inStream = loadResource(getContext(), documentResourceFile) ?: return null
         return inStream.use { input ->
@@ -153,7 +155,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
         input: InputStream,
         output: OutputStream,
         headReplacements: Map<String, String>,
-        bodyParts: Map<String, List<String>>
+        bodyParts: Map<String, List<String>>?
     ) {
         XWPFDocument(input).use { doc ->
             doc.paragraphs.forEach { it.replacePlaceholders(headReplacements) }
@@ -164,7 +166,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
                     }
                 }
             }
-            processBodyParts(doc, bodyParts)
+            if (bodyParts != null) processBodyParts(doc, bodyParts)
             doc.write(output)
         }
     }

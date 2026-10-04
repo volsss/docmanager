@@ -43,6 +43,5 @@ abstract class FormState<D: Document, B: BodyItem> (
     abstract fun addBodyItem()
     abstract fun resetForm(references: Map<ReferenceType, List<Reference>>)
     abstract fun populateFromDocument(document: D, references: Map<ReferenceType, List<Reference>>)
-    abstract fun toDocument(headerId: Int): D?
-    abstract fun prepareExportData(): Pair<Map<String, String>, Map<String, List<String>>>
+    abstract fun toDocument(): D?
 }
