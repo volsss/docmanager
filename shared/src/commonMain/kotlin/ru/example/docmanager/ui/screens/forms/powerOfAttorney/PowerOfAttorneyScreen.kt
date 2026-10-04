@@ -1,62 +1,32 @@
 package ru.example.docmanager.ui.screens.forms.powerOfAttorney
 
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
-import ru.example.docmanager.di.getDocumentProcessor
-import ru.example.docmanager.database.models.references.Individual
-import ru.example.docmanager.database.models.references.Organization
-import ru.example.docmanager.database.models.references.Product
-import ru.example.docmanager.database.models.references.ReferenceType
-import ru.example.docmanager.database.models.references.Supplier
+import ru.example.docmanager.database.models.references.*
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
+import ru.example.docmanager.di.getDocumentProcessor
+import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
 import ru.example.docmanager.ui.screens.forms.ReferenceDropdown
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 import kotlin.time.Clock
-
-@Composable
-fun rememberPowerOfAttorneyFormState(): PowerOfAttorneyFormState {
-    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
-    val defaultEndDate = remember { today.plus(DatePeriod(days = 10)) }
-    return remember { PowerOfAttorneyFormState(today, defaultEndDate) }
-}
 
 @Composable
 fun PowerOfAttorneyScreen(
@@ -86,7 +56,8 @@ fun PowerOfAttorneyScreen(
         referencesItems[ReferenceType.PRODUCT]?.filterIsInstance<Product>().orEmpty()
     }
 
-    val formState = rememberPowerOfAttorneyFormState()
+    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
+    val formState = remember { PowerOfAttorneyFormState(today) }
 
     fun reloadDocuments() {
         scope.launch {
@@ -130,25 +101,19 @@ fun PowerOfAttorneyScreen(
     ) {
         PowerOfAttorneyBanner(
             formState = formState,
-            onResetForm = { formState.resetForm(organizations, individuals, suppliers, products) }
+            onResetForm = { formState.resetForm(referencesItems) }
         )
-
-        Spacer(Modifier.height(16.dp))
 
         PowerOfAttorneyHeaderSection(
             formState = formState,
+            referencesItems = referencesItems,
             organizations = organizations,
             individuals = individuals,
             suppliers = suppliers,
-            products = products,
-            onResetForm = { formState.resetForm(organizations, individuals, suppliers, products) }
+            onResetForm = { formState.resetForm(referencesItems) }
         )
 
-        Spacer(Modifier.height(8.dp))
-
         PowerOfAttorneyBodySection(formState = formState, products = products)
-
-        Spacer(Modifier.height(8.dp))
 
         PowerOfAttorneyActions(
             formState = formState,
@@ -156,7 +121,7 @@ fun PowerOfAttorneyScreen(
             repository = powerOfAttorneyRepository,
             products = products,
             onDocumentChanged = ::reloadDocuments,
-            onResetForm = { formState.resetForm(organizations, individuals, suppliers, products) }
+            onResetForm = { formState.resetForm(referencesItems) }
         )
     }
 }
@@ -201,10 +166,10 @@ private fun PowerOfAttorneyBanner(
 @Composable
 private fun PowerOfAttorneyHeaderSection(
     formState: PowerOfAttorneyFormState,
+    referencesItems: Map<ReferenceType, List<Reference>>,
     organizations: List<Organization>,
     individuals: List<Individual>,
     suppliers: List<Supplier>,
-    products: List<Product>,
     onResetForm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -226,7 +191,7 @@ private fun PowerOfAttorneyHeaderSection(
             existingDocuments = formState.existingDocuments,
             onNewDocumentClick = onResetForm,
             onDocumentSelected = { doc ->
-                formState.populateFromDocument(doc, organizations, individuals, suppliers, products)
+                formState.populateFromDocument(doc, referencesItems)
                 formState.numberDropdownExpanded = false
             }
         )
@@ -294,7 +259,7 @@ private fun PowerOfAttorneyBodySection(
     modifier: Modifier = Modifier
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(840)
+    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -316,15 +281,15 @@ private fun PowerOfAttorneyBodySection(
                     index = index,
                     item = item,
                     products = products,
-                    onItemChange = { updated -> formState.updateBodyRow(index, updated) },
-                    onDelete = { formState.removeBodyRow(index, products.firstOrNull()) },
-                    windowSizeClass = windowSizeClass
+                    onItemChange = { updated -> formState.updateBodyItem(index, updated) },
+                    onDelete = { formState.removeBodyItem(index) },
+                    isWide = isWide
                 )
             }
         }
 
         OutlinedButton(
-            onClick = { formState.addBodyRow(products.firstOrNull()) },
+            onClick = { formState.addBodyItem() },
             modifier = Modifier.align(Alignment.Start)
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
@@ -341,10 +306,8 @@ private fun BodyItemRow(
     products: List<Product>,
     onItemChange: (PowerOfAttorneyBodyItem) -> Unit,
     onDelete: () -> Unit,
-    windowSizeClass: WindowSizeClass
+    isWide: Boolean
 ) {
-    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(840)
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -405,9 +368,8 @@ private fun PowerOfAttorneyActions(
     ) {
         Button(
             onClick = {
-                val document = formState.toPowerOfAttorney(
-                    headerId = formState.selectedDocumentId ?: 0,
-                    defaultProduct = products.firstOrNull()
+                val document = formState.toDocument(
+                    headerId = formState.selectedDocumentId ?: 0
                 )
                 if (document == null) {
                     formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
@@ -436,9 +398,8 @@ private fun PowerOfAttorneyActions(
         if (formState.isEditing) {
             OutlinedButton(
                 onClick = {
-                    val document = formState.toPowerOfAttorney(
-                        headerId = 0,
-                        defaultProduct = products.firstOrNull()
+                    val document = formState.toDocument(
+                        headerId = 0
                     )
                     if (document == null) {
                         formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"

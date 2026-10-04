@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens
+package ru.example.docmanager.ui.screens.references
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -12,13 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.database.models.references.ReferenceType
 import ru.example.docmanager.ui.StringRegistry
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.viewmodel.ReferenceViewModel
@@ -30,6 +28,7 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
     val referenceType = formState.selectedReference
     val referenceItems = formState.currentItems
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
 
     LaunchedEffect(Unit) {
         if (formState.itemsByType.isEmpty()) {
@@ -54,8 +53,7 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
 
     Column(
         Modifier.fillMaxSize().then(
-            if (windowSizeClass.isWidthAtLeastBreakpoint(840))
-                Modifier
+            if (isWide) Modifier
             else Modifier.horizontalScroll(rememberScrollState())
         )
     ) {
@@ -96,94 +94,5 @@ fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
         ) {
             Text("Новое поле")
         }
-    }
-}
-
-@Composable
-fun ReferenceInput(
-    item: Reference,
-    currentValues: Map<String, Any>,
-    onFieldChange: (itemId: Int, fieldName: String, newValue: Any) -> Unit,
-    onRemove: () -> Unit,
-    windowSizeClass: WindowSizeClass
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(item.id.toString())
-
-        item.toMap().forEach { (name, value) ->
-            InputField(
-                label = stringResource(StringRegistry.get(name)),
-                value = currentValues[name] ?: value,
-                onValueChange = { newValue ->
-                    onFieldChange(
-                        item.id,
-                        name,
-                        newValue
-                    )
-                },
-                windowSizeClass = windowSizeClass
-            )
-        }
-
-        IconButton(onClick = onRemove) {
-            Icon(Icons.Filled.Remove, "Удалить")
-        }
-    }
-}
-
-@Composable
-fun RowScope.InputField(
-    label: String,
-    value: Any,
-    onValueChange: (Any) -> Unit,
-    windowSizeClass: WindowSizeClass
-) {
-    val modifier = if (windowSizeClass.isWidthAtLeastBreakpoint(840))
-        Modifier.weight(1f) else Modifier.widthIn(min = 300.dp)
-
-    when (value) {
-        is String -> {
-            OutlinedTextField(
-                label = { Text(label) },
-                modifier = modifier,
-                value = value,
-                onValueChange = onValueChange
-            )
-        }
-        is Int -> {
-            var textValue by remember(value) {
-                mutableStateOf(value.toString())
-            }
-            OutlinedTextField(
-                label = { Text(label) },
-                modifier = modifier,
-                value = textValue,
-                onValueChange = { newText ->
-                    textValue = newText
-                    newText.toIntOrNull()?.let { onValueChange(it) }
-                }
-            )
-        }
-        is LocalDate -> {
-            var textValue by remember(value) {
-                mutableStateOf(value.format(Utils.DATE_FORMAT))
-            }
-            OutlinedTextField(
-                label = { Text(label) },
-                modifier = modifier,
-                value = textValue,
-                onValueChange = { newText ->
-                    textValue = newText
-                    runCatching {
-                        LocalDate.parse(newText, Utils.DATE_FORMAT)
-                    }.getOrNull()?.let(onValueChange)
-                }
-            )
-        }
-        else -> Text("Unsupported type")
     }
 }

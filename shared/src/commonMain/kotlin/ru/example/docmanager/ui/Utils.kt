@@ -14,4 +14,6 @@ object Utils {
     val DATE_FORMAT = LocalDate.Format {
         day(); char('.'); monthNumber(); char('.'); year()
     }
+
+    const val WIDE_BREAKPOINT = 840
 }

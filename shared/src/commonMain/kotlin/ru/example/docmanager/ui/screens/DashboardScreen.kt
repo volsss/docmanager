@@ -20,6 +20,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ru.example.docmanager.ui.screens.references.ReferenceScreen
+import ru.example.docmanager.ui.screens.references.ReferencesScreen
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.DocumentViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
@@ -97,8 +99,7 @@ fun DashboardScreen(
                 )
             ) {
                 Column(
-                    Modifier
-                        .fillMaxSize()
+                    Modifier.fillMaxSize()
                         .padding(16.dp)
                         .verticalScroll(rememberScrollState())
                 ) {

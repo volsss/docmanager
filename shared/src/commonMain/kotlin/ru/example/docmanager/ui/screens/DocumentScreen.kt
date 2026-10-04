@@ -1,14 +1,6 @@
 package ru.example.docmanager.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ContainedLoadingIndicator
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +15,6 @@ import ru.example.docmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScr
 import ru.example.docmanager.viewmodel.DocumentViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DocumentScreen(
     documentsViewModel: DocumentViewModel,
@@ -31,20 +22,14 @@ fun DocumentScreen(
 ) {
     val type by documentsViewModel.selectedDocumentType.collectAsState()
     Text(stringResource(type.stringResource), style = MaterialTheme.typography.titleLarge)
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(8.dp))
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (type) {
             DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(referenceViewModel)
-            else -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    ContainedLoadingIndicator(modifier = Modifier.size(128.dp))
-                }
-            }
         }
     }
 }

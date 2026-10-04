@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens
+package ru.example.docmanager.ui.screens.references
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.database.models.references.ReferenceType
+import ru.example.docmanager.ui.screens.DocumentRow
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 import ru.example.docmanager.viewmodel.Tab
