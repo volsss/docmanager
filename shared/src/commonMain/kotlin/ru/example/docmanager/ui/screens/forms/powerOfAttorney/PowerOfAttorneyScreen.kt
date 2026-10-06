@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.body
+import docmanager.shared.generated.resources.body_field_count
+import docmanager.shared.generated.resources.body_field_unit
 import docmanager.shared.generated.resources.header
 import docmanager.shared.generated.resources.input_individual
 import docmanager.shared.generated.resources.input_organization
@@ -344,7 +346,7 @@ private fun BodyItemRow(
         OutlinedTextField(
             value = item.unit,
             onValueChange = { onItemChange(item.copy(unit = it)) },
-            label = { Text("Ед. изм.") },
+            label = { Text(stringResource(Res.string.body_field_unit)) },
             singleLine = true,
             modifier = if (isWide) Modifier.weight(1f) else Modifier.widthIn(min = 150.dp)
         )
@@ -352,7 +354,7 @@ private fun BodyItemRow(
         OutlinedTextField(
             value = item.count,
             onValueChange = { onItemChange(item.copy(count = it)) },
-            label = { Text("Количество (прописью)") },
+            label = { Text(stringResource(Res.string.body_field_count)) },
             singleLine = true,
             modifier = if (isWide) Modifier.weight(1.5f) else Modifier.widthIn(min = 300.dp)
         )
