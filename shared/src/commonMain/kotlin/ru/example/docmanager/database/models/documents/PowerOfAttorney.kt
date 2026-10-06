@@ -12,8 +12,6 @@ class PowerOfAttorney(
     override val header: Header,
     override val body: Body
 ): Document, HasBody<PowerOfAttorney.BodyItem, PowerOfAttorney.Body> {
-    override fun toMap(): Map<FieldType, String> = header.toMap()
-
     data class Header(
         override val id: Int,
         override var number: Int,
