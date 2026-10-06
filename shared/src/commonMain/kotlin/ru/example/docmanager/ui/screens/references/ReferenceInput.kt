@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.references.Reference
-import ru.example.docmanager.documents.HeaderFieldType
+import ru.example.docmanager.references.base.Reference
+import ru.example.docmanager.documents.base.HeaderFieldType
 import ru.example.docmanager.ui.Utils
 
 @Composable

@@ -1,15 +1,15 @@
 package ru.example.docmanager.di
 
-import ru.example.docmanager.documents.Document
+import ru.example.docmanager.documents.base.Document
 
 interface DocumentProcessor {
-    fun processSave(
+    suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
         document: Document
     )
 
-    fun processPrint(
+    suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
         document: Document

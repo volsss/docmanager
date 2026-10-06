@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.ui.screens.references.ReferenceScreen
 import ru.example.docmanager.ui.screens.references.ReferencesScreen
 import ru.example.docmanager.viewmodel.DashboardViewModel
@@ -66,6 +67,9 @@ fun DashboardScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val documentsLabel = stringResource(Tab.DOCUMENTS.stringResource)
+            val referencesLabel = stringResource(Tab.REFERENCES.stringResource)
+
             ButtonGroup(
                 overflowIndicator = { menuState ->
                     IconButton(onClick = { if (menuState.isShowing) menuState.dismiss() else menuState.show() }) {
@@ -77,15 +81,30 @@ fun DashboardScreen(
                     .padding(horizontal = 16.dp)
                     .widthIn(max = 700.dp),
             ) {
-                listOf(Tab.DOCUMENTS, Tab.REFERENCES).forEach { tab ->
-                    toggleableItem(
-                        checked = selectedTab == tab,
-                        onCheckedChange = { dashboardViewModel.selectTab(tab) },
-                        label = tab.text,
-                        weight = 0.5f,
-                        icon = { Icon(tab.icon, tab.text) }
-                    )
-                }
+                toggleableItem(
+                    checked = selectedTab == Tab.DOCUMENTS,
+                    onCheckedChange = { dashboardViewModel.selectTab(Tab.DOCUMENTS) },
+                    label = documentsLabel,
+                    weight = 0.5f,
+                    icon = {
+                        Icon(
+                            Tab.DOCUMENTS.icon,
+                            stringResource(Tab.DOCUMENTS.stringResource)
+                        )
+                    }
+                )
+                toggleableItem(
+                    checked = selectedTab == Tab.REFERENCES,
+                    onCheckedChange = { dashboardViewModel.selectTab(Tab.REFERENCES) },
+                    label = referencesLabel,
+                    weight = 0.5f,
+                    icon = {
+                        Icon(
+                            Tab.REFERENCES.icon,
+                            stringResource(Tab.REFERENCES.stringResource)
+                        )
+                    }
+                )
             }
             Spacer(Modifier.height(8.dp))
 

@@ -2,6 +2,13 @@ package ru.example.docmanager.documents
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
+import ru.example.docmanager.documents.base.BodyFieldType
+import ru.example.docmanager.documents.base.Document
+import ru.example.docmanager.documents.base.DocumentBody
+import ru.example.docmanager.documents.base.DocumentBodyItem
+import ru.example.docmanager.documents.base.DocumentHeader
+import ru.example.docmanager.documents.base.HeaderFieldType
+import ru.example.docmanager.documents.base.WithBody
 import ru.example.docmanager.references.Individual
 import ru.example.docmanager.references.Organization
 import ru.example.docmanager.references.Product
@@ -35,10 +42,10 @@ class PowerOfAttorney(
         override val items: List<BodyItem>
     ): DocumentBody<BodyItem> {
         override fun toMapByColumns() = mapOf(
-            "Номер по порядку" to List(items.size) { idx -> (idx + 1).toString() },
-            "Материальные ценности" to items.map { it.product.name },
-            "Единица измерения" to items.map { it.unit },
-            "Количество (прописью)" to items.map { it.count }
+            BodyFieldType.NUMBER_SORTED to List(items.size) { idx -> (idx + 1).toString() },
+            BodyFieldType.PRODUCTS to items.map { it.product.name },
+            BodyFieldType.UNIT to items.map { it.unit },
+            BodyFieldType.COUNT to items.map { it.count }
         )
     }
 

@@ -11,8 +11,8 @@ import ru.example.docmanager.documents.PowerOfAttorney
 import ru.example.docmanager.references.Individual
 import ru.example.docmanager.references.Organization
 import ru.example.docmanager.references.Product
-import ru.example.docmanager.references.Reference
-import ru.example.docmanager.references.ReferenceType
+import ru.example.docmanager.references.base.Reference
+import ru.example.docmanager.references.base.ReferenceType
 import ru.example.docmanager.references.Supplier
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.FormState

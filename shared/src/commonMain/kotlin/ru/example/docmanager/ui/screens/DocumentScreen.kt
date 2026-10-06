@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.documents.DocumentType
+import ru.example.docmanager.documents.base.DocumentType
 import ru.example.docmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScreen
 import ru.example.docmanager.viewmodel.DocumentViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel

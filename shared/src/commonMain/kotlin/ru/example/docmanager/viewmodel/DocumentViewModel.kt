@@ -2,7 +2,7 @@ package ru.example.docmanager.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import ru.example.docmanager.documents.DocumentType
+import ru.example.docmanager.documents.base.DocumentType
 
 class DocumentViewModel {
     val selectedDocumentType: StateFlow<DocumentType>

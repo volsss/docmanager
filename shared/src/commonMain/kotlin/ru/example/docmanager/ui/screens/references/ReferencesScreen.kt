@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.references.ReferenceType
+import ru.example.docmanager.references.base.ReferenceType
 import ru.example.docmanager.ui.screens.DocumentRow
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel

@@ -10,9 +10,10 @@ import android.provider.MediaStore
 import android.widget.Toast
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
+import org.jetbrains.compose.resources.getString
 import org.koin.core.context.GlobalContext
-import ru.example.docmanager.documents.Document
-import ru.example.docmanager.documents.WithBody
+import ru.example.docmanager.documents.base.Document
+import ru.example.docmanager.documents.base.WithBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -31,7 +32,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
         }
     }
 
-    override fun processSave(
+    override suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
         document: Document
@@ -39,7 +40,9 @@ class AndroidDocumentProcessor : DocumentProcessor {
         val fileName = if (documentName.endsWith(".docx", ignoreCase = true)) documentName else "$documentName.docx"
         val context = getContext()
         val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
-        val bodyParts = if (document is WithBody<*>) document.body.toMapByColumns() else null
+        val bodyParts = if (document is WithBody<*>) document.body.toMapByColumns().mapKeys {
+            getString(it.key.stringResource)
+        } else null
 
         val generatedBytes = generateDocumentBytes(documentResourceFile, headReplacements, bodyParts)
         if (generatedBytes == null || generatedBytes.isEmpty()) {
@@ -100,7 +103,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
         }
     }
 
-    override fun processPrint(
+    override suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
         document: Document

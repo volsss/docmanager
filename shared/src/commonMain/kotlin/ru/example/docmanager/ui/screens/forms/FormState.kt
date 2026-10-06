@@ -4,9 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
-import ru.example.docmanager.documents.Document
-import ru.example.docmanager.references.Reference
-import ru.example.docmanager.references.ReferenceType
+import ru.example.docmanager.documents.base.Document
+import ru.example.docmanager.references.base.Reference
+import ru.example.docmanager.references.base.ReferenceType
 import ru.example.docmanager.ui.Utils
 
 abstract class FormState<D: Document, B: BodyItem> (

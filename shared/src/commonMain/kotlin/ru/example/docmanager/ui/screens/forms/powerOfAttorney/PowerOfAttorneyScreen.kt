@@ -16,23 +16,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.individual
-import docmanager.shared.generated.resources.organization
-import docmanager.shared.generated.resources.product
-import docmanager.shared.generated.resources.supplier
+import docmanager.shared.generated.resources.body
+import docmanager.shared.generated.resources.header
+import docmanager.shared.generated.resources.input_individual
+import docmanager.shared.generated.resources.input_organization
+import docmanager.shared.generated.resources.input_product
+import docmanager.shared.generated.resources.input_supplier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.documents.HeaderFieldType
+import ru.example.docmanager.documents.base.HeaderFieldType
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.di.getDocumentProcessor
 import ru.example.docmanager.references.Individual
 import ru.example.docmanager.references.Organization
 import ru.example.docmanager.references.Product
-import ru.example.docmanager.references.Reference
-import ru.example.docmanager.references.ReferenceType
+import ru.example.docmanager.references.base.Reference
+import ru.example.docmanager.references.base.ReferenceType
 import ru.example.docmanager.references.Supplier
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
@@ -189,7 +191,7 @@ private fun PowerOfAttorneyHeaderSection(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Шапка документа",
+            text = stringResource(Res.string.header),
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.titleMedium
         )
@@ -224,7 +226,7 @@ private fun PowerOfAttorneyHeaderSection(
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.organization),
+            label = stringResource(Res.string.input_organization),
             items = organizations,
             selectedItem = formState.selectedOrganization,
             onItemSelected = { formState.selectedOrganization = it },
@@ -233,7 +235,7 @@ private fun PowerOfAttorneyHeaderSection(
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.individual),
+            label = stringResource(Res.string.input_individual),
             items = individuals,
             selectedItem = formState.selectedIndividual,
             onItemSelected = { formState.selectedIndividual = it },
@@ -245,7 +247,7 @@ private fun PowerOfAttorneyHeaderSection(
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.supplier),
+            label = stringResource(Res.string.input_supplier),
             items = suppliers,
             selectedItem = formState.selectedSupplier,
             onItemSelected = { formState.selectedSupplier = it },
@@ -277,7 +279,7 @@ private fun PowerOfAttorneyBodySection(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Тело документа",
+            text = stringResource(Res.string.body),
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.titleMedium
         )
@@ -331,7 +333,7 @@ private fun BodyItemRow(
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.product),
+            label = stringResource(Res.string.input_product),
             items = products,
             selectedItem = item.product,
             onItemSelected = { onItemChange(item.copy(product = it)) },
@@ -448,20 +450,22 @@ private fun PowerOfAttorneyActions(
 
         Button(
             onClick = {
-                try {
-                    val document = formState.toDocument()
-                    if (document == null) {
-                        formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
-                        return@Button
+                scope.launch {
+                    try {
+                        val document = formState.toDocument()
+                        if (document == null) {
+                            formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
+                            return@launch
+                        }
+                        getDocumentProcessor().processSave(
+                            documentName = "Доверенность",
+                            documentResourceFile = "Доверенность.docx",
+                            document = document
+                        )
+                        formState.statusMessage = "Документ сохранен в файл"
+                    } catch (e: Exception) {
+                        formState.statusMessage = "Ошибка при сохранении в файл: ${e.message}"
                     }
-                    getDocumentProcessor().processSave(
-                        documentName = "Доверенность",
-                        documentResourceFile = "Доверенность.docx",
-                        document = document
-                    )
-                    formState.statusMessage = "Документ сохранен в файл"
-                } catch (e: Exception) {
-                    formState.statusMessage = "Ошибка при сохранении в файл: ${e.message}"
                 }
             }
         ) {
@@ -470,20 +474,22 @@ private fun PowerOfAttorneyActions(
 
         Button(
             onClick = {
-                try {
-                    val document = formState.toDocument()
-                    if (document == null) {
-                        formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
-                        return@Button
+                scope.launch {
+                    try {
+                        val document = formState.toDocument()
+                        if (document == null) {
+                            formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
+                            return@launch
+                        }
+                        getDocumentProcessor().processPrint(
+                            documentName = "Доверенность",
+                            documentResourceFile = "Доверенность.docx",
+                            document = document
+                        )
+                        formState.statusMessage = "Запрос на печать документа отправлен"
+                    } catch (e: Exception) {
+                        formState.statusMessage = "Ошибка при формировании документа для печати: ${e.message}"
                     }
-                    getDocumentProcessor().processPrint(
-                        documentName = "Доверенность",
-                        documentResourceFile = "Доверенность.docx",
-                        document = document
-                    )
-                    formState.statusMessage = "Запрос на печать документа отправлен"
-                } catch (e: Exception) {
-                    formState.statusMessage = "Ошибка при формировании документа для печати: ${e.message}"
                 }
             }
         ) {

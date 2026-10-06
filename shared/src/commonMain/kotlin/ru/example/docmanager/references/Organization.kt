@@ -1,6 +1,7 @@
 package ru.example.docmanager.references
 
-import ru.example.docmanager.documents.HeaderFieldType
+import ru.example.docmanager.documents.base.HeaderFieldType
+import ru.example.docmanager.references.base.Reference
 
 data class Organization(
     override var id: Int = -1,

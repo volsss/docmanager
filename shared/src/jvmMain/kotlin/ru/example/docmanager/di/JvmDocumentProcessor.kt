@@ -2,8 +2,9 @@ package ru.example.docmanager.di
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
-import ru.example.docmanager.documents.Document
-import ru.example.docmanager.documents.WithBody
+import org.jetbrains.compose.resources.getString
+import ru.example.docmanager.documents.base.Document
+import ru.example.docmanager.documents.base.WithBody
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame
@@ -19,7 +20,7 @@ import kotlin.collections.iterator
 
 class JvmDocumentProcessor : DocumentProcessor {
 
-    override fun processSave(
+    override suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
         document: Document
@@ -28,7 +29,7 @@ class JvmDocumentProcessor : DocumentProcessor {
         processSaveToFile(destination, documentResourceFile, document)
     }
 
-    override fun processPrint(
+    override suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
         document: Document
@@ -86,7 +87,7 @@ class JvmDocumentProcessor : DocumentProcessor {
         return null
     }
 
-    fun processSaveToFile(
+    suspend fun processSaveToFile(
         destination: File,
         documentResourceFile: String,
         document: Document
@@ -103,7 +104,7 @@ class JvmDocumentProcessor : DocumentProcessor {
         }
     }
 
-    fun processDocument(
+    suspend fun processDocument(
         input: InputStream,
         output: OutputStream,
         document: Document
@@ -119,7 +120,7 @@ class JvmDocumentProcessor : DocumentProcessor {
                 }
             }
             if (document is WithBody<*>) {
-                val bodyParts = document.body.toMapByColumns()
+                val bodyParts = document.body.toMapByColumns().mapKeys { getString(it.key.stringResource) }
                 processBodyParts(doc, bodyParts)
             }
             doc.write(output)
