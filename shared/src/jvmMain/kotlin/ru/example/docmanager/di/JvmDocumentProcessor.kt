@@ -2,8 +2,8 @@ package ru.example.docmanager.di
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
-import ru.example.docmanager.database.models.documents.Document
-import ru.example.docmanager.database.models.documents.WithBody
+import ru.example.docmanager.documents.Document
+import ru.example.docmanager.documents.WithBody
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame

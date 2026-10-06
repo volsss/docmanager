@@ -1,12 +1,12 @@
-package ru.example.docmanager.database.models.references
+package ru.example.docmanager.references
 
-import ru.example.docmanager.database.models.FieldType
+import ru.example.docmanager.documents.HeaderFieldType
 
 abstract class Reference(
     open var id: Int
 ) {
-    abstract fun toMap(): Map<FieldType, String>
-    abstract fun copyWithFields(fields: Map<FieldType, String>): Reference
+    abstract fun toMap(): Map<HeaderFieldType, String>
+    abstract fun copyWithFields(fields: Map<HeaderFieldType, String>): Reference
 
     override fun equals(other: Any?): Boolean =
         other is Reference && this.id == other.id

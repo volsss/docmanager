@@ -7,13 +7,13 @@ import androidx.compose.ui.util.fastFilteredMap
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import ru.example.docmanager.database.models.documents.PowerOfAttorney
-import ru.example.docmanager.database.models.references.Individual
-import ru.example.docmanager.database.models.references.Organization
-import ru.example.docmanager.database.models.references.Product
-import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.database.models.references.ReferenceType
-import ru.example.docmanager.database.models.references.Supplier
+import ru.example.docmanager.documents.PowerOfAttorney
+import ru.example.docmanager.references.Individual
+import ru.example.docmanager.references.Organization
+import ru.example.docmanager.references.Product
+import ru.example.docmanager.references.Reference
+import ru.example.docmanager.references.ReferenceType
+import ru.example.docmanager.references.Supplier
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.FormState
 

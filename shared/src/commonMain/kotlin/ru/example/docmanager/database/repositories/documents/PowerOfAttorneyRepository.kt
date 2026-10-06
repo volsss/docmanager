@@ -11,7 +11,7 @@ import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.database.dbQuery
 import ru.example.docmanager.database.tables.PowerOfAttorneyTables.BodiesTable
 import ru.example.docmanager.database.tables.PowerOfAttorneyTables.HeadersTable
-import ru.example.docmanager.database.models.documents.PowerOfAttorney
+import ru.example.docmanager.documents.PowerOfAttorney
 import ru.example.docmanager.database.repositories.references.IndividualsRepository
 import ru.example.docmanager.database.repositories.references.OrganizationsRepository
 import ru.example.docmanager.database.repositories.references.ProductsRepository

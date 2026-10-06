@@ -25,10 +25,15 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.database.models.FieldType
-import ru.example.docmanager.database.models.references.*
+import ru.example.docmanager.documents.HeaderFieldType
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.di.getDocumentProcessor
+import ru.example.docmanager.references.Individual
+import ru.example.docmanager.references.Organization
+import ru.example.docmanager.references.Product
+import ru.example.docmanager.references.Reference
+import ru.example.docmanager.references.ReferenceType
+import ru.example.docmanager.references.Supplier
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
 import ru.example.docmanager.ui.screens.forms.ReferenceDropdown
@@ -205,7 +210,7 @@ private fun PowerOfAttorneyHeaderSection(
         OutlinedTextField(
             value = formState.dischargeDate,
             onValueChange = { formState.dischargeDate = it },
-            label = { Text(stringResource(FieldType.DISCHARGE_DATE.stringResource)) },
+            label = { Text(stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -213,7 +218,7 @@ private fun PowerOfAttorneyHeaderSection(
         OutlinedTextField(
             value = formState.endDate,
             onValueChange = { formState.endDate = it },
-            label = { Text(stringResource(FieldType.END_DATE.stringResource)) },
+            label = { Text(stringResource(HeaderFieldType.END_DATE.stringResource)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -251,7 +256,7 @@ private fun PowerOfAttorneyHeaderSection(
         OutlinedTextField(
             value = formState.supplierAgreement,
             onValueChange = { formState.supplierAgreement = it },
-            label = { Text(stringResource(FieldType.SUPPLIER_AGREEMENT.stringResource)) },
+            label = { Text(stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )

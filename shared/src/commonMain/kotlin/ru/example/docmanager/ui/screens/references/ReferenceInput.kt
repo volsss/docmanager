@@ -16,15 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.database.models.FieldType
+import ru.example.docmanager.references.Reference
+import ru.example.docmanager.documents.HeaderFieldType
 import ru.example.docmanager.ui.Utils
 
 @Composable
 fun ReferenceInput(
     item: Reference,
-    currentValues: Map<FieldType, String>,
-    onFieldChange: (itemId: Int, fieldType: FieldType, newValue: String) -> Unit,
+    currentValues: Map<HeaderFieldType, String>,
+    onFieldChange: (itemId: Int, headerFieldType: HeaderFieldType, newValue: String) -> Unit,
     onRemove: () -> Unit,
     windowSizeClass: WindowSizeClass
 ) {

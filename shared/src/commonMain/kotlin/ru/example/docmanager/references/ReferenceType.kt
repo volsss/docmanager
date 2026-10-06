@@ -1,4 +1,4 @@
-package ru.example.docmanager.database.models.references
+package ru.example.docmanager.references
 
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.individuals

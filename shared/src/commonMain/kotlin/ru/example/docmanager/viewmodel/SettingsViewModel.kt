@@ -2,7 +2,7 @@ package ru.example.docmanager.viewmodel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import ru.example.docmanager.database.models.Metadata
+import ru.example.docmanager.database.Metadata
 import ru.example.docmanager.database.repositories.MetadataRepository
 
 class SettingsViewModel(

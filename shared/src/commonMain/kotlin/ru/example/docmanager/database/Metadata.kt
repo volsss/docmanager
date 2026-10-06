@@ -1,4 +1,4 @@
-package ru.example.docmanager.database.models
+package ru.example.docmanager.database
 
 data class Metadata(
     val name: String,

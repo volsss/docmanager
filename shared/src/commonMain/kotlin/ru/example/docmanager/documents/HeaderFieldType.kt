@@ -1,9 +1,8 @@
-package ru.example.docmanager.database.models
+package ru.example.docmanager.documents
 
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.dischargeDate
 import docmanager.shared.generated.resources.endDate
-import docmanager.shared.generated.resources.individual
 import docmanager.shared.generated.resources.individualDate
 import docmanager.shared.generated.resources.individualIssued
 import docmanager.shared.generated.resources.individualJob
@@ -11,19 +10,16 @@ import docmanager.shared.generated.resources.individualName
 import docmanager.shared.generated.resources.individualNumber
 import docmanager.shared.generated.resources.individualSeries
 import docmanager.shared.generated.resources.number
-import docmanager.shared.generated.resources.organization
 import docmanager.shared.generated.resources.organizationAccount
 import docmanager.shared.generated.resources.organizationConsumer
 import docmanager.shared.generated.resources.organizationName
 import docmanager.shared.generated.resources.organizationPayer
-import docmanager.shared.generated.resources.product
 import docmanager.shared.generated.resources.productName
-import docmanager.shared.generated.resources.supplier
 import docmanager.shared.generated.resources.supplierAgreement
 import docmanager.shared.generated.resources.supplierName
 import org.jetbrains.compose.resources.StringResource
 
-enum class FieldType (
+enum class HeaderFieldType (
     val stringResource: StringResource,
     val placeholder: String,
 ) {

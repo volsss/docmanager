@@ -1,6 +1,6 @@
 package ru.example.docmanager.di
 
-import ru.example.docmanager.database.models.documents.Document
+import ru.example.docmanager.documents.Document
 
 interface DocumentProcessor {
     fun processSave(

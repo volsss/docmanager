@@ -1,4 +1,4 @@
-package ru.example.docmanager.database.models.documents
+package ru.example.docmanager.documents
 
 interface WithBody <T: DocumentBodyItem> {
     val body: DocumentBody<T>

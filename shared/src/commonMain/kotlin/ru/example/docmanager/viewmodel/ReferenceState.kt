@@ -3,14 +3,14 @@ package ru.example.docmanager.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.database.models.FieldType
-import ru.example.docmanager.database.models.references.ReferenceType
+import ru.example.docmanager.references.Reference
+import ru.example.docmanager.documents.HeaderFieldType
+import ru.example.docmanager.references.ReferenceType
 
 class ReferenceState {
     var selectedReference by mutableStateOf(ReferenceType.INDIVIDUAL)
     var itemsByType by mutableStateOf<Map<ReferenceType, List<Reference>>>(emptyMap())
-    var fieldValues by mutableStateOf<Map<Int, Map<FieldType, String>>>(emptyMap())
+    var fieldValues by mutableStateOf<Map<Int, Map<HeaderFieldType, String>>>(emptyMap())
     var statusMessage by mutableStateOf<String?>(null)
 
     val currentItems: List<Reference>
@@ -34,9 +34,9 @@ class ReferenceState {
         syncFieldValues()
     }
 
-    fun updateField(itemId: Int, fieldType: FieldType, value: String) {
+    fun updateField(itemId: Int, headerFieldType: HeaderFieldType, value: String) {
         val currentFields = fieldValues[itemId].orEmpty()
-        fieldValues = fieldValues + (itemId to (currentFields + (fieldType to value)))
+        fieldValues = fieldValues + (itemId to (currentFields + (headerFieldType to value)))
     }
 
     fun addItem(referenceType: ReferenceType, item: Reference) {

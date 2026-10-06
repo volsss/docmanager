@@ -11,8 +11,8 @@ import android.widget.Toast
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.koin.core.context.GlobalContext
-import ru.example.docmanager.database.models.documents.Document
-import ru.example.docmanager.database.models.documents.WithBody
+import ru.example.docmanager.documents.Document
+import ru.example.docmanager.documents.WithBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream

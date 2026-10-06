@@ -1,12 +1,11 @@
-package ru.example.docmanager.database.models.documents
+package ru.example.docmanager.documents
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
-import ru.example.docmanager.database.models.FieldType
-import ru.example.docmanager.database.models.references.Individual
-import ru.example.docmanager.database.models.references.Organization
-import ru.example.docmanager.database.models.references.Product
-import ru.example.docmanager.database.models.references.Supplier
+import ru.example.docmanager.references.Individual
+import ru.example.docmanager.references.Organization
+import ru.example.docmanager.references.Product
+import ru.example.docmanager.references.Supplier
 
 class PowerOfAttorney(
     override val header: Header,
@@ -22,11 +21,11 @@ class PowerOfAttorney(
         var supplier: Supplier,
         var supplierAgreement: String
     ): DocumentHeader {
-        override fun toMap(): Map<FieldType, String> = mapOf(
-            FieldType.NUMBER to number.toString(),
-            FieldType.DISCHARGE_DATE to dischargeDate.format(LocalDate.Formats.ISO),
-            FieldType.END_DATE to endDate.format(LocalDate.Formats.ISO),
-            FieldType.SUPPLIER_AGREEMENT to supplierAgreement,
+        override fun toMap(): Map<HeaderFieldType, String> = mapOf(
+            HeaderFieldType.NUMBER to number.toString(),
+            HeaderFieldType.DISCHARGE_DATE to dischargeDate.format(LocalDate.Formats.ISO),
+            HeaderFieldType.END_DATE to endDate.format(LocalDate.Formats.ISO),
+            HeaderFieldType.SUPPLIER_AGREEMENT to supplierAgreement,
         ) + organization.toMap() +
                 individual.toMap() +
                 supplier.toMap()

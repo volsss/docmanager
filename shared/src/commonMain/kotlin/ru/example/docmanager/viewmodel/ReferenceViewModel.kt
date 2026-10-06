@@ -1,7 +1,7 @@
 package ru.example.docmanager.viewmodel
 
-import ru.example.docmanager.database.models.references.Reference
-import ru.example.docmanager.database.models.references.ReferenceType
+import ru.example.docmanager.references.Reference
+import ru.example.docmanager.references.ReferenceType
 import ru.example.docmanager.database.repositories.references.IndividualsRepository
 import ru.example.docmanager.database.repositories.references.OrganizationsRepository
 import ru.example.docmanager.database.repositories.references.ProductsRepository
