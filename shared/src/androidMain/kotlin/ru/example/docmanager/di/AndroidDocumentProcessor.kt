@@ -12,8 +12,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.koin.core.context.GlobalContext
 import ru.example.docmanager.database.models.documents.Document
-import ru.example.docmanager.database.models.documents.HasBody
-import ru.example.docmanager.di.DocumentProcessor
+import ru.example.docmanager.database.models.documents.WithBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -40,7 +39,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
         val fileName = if (documentName.endsWith(".docx", ignoreCase = true)) documentName else "$documentName.docx"
         val context = getContext()
         val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
-        val bodyParts = if (document is HasBody<*, *>) document.body.toMapByColumns() else null
+        val bodyParts = if (document is WithBody<*>) document.body.toMapByColumns() else null
 
         val generatedBytes = generateDocumentBytes(documentResourceFile, headReplacements, bodyParts)
         if (generatedBytes == null || generatedBytes.isEmpty()) {

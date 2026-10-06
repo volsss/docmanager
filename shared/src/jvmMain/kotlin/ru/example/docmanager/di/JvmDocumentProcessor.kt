@@ -3,13 +3,11 @@ package ru.example.docmanager.di
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import ru.example.docmanager.database.models.documents.Document
-import ru.example.docmanager.database.models.documents.HasBody
-import ru.example.docmanager.di.DocumentProcessor
+import ru.example.docmanager.database.models.documents.WithBody
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame
 import java.awt.GraphicsEnvironment
-import java.awt.print.PrinterJob
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -120,7 +118,7 @@ class JvmDocumentProcessor : DocumentProcessor {
                     }
                 }
             }
-            if (document is HasBody<*, *>) {
+            if (document is WithBody<*>) {
                 val bodyParts = document.body.toMapByColumns()
                 processBodyParts(doc, bodyParts)
             }

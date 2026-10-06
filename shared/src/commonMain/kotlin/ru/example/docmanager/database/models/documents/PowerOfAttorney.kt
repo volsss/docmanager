@@ -11,7 +11,7 @@ import ru.example.docmanager.database.models.references.Supplier
 class PowerOfAttorney(
     override val header: Header,
     override val body: Body
-): Document, HasBody<PowerOfAttorney.BodyItem, PowerOfAttorney.Body> {
+): Document, WithBody<PowerOfAttorney.BodyItem> {
     data class Header(
         override val id: Int,
         override var number: Int,
