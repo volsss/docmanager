@@ -1,4 +1,12 @@
 <resources>
+    <string name="start_screen_title">docmanager</string>
+
+    <string name="input_supporting_required">* Обязательное поле</string>
+    <string name="input_jdbc_url">JDBC URL*</string>
+    <string name="input_driver">Драйвер*</string>
+    <string name="input_user">Пользователь</string>
+    <string name="input_password">Пароль</string>
+
     <string name="tabs_documents">Документы</string>
     <string name="tabs_document">Документ</string>
     <string name="tabs_references">Справочники</string>

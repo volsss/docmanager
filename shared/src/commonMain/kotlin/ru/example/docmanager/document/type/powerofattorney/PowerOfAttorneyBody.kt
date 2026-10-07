@@ -1,7 +1,7 @@
 package ru.example.docmanager.document.type.powerofattorney
 
-import ru.example.docmanager.document.BodyFieldType
-import ru.example.docmanager.document.DocumentBody
+import ru.example.docmanager.document.body.BodyFieldType
+import ru.example.docmanager.document.body.DocumentBody
 
 data class PowerOfAttorneyBody (
     override val items: List<PowerOfAttorneyBodyItem>

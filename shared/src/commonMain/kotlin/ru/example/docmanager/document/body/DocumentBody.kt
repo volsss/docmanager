@@ -1,4 +1,4 @@
-package ru.example.docmanager.document
+package ru.example.docmanager.document.body
 
 interface DocumentBody<T : DocumentBodyItem> {
     val items: List<T>

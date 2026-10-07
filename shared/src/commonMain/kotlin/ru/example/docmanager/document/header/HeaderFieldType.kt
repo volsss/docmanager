@@ -1,4 +1,4 @@
-package ru.example.docmanager.document
+package ru.example.docmanager.document.header
 
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.header_field_discharge_date

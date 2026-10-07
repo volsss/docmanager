@@ -2,8 +2,8 @@ package ru.example.docmanager.document.type.powerofattorney
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
-import ru.example.docmanager.document.DocumentHeader
-import ru.example.docmanager.document.HeaderFieldType
+import ru.example.docmanager.document.header.DocumentHeader
+import ru.example.docmanager.document.header.HeaderFieldType
 import ru.example.docmanager.reference.Individual
 import ru.example.docmanager.reference.Organization
 import ru.example.docmanager.reference.Supplier

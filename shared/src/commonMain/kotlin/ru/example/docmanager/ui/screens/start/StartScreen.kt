@@ -1,47 +1,29 @@
-package ru.example.docmanager.ui.screens
+package ru.example.docmanager.ui.screens.start
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import docmanager.shared.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.di.Platform
 import ru.example.docmanager.di.getPlatform
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.viewmodel.ConnectionViewModel
 
 @Composable
-fun ConnectionScreen(
+fun StartScreen(
     viewModel: ConnectionViewModel,
     onConnect: (String, String, String, String) -> Unit
 ) {
@@ -52,18 +34,29 @@ fun ConnectionScreen(
     var password by remember { mutableStateOf("") }
     val error by viewModel.error.collectAsState()
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Подключение к базе данных") }) }
-    ) { paddingValues ->
+    Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth().height(256.dp)
+            ) {
+                Text (
+                    text = stringResource(Res.string.start_screen_title),
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
             Column(
                 modifier = Modifier.widthIn(max = 500.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -71,11 +64,12 @@ fun ConnectionScreen(
             ) {
                 OutlinedTextField(
                     value = jdbcUrl,
-                    readOnly = driver == Utils.H2_DRIVER,
+                    enabled = driver != Utils.H2_DRIVER,
                     onValueChange = { jdbcUrl = it },
-                    label = { Text("JDBC URL*") },
-                    supportingText = { Text("*обязательно для заполнения") },
+                    label = { Text(stringResource(Res.string.input_jdbc_url)) },
+                    supportingText = { Text(stringResource(Res.string.input_supporting_required)) },
                     singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -92,22 +86,30 @@ fun ConnectionScreen(
                     }
                 )
 
-                OutlinedTextField(
-                    value = user,
-                    onValueChange = { user = it },
-                    label = { Text("Пользователь") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                AnimatedVisibility(driver == Utils.POSTGRES_DRIVER) {
+                    Column (
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = user,
+                            onValueChange = { user = it },
+                            label = { Text(stringResource(Res.string.input_user)) },
+                            singleLine = true,
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Пароль") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation()
-                )
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text(stringResource(Res.string.input_password)) },
+                            singleLine = true,
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            visualTransformation = PasswordVisualTransformation()
+                        )
+                    }
+                }
 
                 AnimatedVisibility(error != null) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -166,10 +168,11 @@ fun DriverDropDown(
             value = selectedItem.orEmpty(),
             onValueChange = {},
             readOnly = true,
-            label = { Text("Драйвер*") },
-            supportingText = { Text("*обязательно для заполнения") },
+            label = { Text(stringResource(Res.string.input_driver)) },
+            supportingText = { Text(stringResource(Res.string.input_supporting_required)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+            shape = RoundedCornerShape(16.dp),
             singleLine = true
         )
         ExposedDropdownMenu(
@@ -184,9 +187,9 @@ fun DriverDropDown(
                 }
             )
             DropdownMenuItem(
-                text = { Text(Utils.POSTGRES_DRIVER) },
+                text = { Text("Postgres") },
                 onClick = {
-                    onItemSelected("")
+                    onItemSelected(Utils.POSTGRES_DRIVER)
                     expanded = false
                 }
             )

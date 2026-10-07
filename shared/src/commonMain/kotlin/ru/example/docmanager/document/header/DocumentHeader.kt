@@ -1,4 +1,4 @@
-package ru.example.docmanager.document
+package ru.example.docmanager.document.header
 
 import kotlinx.datetime.LocalDate
 

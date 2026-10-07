@@ -1,6 +1,6 @@
 package ru.example.docmanager.reference
 
-import ru.example.docmanager.document.HeaderFieldType
+import ru.example.docmanager.document.header.HeaderFieldType
 
 data class Product(
     override var id: Int = -1,

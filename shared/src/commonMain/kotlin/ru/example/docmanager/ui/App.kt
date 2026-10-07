@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import ru.example.docmanager.database.DatabaseFactory
-import ru.example.docmanager.ui.screens.ConnectionScreen
+import ru.example.docmanager.ui.screens.start.StartScreen
 import ru.example.docmanager.ui.screens.DashboardScreen
 import ru.example.docmanager.viewmodel.ConnectionViewModel
 import ru.example.docmanager.viewmodel.DashboardViewModel
@@ -45,7 +45,7 @@ fun App() {
     val scope = rememberCoroutineScope()
 
     when (state) {
-        ConnectionState.NONE -> ConnectionScreen(
+        ConnectionState.NONE -> StartScreen(
             viewModel = connectionViewModel,
             onConnect = { url, driver, user, password ->
                 scope.launch {

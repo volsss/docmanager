@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.todayIn
-import ru.example.docmanager.document.HeaderFieldType
+import ru.example.docmanager.document.header.HeaderFieldType
 import ru.example.docmanager.ui.Utils
 import kotlin.time.Clock
 
