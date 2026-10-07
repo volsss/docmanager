@@ -11,7 +11,6 @@ import ru.example.docmanager.database.repositories.references.ProductsRepository
 import ru.example.docmanager.database.repositories.references.SuppliersRepository
 import ru.example.docmanager.viewmodel.AppViewModel
 import ru.example.docmanager.viewmodel.DashboardViewModel
-import ru.example.docmanager.viewmodel.DocumentViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 import ru.example.docmanager.viewmodel.SettingsViewModel
 
@@ -26,7 +25,6 @@ val sharedModule = module {
     singleOf(::ReferenceViewModel)
     singleOf(::AppViewModel)
     singleOf(::DashboardViewModel)
-    singleOf(::DocumentViewModel)
     factoryOf(::SettingsViewModel)
 }
 

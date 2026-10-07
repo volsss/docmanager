@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import ru.example.docmanager.document.header.HeaderFieldType
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.di.getDocumentProcessor
@@ -46,7 +47,7 @@ import kotlin.time.Clock
 
 @Composable
 fun PowerOfAttorneyScreen(
-    referenceViewModel: ReferenceViewModel
+    referenceViewModel: ReferenceViewModel = koinInject()
 ) {
     val scope = rememberCoroutineScope()
     val powerOfAttorneyRepository = remember {

@@ -1,5 +1,6 @@
 package ru.example.docmanager.viewmodel
 
+import androidx.lifecycle.ViewModel
 import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.reference.ReferenceType
 import ru.example.docmanager.database.repositories.references.IndividualsRepository
@@ -13,7 +14,7 @@ class ReferenceViewModel(
     val organizationsRepository: OrganizationsRepository,
     val productsRepository: ProductsRepository,
     val suppliersRepository: SuppliersRepository
-) {
+): ViewModel() {
     val formState = ReferenceState()
 
     private val repositories = mapOf(
@@ -31,12 +32,13 @@ class ReferenceViewModel(
         )
     }
 
-    fun selectReference(referenceType: ReferenceType) {
-        formState.selectReference(referenceType)
+    fun setType(referenceType: ReferenceType) {
+        formState.referenceType = referenceType
+        formState.syncFieldValues()
     }
 
     suspend fun createItem() {
-        val referenceType = formState.selectedReference
+        val referenceType = formState.referenceType
         val repository = repositories[referenceType] ?: return
 
         val created = repository.createItem()
@@ -45,7 +47,7 @@ class ReferenceViewModel(
     }
 
     suspend fun deleteItem(item: Reference) {
-        val referenceType = formState.selectedReference
+        val referenceType = formState.referenceType
         val repository = repositories[referenceType] ?: return
 
         repository.deleteItem(item.id)
@@ -54,7 +56,7 @@ class ReferenceViewModel(
     }
 
     suspend fun saveAll() {
-        val referenceType = formState.selectedReference
+        val referenceType = formState.referenceType
         val repository = repositories[referenceType] ?: return
 
         formState.buildUpdatedItems().forEach { item ->

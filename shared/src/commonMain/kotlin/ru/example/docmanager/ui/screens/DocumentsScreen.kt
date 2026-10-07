@@ -17,13 +17,11 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
+import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.DashboardViewModel
-import ru.example.docmanager.viewmodel.DocumentViewModel
-import ru.example.docmanager.viewmodel.Tab
 
 @Composable
 fun DocumentsScreen(
-    documentViewModel: DocumentViewModel,
     dashboardViewModel: DashboardViewModel
 ) {
     Column(
@@ -36,8 +34,9 @@ fun DocumentsScreen(
             DocumentRow(
                 title = stringResource(type.stringResource),
                 onClick = {
-                    documentViewModel.selectDocument(type)
-                    dashboardViewModel.selectTab(Tab.DOCUMENT)
+                    dashboardViewModel.navigateTo(
+                        DashboardDestination.Document(type)
+                    )
                 }
             )
         }

@@ -10,18 +10,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import ru.example.docmanager.ui.Utils
+import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 
 @Composable
-fun ReferenceScreen(referenceViewModel: ReferenceViewModel) {
+fun ReferenceScreen(
+    destination: DashboardDestination.Reference,
+    referenceViewModel: ReferenceViewModel = koinInject()
+) {
     val scope = rememberCoroutineScope()
     val formState = referenceViewModel.formState
-    val referenceType = formState.selectedReference
+    val referenceType = destination.type
     val referenceItems = formState.currentItems
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
 
+    LaunchedEffect(destination) {
+        referenceViewModel.setType(referenceType)
+    }
     LaunchedEffect(Unit) {
         if (formState.itemsByType.isEmpty()) {
             referenceViewModel.loadReferenceItems()

@@ -7,24 +7,19 @@ import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.document.header.HeaderFieldType
 import ru.example.docmanager.reference.ReferenceType
 
-class ReferenceState {
-    var selectedReference by mutableStateOf(ReferenceType.INDIVIDUAL)
+class ReferenceState (
+    var referenceType: ReferenceType = ReferenceType.INDIVIDUAL
+) {
     var itemsByType by mutableStateOf<Map<ReferenceType, List<Reference>>>(emptyMap())
     var fieldValues by mutableStateOf<Map<Int, Map<HeaderFieldType, String>>>(emptyMap())
     var statusMessage by mutableStateOf<String?>(null)
 
     val currentItems: List<Reference>
-        get() = itemsByType[selectedReference].orEmpty()
-
-    fun selectReference(referenceType: ReferenceType) {
-        selectedReference = referenceType
-        syncFieldValues()
-        statusMessage = null
-    }
+        get() = itemsByType[referenceType].orEmpty()
 
     fun setItems(referenceType: ReferenceType, items: List<Reference>) {
         itemsByType = itemsByType + (referenceType to items)
-        if (referenceType == selectedReference) {
+        if (this.referenceType == referenceType) {
             syncFieldValues()
         }
     }
@@ -64,7 +59,7 @@ class ReferenceState {
         }
     }
 
-    private fun syncFieldValues() {
+    fun syncFieldValues() {
         fieldValues = currentItems.associate { item ->
             item.id to item.toMap()
         }

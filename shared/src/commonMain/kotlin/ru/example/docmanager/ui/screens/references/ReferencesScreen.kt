@@ -11,13 +11,12 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.reference.ReferenceType
 import ru.example.docmanager.ui.screens.DocumentRow
+import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
-import ru.example.docmanager.viewmodel.Tab
 
 @Composable
 fun ReferencesScreen(
-    referenceViewModel: ReferenceViewModel,
     dashboardViewModel: DashboardViewModel,
 ) {
     Column(
@@ -30,8 +29,9 @@ fun ReferencesScreen(
             DocumentRow(
                 title = stringResource(reference.stringResource),
                 onClick = {
-                    referenceViewModel.selectReference(reference)
-                    dashboardViewModel.selectTab(Tab.REFERENCE)
+                    dashboardViewModel.navigateTo(
+                        DashboardDestination.Reference(reference)
+                    )
                 }
             )
         }
