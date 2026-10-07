@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {

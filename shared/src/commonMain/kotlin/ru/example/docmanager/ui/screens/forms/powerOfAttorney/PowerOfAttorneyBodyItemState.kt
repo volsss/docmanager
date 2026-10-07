@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
 package ru.example.docmanager.ui.screens.forms.powerOfAttorney
 
 import ru.example.docmanager.reference.Product

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
 package ru.example.docmanager.reference
 
 import ru.example.docmanager.document.header.HeaderFieldType

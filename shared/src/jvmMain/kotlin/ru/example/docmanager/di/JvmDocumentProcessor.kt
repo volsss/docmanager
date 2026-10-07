@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
 package ru.example.docmanager.di
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument

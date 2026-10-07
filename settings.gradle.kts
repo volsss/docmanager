@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
 rootProject.name = "docmanager"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
