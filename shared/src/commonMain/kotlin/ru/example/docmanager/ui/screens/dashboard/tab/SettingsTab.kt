@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens
+package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,12 +17,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.settings_field_author
+import docmanager.shared.generated.resources.settings_field_creation_date
+import docmanager.shared.generated.resources.settings_field_project_name
+import docmanager.shared.generated.resources.settings_field_version
+import docmanager.shared.generated.resources.settings_save_button
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import ru.example.docmanager.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsScreen(
+fun SettingsTab(
     viewModel: SettingsViewModel = koinInject()
 ) {
     val metadata by viewModel.metadata.collectAsState()
@@ -43,28 +50,29 @@ fun SettingsScreen(
         OutlinedTextField(
             value = projectName,
             onValueChange = { projectName = it },
-            label = { Text("Название проекта") },
+            label = { Text(stringResource(Res.string.settings_field_project_name)) },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = version,
             onValueChange = { version = it },
-            label = { Text("Версия") },
+            label = { Text(stringResource(Res.string.settings_field_version)) },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = author,
             onValueChange = { author = it },
-            label = { Text("Автор") },
+            label = { Text(stringResource(Res.string.settings_field_author)) },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
             value = current.creationDate,
             onValueChange = {},
-            label = { Text("Дата создания") },
+            label = { Text(stringResource(Res.string.settings_field_creation_date)) },
             enabled = false,
             modifier = Modifier.fillMaxWidth()
         )
+
         Button(onClick = {
             scope.launch {
                 viewModel.updateMetadata(
@@ -76,7 +84,7 @@ fun SettingsScreen(
                 )
             }
         }) {
-            Text("Сохранить настройки")
+            Text(stringResource(Res.string.settings_save_button))
         }
     }
 }

@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens
+package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +16,7 @@ import ru.example.docmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScr
 import ru.example.docmanager.viewmodel.DashboardDestination
 
 @Composable
-fun DocumentScreen (
+fun DocumentTab (
     destination: DashboardDestination.Document
 ) {
     val type = destination.type

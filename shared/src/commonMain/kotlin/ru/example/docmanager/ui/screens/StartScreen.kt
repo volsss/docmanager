@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens.start
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
@@ -52,7 +52,7 @@ fun StartScreen (
                 modifier = Modifier.fillMaxWidth().height(256.dp)
             ) {
                 Text (
-                    text = stringResource(Res.string.start_screen_title),
+                    text = stringResource(Res.string.start_title),
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace,

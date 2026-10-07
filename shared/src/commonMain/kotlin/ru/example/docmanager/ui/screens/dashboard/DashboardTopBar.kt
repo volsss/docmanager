@@ -10,6 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.dashboard_action_disconnect
+import docmanager.shared.generated.resources.dashboard_action_settings
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DashboardTopBar(
@@ -30,14 +34,14 @@ fun DashboardTopBar(
             IconButton(onClick = onSettings) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Настройки",
+                    contentDescription = stringResource(Res.string.dashboard_action_settings),
                 )
             }
 
             IconButton(onClick = onDisconnect) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Отключиться",
+                    contentDescription = stringResource(Res.string.dashboard_action_disconnect),
                 )
             }
         },

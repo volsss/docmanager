@@ -10,6 +10,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.dashboard_tabs_more
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.viewmodel.DashboardDestination
 
@@ -24,8 +26,16 @@ fun DashboardTabs(
 
     ButtonGroup(
         overflowIndicator = { menuState ->
-            IconButton(onClick = { if (menuState.isShowing) menuState.dismiss() else menuState.show() }) {
-                Icon(Icons.Filled.MoreVert, "Ещё")
+            IconButton(
+                onClick = {
+                    if (menuState.isShowing) menuState.dismiss()
+                    else menuState.show()
+                }
+            ) {
+                Icon(
+                    Icons.Filled.MoreVert,
+                    stringResource(Res.string.dashboard_tabs_more)
+                )
             }
         },
         expandedRatio = 0.1f,

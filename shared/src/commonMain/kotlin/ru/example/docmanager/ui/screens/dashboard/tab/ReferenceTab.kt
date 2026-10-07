@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens.references
+package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -8,15 +8,19 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.reference_new_item_button
+import docmanager.shared.generated.resources.reference_save_button
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import ru.example.docmanager.ui.Utils
+import ru.example.docmanager.ui.components.ReferenceInput
 import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 
 @Composable
-fun ReferenceScreen(
+fun ReferenceTab(
     destination: DashboardDestination.Reference,
     referenceViewModel: ReferenceViewModel = koinInject()
 ) {
@@ -82,7 +86,7 @@ fun ReferenceScreen(
                 }
             }
         ) {
-            Text("Сохранить")
+            Text(stringResource(Res.string.reference_save_button))
         }
 
         Button(
@@ -92,7 +96,7 @@ fun ReferenceScreen(
                 }
             }
         ) {
-            Text("Новое поле")
+            Text(stringResource(Res.string.reference_new_item_button))
         }
     }
 }

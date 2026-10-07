@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens
+package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +21,7 @@ import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.DashboardViewModel
 
 @Composable
-fun DocumentsScreen(
+fun DocumentsTab(
     dashboardViewModel: DashboardViewModel
 ) {
     Column(

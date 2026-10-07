@@ -14,12 +14,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.dashboard_project_name_fallback
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import ru.example.docmanager.ui.screens.DocumentScreen
-import ru.example.docmanager.ui.screens.DocumentsScreen
-import ru.example.docmanager.ui.screens.SettingsScreen
-import ru.example.docmanager.ui.screens.references.ReferenceScreen
-import ru.example.docmanager.ui.screens.references.ReferencesScreen
+import ru.example.docmanager.ui.screens.dashboard.tab.DocumentTab
+import ru.example.docmanager.ui.screens.dashboard.tab.DocumentsTab
+import ru.example.docmanager.ui.screens.dashboard.tab.SettingsTab
+import ru.example.docmanager.ui.screens.dashboard.tab.ReferenceTab
+import ru.example.docmanager.ui.screens.dashboard.tab.ReferencesTab
 import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.SettingsViewModel
@@ -36,9 +39,11 @@ fun DashboardScreen(
     Scaffold(
         topBar = {
             DashboardTopBar(
-                title = projectMetadata?.name ?: "Название проекта",
+                title = projectMetadata?.name ?: stringResource(
+                    Res.string.dashboard_project_name_fallback
+                ),
                 onSettings = {
-                    dashboardViewModel.navigateTo (
+                    dashboardViewModel.navigateTo(
                         DashboardDestination.Settings
                     )
                 },
@@ -68,7 +73,7 @@ fun DashboardContent (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DashboardTabs (
+        DashboardTabs(
             destination = destination,
             onTabSelected = onTabSelected
         )
@@ -90,20 +95,20 @@ fun DashboardContent (
             ) {
                 when (destination) {
                     DashboardDestination.Settings -> {
-                        SettingsScreen()
+                        SettingsTab()
                     }
                     DashboardDestination.Documents -> {
-                        DocumentsScreen(dashboardViewModel)
+                        DocumentsTab(dashboardViewModel)
                     }
                     DashboardDestination.References -> {
-                        ReferencesScreen(dashboardViewModel)
+                        ReferencesTab(dashboardViewModel)
                     }
 
                     is DashboardDestination.Document -> {
-                        DocumentScreen(destination)
+                        DocumentTab(destination)
                     }
                     is DashboardDestination.Reference -> {
-                        ReferenceScreen(destination)
+                        ReferenceTab(destination)
                     }
                 }
             }

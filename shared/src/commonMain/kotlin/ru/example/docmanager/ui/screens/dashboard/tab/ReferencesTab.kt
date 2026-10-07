@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens.references
+package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,13 +10,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.reference.ReferenceType
-import ru.example.docmanager.ui.screens.DocumentRow
 import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.DashboardViewModel
-import ru.example.docmanager.viewmodel.ReferenceViewModel
 
 @Composable
-fun ReferencesScreen(
+fun ReferencesTab(
     dashboardViewModel: DashboardViewModel,
 ) {
     Column(

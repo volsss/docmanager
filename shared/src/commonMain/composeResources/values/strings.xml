@@ -1,5 +1,20 @@
 <resources>
-    <string name="start_screen_title">docmanager</string>
+    <string name="start_title">docmanager</string>
+
+    <string name="dashboard_project_name_fallback">Неназванный проект</string>
+    <string name="dashboard_tabs_more">Ещё</string>
+    <string name="dashboard_action_settings">Настройки</string>
+    <string name="dashboard_action_disconnect">Отключиться</string>
+
+    <string name="reference_save_button">Сохранить</string>
+    <string name="reference_new_item_button">Новое поле</string>
+
+    <string name="settings_title">Настройки проекта</string>
+    <string name="settings_field_project_name">Название</string>
+    <string name="settings_field_version">Версия</string>
+    <string name="settings_field_author">Автор</string>
+    <string name="settings_field_creation_date">Дата создания</string>
+    <string name="settings_save_button">Сохранить</string>
 
     <string name="input_supporting_required">* Обязательное поле</string>
     <string name="input_jdbc_url">JDBC URL*</string>

@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
 import ru.example.docmanager.ui.screens.dashboard.DashboardScreen
-import ru.example.docmanager.ui.screens.start.StartScreen
+import ru.example.docmanager.ui.screens.StartScreen
 import ru.example.docmanager.viewmodel.AppViewModel
 import ru.example.docmanager.viewmodel.ConnectionState
 

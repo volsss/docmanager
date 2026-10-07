@@ -1,4 +1,4 @@
-package ru.example.docmanager.ui.screens.references
+package ru.example.docmanager.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
