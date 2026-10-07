@@ -20,19 +20,22 @@ import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.di.Platform
 import ru.example.docmanager.di.getPlatform
 import ru.example.docmanager.ui.Utils
-import ru.example.docmanager.viewmodel.ConnectionViewModel
+import ru.example.docmanager.ui.components.Dropdown
+import ru.example.docmanager.ui.components.DropdownMode
+import ru.example.docmanager.viewmodel.AppViewModel
+import ru.example.docmanager.viewmodel.ConnectionState
 
 @Composable
-fun StartScreen(
-    viewModel: ConnectionViewModel,
+fun StartScreen (
+    viewModel: AppViewModel,
+    state: ConnectionState,
     onConnect: (String, String, String, String) -> Unit
 ) {
     val platform = remember { getPlatform() }
     var jdbcUrl by remember { mutableStateOf("") }
-    var driver by remember { mutableStateOf<String?>(null) }
+    var driver by remember { mutableStateOf("") }
     var user by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val error by viewModel.error.collectAsState()
 
     Scaffold { paddingValues ->
         Column(
@@ -73,17 +76,20 @@ fun StartScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                DriverDropDown(
-                    modifier = Modifier.fillMaxWidth(),
-                    selectedItem = driver,
-                    onItemSelected = {
+                Dropdown (
+                    value = driver,
+                    items = listOf(Utils.H2_DRIVER, Utils.POSTGRES_DRIVER),
+                    label = stringResource(Res.string.input_driver),
+                    supportingText = stringResource(Res.string.input_supporting_required),
+                    onValueChange = {
                         driver = it
                         if (driver == Utils.POSTGRES_DRIVER)
                             jdbcUrl = Utils.DEFAULT_POSTGRES_JDBC
                         if (driver == Utils.H2_DRIVER)
                             jdbcUrl = if (platform == Platform.JVM) Utils.JVM_H2_JDBC
                             else Utils.ANDROID_H2_JDBC
-                    }
+                    },
+                    mode = DropdownMode.VALUES_ONLY
                 )
 
                 AnimatedVisibility(driver == Utils.POSTGRES_DRIVER) {
@@ -111,10 +117,10 @@ fun StartScreen(
                     }
                 }
 
-                AnimatedVisibility(error != null) {
+                AnimatedVisibility(state is ConnectionState.Error) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        error.orEmpty(),
+                        (state as ConnectionState.Error).message,
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Left
                     )
@@ -123,20 +129,16 @@ fun StartScreen(
                 Spacer(modifier = Modifier.heightIn(min = 16.dp))
                 Button(
                     onClick = {
-                        if (driver == null) {
-                            viewModel.setError("Драйвер не выбран")
-                            return@Button
-                        }
                         if (jdbcUrl.isBlank()) {
-                            viewModel.setError("URL не может быть пустым")
+                            viewModel.error("URL не может быть пустым")
                             return@Button
                         }
                         if (driver == Utils.POSTGRES_DRIVER && (user.isBlank() || password.isBlank())) {
-                            viewModel.setError("Пользователь и пароль не могут быть пустыми для PostgreSQL")
+                            viewModel.error("Пользователь и пароль не могут быть пустыми для PostgreSQL")
                             return@Button
                         }
 
-                        onConnect(jdbcUrl, driver!!, user, password)
+                        onConnect(jdbcUrl, driver, user, password)
                     },
                     contentPadding = ButtonDefaults.LargeContentPadding,
                 ) {
@@ -146,53 +148,6 @@ fun StartScreen(
                     )
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DriverDropDown(
-    selectedItem: String?,
-    onItemSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = modifier
-    ) {
-        OutlinedTextField(
-            value = selectedItem.orEmpty(),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(Res.string.input_driver)) },
-            supportingText = { Text(stringResource(Res.string.input_supporting_required)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            shape = RoundedCornerShape(16.dp),
-            singleLine = true
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("H2") },
-                onClick = {
-                    onItemSelected(Utils.H2_DRIVER)
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Postgres") },
-                onClick = {
-                    onItemSelected(Utils.POSTGRES_DRIVER)
-                    expanded = false
-                }
-            )
         }
     }
 }

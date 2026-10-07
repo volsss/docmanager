@@ -9,7 +9,7 @@ import ru.example.docmanager.database.repositories.references.IndividualsReposit
 import ru.example.docmanager.database.repositories.references.OrganizationsRepository
 import ru.example.docmanager.database.repositories.references.ProductsRepository
 import ru.example.docmanager.database.repositories.references.SuppliersRepository
-import ru.example.docmanager.viewmodel.ConnectionViewModel
+import ru.example.docmanager.viewmodel.AppViewModel
 import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.DocumentViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
@@ -24,7 +24,7 @@ val sharedModule = module {
     factoryOf(::PowerOfAttorneyRepository)
 
     singleOf(::ReferenceViewModel)
-    singleOf(::ConnectionViewModel)
+    singleOf(::AppViewModel)
     singleOf(::DashboardViewModel)
     singleOf(::DocumentViewModel)
     factoryOf(::SettingsViewModel)
