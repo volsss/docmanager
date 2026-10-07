@@ -1,4 +1,4 @@
-package ru.example.docmanager.documents.base
+package ru.example.docmanager.document
 
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.body_field_count

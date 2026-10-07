@@ -12,8 +12,8 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.jetbrains.compose.resources.getString
 import org.koin.core.context.GlobalContext
-import ru.example.docmanager.documents.base.Document
-import ru.example.docmanager.documents.base.WithBody
+import ru.example.docmanager.document.Document
+import ru.example.docmanager.document.WithBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream

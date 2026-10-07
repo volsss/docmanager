@@ -1,6 +1,6 @@
 package ru.example.docmanager.di
 
-import ru.example.docmanager.documents.base.Document
+import ru.example.docmanager.document.Document
 
 interface DocumentProcessor {
     suspend fun processSave(

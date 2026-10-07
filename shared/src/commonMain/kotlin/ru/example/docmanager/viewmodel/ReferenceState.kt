@@ -3,9 +3,9 @@ package ru.example.docmanager.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import ru.example.docmanager.references.base.Reference
-import ru.example.docmanager.documents.base.HeaderFieldType
-import ru.example.docmanager.references.base.ReferenceType
+import ru.example.docmanager.reference.Reference
+import ru.example.docmanager.document.HeaderFieldType
+import ru.example.docmanager.reference.ReferenceType
 
 class ReferenceState {
     var selectedReference by mutableStateOf(ReferenceType.INDIVIDUAL)

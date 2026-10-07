@@ -1,4 +1,4 @@
-package ru.example.docmanager.documents.base
+package ru.example.docmanager.document
 
 interface DocumentBodyItem {
     val id: Int

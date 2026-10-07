@@ -1,6 +1,6 @@
 package ru.example.docmanager.database.repositories.documents
 
-import ru.example.docmanager.documents.base.Document
+import ru.example.docmanager.document.Document
 
 interface DocumentRepository<T: Document> {
     suspend fun createDocument(document: T)

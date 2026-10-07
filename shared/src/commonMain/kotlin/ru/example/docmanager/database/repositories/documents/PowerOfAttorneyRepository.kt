@@ -11,11 +11,14 @@ import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.database.dbQuery
 import ru.example.docmanager.database.tables.PowerOfAttorneyTables.BodiesTable
 import ru.example.docmanager.database.tables.PowerOfAttorneyTables.HeadersTable
-import ru.example.docmanager.documents.PowerOfAttorney
+import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.database.repositories.references.IndividualsRepository
 import ru.example.docmanager.database.repositories.references.OrganizationsRepository
 import ru.example.docmanager.database.repositories.references.ProductsRepository
 import ru.example.docmanager.database.repositories.references.SuppliersRepository
+import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyBody
+import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyBodyItem
+import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyHeader
 
 class PowerOfAttorneyRepository(
     val individualsRepository: IndividualsRepository,
@@ -86,7 +89,7 @@ class PowerOfAttorneyRepository(
         val individual = individualsRepository.getItem(headerRow[HeadersTable.individualId])
         val supplier = suppliersRepository.getItem(headerRow[HeadersTable.supplierId])
 
-        val header = PowerOfAttorney.Header(
+        val header = PowerOfAttorneyHeader(
             id = id,
             organization = organization,
             number = headerRow[HeadersTable.number],
@@ -99,16 +102,15 @@ class PowerOfAttorneyRepository(
 
         val bodyItemList = bodyRows.map { row ->
             val product = productsRepository.getItem(row[BodiesTable.productId])
-            PowerOfAttorney.BodyItem(
+            PowerOfAttorneyBodyItem(
                 id = row[BodiesTable.id].value,
                 count = row[BodiesTable.count],
                 unit = row[BodiesTable.unit],
-                header = header,
                 product = product
             )
         }
 
-        val body = PowerOfAttorney.Body(bodyItemList)
+        val body = PowerOfAttorneyBody(bodyItemList)
 
         return PowerOfAttorney(header = header, body = body)
     }

@@ -1,6 +1,6 @@
-package ru.example.docmanager.references.base
+package ru.example.docmanager.reference
 
-import ru.example.docmanager.documents.base.HeaderFieldType
+import ru.example.docmanager.document.HeaderFieldType
 
 abstract class Reference(
     open var id: Int

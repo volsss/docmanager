@@ -1,6 +1,6 @@
 package ru.example.docmanager.database.repositories.references
 
-import ru.example.docmanager.references.base.Reference
+import ru.example.docmanager.reference.Reference
 
 abstract class ReferenceRepository<T: Reference>(
     val name: String

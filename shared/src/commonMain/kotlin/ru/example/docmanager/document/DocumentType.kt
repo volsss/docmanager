@@ -1,4 +1,4 @@
-package ru.example.docmanager.documents.base
+package ru.example.docmanager.document
 
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.document_power_of_attorney

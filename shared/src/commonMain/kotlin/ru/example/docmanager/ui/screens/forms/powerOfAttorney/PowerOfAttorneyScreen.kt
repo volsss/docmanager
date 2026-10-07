@@ -29,15 +29,15 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.documents.base.HeaderFieldType
+import ru.example.docmanager.document.HeaderFieldType
 import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.di.getDocumentProcessor
-import ru.example.docmanager.references.Individual
-import ru.example.docmanager.references.Organization
-import ru.example.docmanager.references.Product
-import ru.example.docmanager.references.base.Reference
-import ru.example.docmanager.references.base.ReferenceType
-import ru.example.docmanager.references.Supplier
+import ru.example.docmanager.reference.Individual
+import ru.example.docmanager.reference.Organization
+import ru.example.docmanager.reference.Product
+import ru.example.docmanager.reference.Reference
+import ru.example.docmanager.reference.ReferenceType
+import ru.example.docmanager.reference.Supplier
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
 import ru.example.docmanager.ui.screens.forms.ReferenceDropdown
@@ -317,9 +317,9 @@ private fun PowerOfAttorneyBodySection(
 @Composable
 private fun BodyItemRow(
     index: Int,
-    item: PowerOfAttorneyBodyItem,
+    item: PowerOfAttorneyBodyItemState,
     products: List<Product>,
-    onItemChange: (PowerOfAttorneyBodyItem) -> Unit,
+    onItemChange: (PowerOfAttorneyBodyItemState) -> Unit,
     onDelete: () -> Unit,
     isWide: Boolean
 ) {

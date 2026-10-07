@@ -1,11 +1,10 @@
-package ru.example.docmanager.references
+package ru.example.docmanager.reference
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.todayIn
-import ru.example.docmanager.documents.base.HeaderFieldType
-import ru.example.docmanager.references.base.Reference
+import ru.example.docmanager.document.HeaderFieldType
 import ru.example.docmanager.ui.Utils
 import kotlin.time.Clock
 

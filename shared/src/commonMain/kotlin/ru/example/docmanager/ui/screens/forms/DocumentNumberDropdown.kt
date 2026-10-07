@@ -12,7 +12,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.example.docmanager.documents.base.Document
+import ru.example.docmanager.document.Document
 import ru.example.docmanager.ui.Utils
 import kotlin.collections.forEach
 

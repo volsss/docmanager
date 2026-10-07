@@ -1,4 +1,4 @@
-package ru.example.docmanager.references.base
+package ru.example.docmanager.reference
 
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.reference_individuals

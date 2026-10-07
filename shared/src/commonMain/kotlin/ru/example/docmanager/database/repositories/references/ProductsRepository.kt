@@ -8,7 +8,7 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.database.dbQuery
 import ru.example.docmanager.database.tables.PowerOfAttorneyTables.ProductsTable
-import ru.example.docmanager.references.Product
+import ru.example.docmanager.reference.Product
 
 class ProductsRepository : ReferenceRepository<Product>("products") {
 
