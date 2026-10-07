@@ -6,8 +6,9 @@
 package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,13 +24,15 @@ import ru.example.docmanager.viewmodel.DashboardViewModel
 fun ReferencesTab(
     dashboardViewModel: DashboardViewModel,
 ) {
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .fillMaxWidth(),
+    LazyColumn (
+        modifier = Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp)),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        ReferenceType.entries.forEach { reference ->
+        items(
+            items = ReferenceType.entries,
+            key = { it.name }
+        ) { reference ->
             ClickableItem(
                 title = stringResource(reference.stringResource),
                 onClick = {

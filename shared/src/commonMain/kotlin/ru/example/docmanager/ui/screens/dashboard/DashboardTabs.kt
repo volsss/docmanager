@@ -49,7 +49,7 @@ fun DashboardTabs(
             .widthIn(max = 700.dp),
     ) {
         toggleableItem(
-            checked = destination == DashboardDestination.Documents,
+            checked = destination == DashboardDestination.Documents || destination is DashboardDestination.Document,
             onCheckedChange = { onTabSelected(DashboardDestination.Documents) },
             label = documentsLabel,
             weight = 0.5f,
@@ -61,7 +61,7 @@ fun DashboardTabs(
             }
         )
         toggleableItem(
-            checked = destination == DashboardDestination.References,
+            checked = destination == DashboardDestination.References || destination is DashboardDestination.Reference,
             onCheckedChange = { onTabSelected(DashboardDestination.References) },
             label = referencesLabel,
             weight = 0.5f,

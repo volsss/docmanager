@@ -40,6 +40,7 @@ class ReferenceViewModel(
     fun setType(referenceType: ReferenceType) {
         formState.referenceType = referenceType
         formState.syncFieldValues()
+        formState.statusMessage = null
     }
 
     suspend fun createItem() {
@@ -64,11 +65,11 @@ class ReferenceViewModel(
         val referenceType = formState.referenceType
         val repository = repositories[referenceType] ?: return
 
-        formState.buildUpdatedItems().forEach { item ->
+        val updatedItems = formState.buildUpdatedItems()
+        updatedItems.forEach { item ->
             updateItem(repository, item)
-            formState.replaceItem(referenceType, item)
         }
-
+        formState.setItems(referenceType, updatedItems)
         formState.statusMessage = "Изменения сохранены"
     }
 

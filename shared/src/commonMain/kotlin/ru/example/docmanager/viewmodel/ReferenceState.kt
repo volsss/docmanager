@@ -13,8 +13,9 @@ import ru.example.docmanager.document.header.HeaderFieldType
 import ru.example.docmanager.reference.ReferenceType
 
 class ReferenceState (
-    var referenceType: ReferenceType = ReferenceType.INDIVIDUAL
+    referenceType: ReferenceType = ReferenceType.INDIVIDUAL
 ) {
+    var referenceType by mutableStateOf(referenceType)
     var itemsByType by mutableStateOf<Map<ReferenceType, List<Reference>>>(emptyMap())
     var fieldValues by mutableStateOf<Map<Int, Map<HeaderFieldType, String>>>(emptyMap())
     var statusMessage by mutableStateOf<String?>(null)
@@ -41,12 +42,13 @@ class ReferenceState (
 
     fun addItem(referenceType: ReferenceType, item: Reference) {
         val updatedItems = itemsByType[referenceType].orEmpty() + item
-        setItems(referenceType, updatedItems)
+        itemsByType = itemsByType + (referenceType to updatedItems)
+        fieldValues = fieldValues + (item.id to item.toMap())
     }
 
     fun removeItem(referenceType: ReferenceType, item: Reference) {
         val updatedItems = itemsByType[referenceType].orEmpty().filterNot { it.id == item.id }
-        setItems(referenceType, updatedItems)
+        itemsByType = itemsByType + (referenceType to updatedItems)
         fieldValues = fieldValues - item.id
     }
 
@@ -54,7 +56,8 @@ class ReferenceState (
         val updatedItems = itemsByType[referenceType].orEmpty().map { current ->
             if (current.id == item.id) item else current
         }
-        setItems(referenceType, updatedItems)
+        itemsByType = itemsByType + (referenceType to updatedItems)
+        fieldValues = fieldValues + (item.id to item.toMap())
     }
 
     fun buildUpdatedItems(): List<Reference> {

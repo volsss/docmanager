@@ -5,6 +5,7 @@
 
 package ru.example.docmanager.ui.screens.dashboard.tab
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,12 +33,13 @@ import ru.example.docmanager.viewmodel.ReferenceViewModel
 @Composable
 fun ReferenceTab(
     destination: DashboardDestination.Reference,
+    snackbarHostState: SnackbarHostState,
     viewModel: ReferenceViewModel = koinInject()
 ) {
     val scope = rememberCoroutineScope()
     val referenceState = viewModel.formState
     val referenceType = destination.type
-    val referenceItems = referenceState.currentItems
+    val referenceItems = referenceState.itemsByType[referenceType].orEmpty()
 
     LaunchedEffect(destination) {
         viewModel.setType(referenceType)
@@ -47,44 +49,50 @@ fun ReferenceTab(
             viewModel.loadReferenceItems()
         }
     }
+    LaunchedEffect(referenceState.statusMessage) {
+        referenceState.statusMessage?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
 
     Column (
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         ReferenceBanner(
-            referenceState = referenceState,
-            referenceType = referenceType
+            referenceType = referenceType,
+            scope = scope,
+            viewModel = viewModel
         )
 
         ReferenceItems(
             referenceState = referenceState,
             references = referenceItems,
             scope = scope,
-            referenceViewModel = viewModel
-        )
-
-        ReferenceActions(
-            scope = scope,
-            referenceViewModel = viewModel
+            viewModel = viewModel
         )
     }
 }
 
 @Composable
 fun ReferenceBanner(
-    referenceState: ReferenceState,
-    referenceType: ReferenceType
+    referenceType: ReferenceType,
+    scope: CoroutineScope,
+    viewModel: ReferenceViewModel,
+    modifier: Modifier = Modifier
 ) {
-    Text(
-        stringResource(referenceType.stringResource),
-        style = MaterialTheme.typography.titleLarge
-    )
-    referenceState.statusMessage?.let { message ->
-        Spacer(Modifier.height(8.dp))
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Text(
-            text = message,
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyMedium
+            stringResource(referenceType.stringResource),
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        ReferenceActions(
+            scope = scope,
+            viewModel = viewModel
         )
     }
 }
@@ -94,17 +102,22 @@ fun ReferenceItems(
     referenceState: ReferenceState,
     references: List<Reference>,
     scope: CoroutineScope,
-    referenceViewModel: ReferenceViewModel
+    viewModel: ReferenceViewModel,
+    modifier: Modifier = Modifier
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
     LazyColumn(
-        modifier = Modifier.fillMaxSize().then(
+        modifier = modifier.fillMaxSize().then(
             if (isWide) Modifier
             else Modifier.horizontalScroll(rememberScrollState())
-        )
+        ),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(references.size) { index ->
+        items(
+            count = references.size,
+            key = { index -> references[index].id }
+        ) { index ->
             val item = references[index]
             ReferenceInput(
                 item = item,
@@ -112,7 +125,7 @@ fun ReferenceItems(
                 onFieldChange = referenceState::updateField,
                 onRemove = {
                     scope.launch {
-                        referenceViewModel.deleteItem(item)
+                        viewModel.deleteItem(item)
                     }
                 }
             )
@@ -123,13 +136,17 @@ fun ReferenceItems(
 @Composable
 fun ReferenceActions(
     scope: CoroutineScope,
-    referenceViewModel: ReferenceViewModel
+    viewModel: ReferenceViewModel,
+    modifier: Modifier = Modifier
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Button(
             onClick = {
                 scope.launch {
-                    referenceViewModel.saveAll()
+                    viewModel.saveAll()
                 }
             }
         ) {
@@ -139,7 +156,7 @@ fun ReferenceActions(
         Button(
             onClick = {
                 scope.launch {
-                    referenceViewModel.createItem()
+                    viewModel.createItem()
                 }
             }
         ) {

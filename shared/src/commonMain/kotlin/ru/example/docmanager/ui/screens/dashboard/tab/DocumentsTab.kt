@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,13 +32,12 @@ import ru.example.docmanager.viewmodel.DashboardViewModel
 fun DocumentsTab(
     dashboardViewModel: DashboardViewModel
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
+    LazyColumn (
+        modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(16.dp)),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        DocumentType.entries.forEach { type ->
+        items(DocumentType.entries) { type ->
             ClickableItem(
                 title = stringResource(type.stringResource),
                 onClick = {

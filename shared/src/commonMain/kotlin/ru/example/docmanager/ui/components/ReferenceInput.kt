@@ -54,7 +54,8 @@ fun ReferenceInput(
                         type,
                         newValue
                     )
-                }
+                },
+                singleLine = true
             )
         }
 

@@ -8,6 +8,7 @@ package ru.example.docmanager.ui.screens.dashboard
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,8 +17,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.dashboard_project_name_fallback
@@ -38,6 +41,7 @@ fun DashboardScreen(
     settingsViewModel: SettingsViewModel = koinInject(),
     onDisconnect: () -> Unit
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val destination by dashboardViewModel.destination.collectAsState()
     val projectMetadata by settingsViewModel.metadata.collectAsState()
 
@@ -55,13 +59,27 @@ fun DashboardScreen(
                 onDisconnect = onDisconnect,
             )
         },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = {
+                    Snackbar(
+                        snackbarData = it,
+                        shape = MaterialTheme.shapes.large,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+            )
+        },
         containerColor = MaterialTheme.colorScheme.primaryContainer
     ) { paddingValues ->
         DashboardContent(
             modifier = Modifier.padding(paddingValues),
             destination = destination,
             onTabSelected = dashboardViewModel::navigateTo,
-            dashboardViewModel = dashboardViewModel
+            dashboardViewModel = dashboardViewModel,
+            snackbarHostState = snackbarHostState
         )
     }
 }
@@ -71,6 +89,7 @@ fun DashboardContent (
     destination: DashboardDestination,
     onTabSelected: (DashboardDestination) -> Unit,
     dashboardViewModel: DashboardViewModel,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -111,7 +130,7 @@ fun DashboardContent (
                         DocumentTab(destination)
                     }
                     is DashboardDestination.Reference -> {
-                        ReferenceTab(destination)
+                        ReferenceTab(destination, snackbarHostState)
                     }
                 }
             }
