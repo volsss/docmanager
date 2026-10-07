@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.reference.ReferenceType
+import ru.example.docmanager.ui.components.ClickableItem
 import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.DashboardViewModel
 
@@ -29,7 +30,7 @@ fun ReferencesTab(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         ReferenceType.entries.forEach { reference ->
-            DocumentRow(
+            ClickableItem(
                 title = stringResource(reference.stringResource),
                 onClick = {
                     dashboardViewModel.navigateTo(

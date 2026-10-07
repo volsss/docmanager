@@ -28,6 +28,7 @@ import docmanager.shared.generated.resources.settings_field_creation_date
 import docmanager.shared.generated.resources.settings_field_project_name
 import docmanager.shared.generated.resources.settings_field_version
 import docmanager.shared.generated.resources.settings_save_button
+import docmanager.shared.generated.resources.settings_title
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -51,7 +52,10 @@ fun SettingsTab(
     var author by remember(current) { mutableStateOf(current.author) }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Настройки проекта", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = stringResource(Res.string.settings_title),
+            style = MaterialTheme.typography.headlineSmall
+        )
         OutlinedTextField(
             value = projectName,
             onValueChange = { projectName = it },

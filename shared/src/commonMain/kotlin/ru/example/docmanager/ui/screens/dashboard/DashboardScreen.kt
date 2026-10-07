@@ -94,9 +94,7 @@ fun DashboardContent (
             )
         ) {
             Column(
-                Modifier.fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+                Modifier.fillMaxSize().padding(16.dp)
             ) {
                 when (destination) {
                     DashboardDestination.Settings -> {

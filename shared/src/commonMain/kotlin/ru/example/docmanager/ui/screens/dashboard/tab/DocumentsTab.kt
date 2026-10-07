@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
+import ru.example.docmanager.ui.components.ClickableItem
 import ru.example.docmanager.viewmodel.DashboardDestination
 import ru.example.docmanager.viewmodel.DashboardViewModel
 
@@ -36,7 +37,7 @@ fun DocumentsTab(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         DocumentType.entries.forEach { type ->
-            DocumentRow(
+            ClickableItem(
                 title = stringResource(type.stringResource),
                 onClick = {
                     dashboardViewModel.navigateTo(
@@ -45,25 +46,5 @@ fun DocumentsTab(
                 }
             )
         }
-    }
-}
-
-@Composable
-fun DocumentRow(
-    title: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .fillMaxWidth()
-            .clickable(onClick = onClick, role = Role.Button)
-            .padding(16.dp)
-    ) {
-        Text(
-            title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
-        )
     }
 }
