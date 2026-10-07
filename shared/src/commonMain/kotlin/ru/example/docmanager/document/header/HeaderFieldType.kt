@@ -5,23 +5,7 @@
 
 package ru.example.docmanager.document.header
 
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.header_field_discharge_date
-import docmanager.shared.generated.resources.header_field_end_date
-import docmanager.shared.generated.resources.header_field_individual_date
-import docmanager.shared.generated.resources.header_field_individual_issued
-import docmanager.shared.generated.resources.header_field_individual_job
-import docmanager.shared.generated.resources.header_field_individual_name
-import docmanager.shared.generated.resources.header_field_individual_number
-import docmanager.shared.generated.resources.header_field_individual_series
-import docmanager.shared.generated.resources.header_field_number
-import docmanager.shared.generated.resources.header_field_organization_account
-import docmanager.shared.generated.resources.header_field_organization_consumer
-import docmanager.shared.generated.resources.header_field_organization_name
-import docmanager.shared.generated.resources.header_field_organization_payer
-import docmanager.shared.generated.resources.header_field_product_name
-import docmanager.shared.generated.resources.header_field_supplier_agreement
-import docmanager.shared.generated.resources.header_field_supplier_name
+import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
 
 enum class HeaderFieldType (

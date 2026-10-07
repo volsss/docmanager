@@ -5,11 +5,7 @@
 
 package ru.example.docmanager.document.body
 
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.body_field_count
-import docmanager.shared.generated.resources.body_field_number_sorted
-import docmanager.shared.generated.resources.body_field_products
-import docmanager.shared.generated.resources.body_field_unit
+import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
 
 enum class BodyFieldType (

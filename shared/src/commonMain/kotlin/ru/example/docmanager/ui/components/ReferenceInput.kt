@@ -20,10 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.document.header.HeaderFieldType
+import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.ui.Utils
 
 @Composable

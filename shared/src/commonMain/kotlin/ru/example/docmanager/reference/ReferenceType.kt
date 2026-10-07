@@ -5,11 +5,7 @@
 
 package ru.example.docmanager.reference
 
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.reference_individuals
-import docmanager.shared.generated.resources.reference_organizations
-import docmanager.shared.generated.resources.reference_products
-import docmanager.shared.generated.resources.reference_suppliers
+import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
 
 enum class ReferenceType (

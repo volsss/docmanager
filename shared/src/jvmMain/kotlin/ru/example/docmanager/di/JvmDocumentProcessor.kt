@@ -21,7 +21,6 @@ import java.io.OutputStream
 import javax.print.PrintServiceLookup
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
-import kotlin.collections.iterator
 
 class JvmDocumentProcessor : DocumentProcessor {
 

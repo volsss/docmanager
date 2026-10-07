@@ -8,8 +8,8 @@ package ru.example.docmanager.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.document.header.HeaderFieldType
+import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.reference.ReferenceType
 
 class ReferenceState (

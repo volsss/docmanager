@@ -16,12 +16,7 @@ import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyBody
 import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyBodyItem
 import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyHeader
-import ru.example.docmanager.reference.Individual
-import ru.example.docmanager.reference.Organization
-import ru.example.docmanager.reference.Product
-import ru.example.docmanager.reference.Reference
-import ru.example.docmanager.reference.ReferenceType
-import ru.example.docmanager.reference.Supplier
+import ru.example.docmanager.reference.*
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.FormState
 

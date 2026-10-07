@@ -3,8 +3,6 @@
  * docmanager — a scalable document management system.
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader

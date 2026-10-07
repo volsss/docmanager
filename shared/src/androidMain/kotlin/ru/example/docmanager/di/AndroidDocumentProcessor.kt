@@ -19,12 +19,7 @@ import org.jetbrains.compose.resources.getString
 import org.koin.core.context.GlobalContext
 import ru.example.docmanager.document.Document
 import ru.example.docmanager.document.WithBody
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
-import kotlin.collections.iterator
+import java.io.*
 
 class AndroidDocumentProcessor : DocumentProcessor {
 

@@ -14,8 +14,8 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import ru.example.docmanager.database.tables.PowerOfAttorneyTables
 import ru.example.docmanager.database.tables.MetadataTable
+import ru.example.docmanager.database.tables.PowerOfAttorneyTables
 import java.time.LocalDate
 
 object DatabaseFactory {

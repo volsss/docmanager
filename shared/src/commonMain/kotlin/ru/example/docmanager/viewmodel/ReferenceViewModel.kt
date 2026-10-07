@@ -6,13 +6,9 @@
 package ru.example.docmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
+import ru.example.docmanager.database.repositories.references.*
 import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.reference.ReferenceType
-import ru.example.docmanager.database.repositories.references.IndividualsRepository
-import ru.example.docmanager.database.repositories.references.OrganizationsRepository
-import ru.example.docmanager.database.repositories.references.ProductsRepository
-import ru.example.docmanager.database.repositories.references.ReferenceRepository
-import ru.example.docmanager.database.repositories.references.SuppliersRepository
 
 class ReferenceViewModel(
     val individualsRepository: IndividualsRepository,

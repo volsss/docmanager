@@ -7,28 +7,18 @@ package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.settings_field_author
-import docmanager.shared.generated.resources.settings_field_creation_date
-import docmanager.shared.generated.resources.settings_field_project_name
-import docmanager.shared.generated.resources.settings_field_version
-import docmanager.shared.generated.resources.settings_save_button
-import docmanager.shared.generated.resources.settings_title
+import docmanager.shared.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -51,7 +41,11 @@ fun SettingsTab(
     var version by remember(current) { mutableStateOf(current.version) }
     var author by remember(current) { mutableStateOf(current.author) }
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         Text(
             text = stringResource(Res.string.settings_title),
             style = MaterialTheme.typography.headlineSmall
