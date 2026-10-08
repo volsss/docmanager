@@ -25,9 +25,8 @@ import org.koin.compose.koinInject
 import ru.example.docmanager.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsTab(
-    viewModel: SettingsViewModel = koinInject()
-) {
+fun SettingsTab() {
+    val viewModel = koinInject<SettingsViewModel>()
     val metadata by viewModel.metadata.collectAsState()
     val scope = rememberCoroutineScope()
 

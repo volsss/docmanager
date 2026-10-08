@@ -16,6 +16,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.component_dropdown_placeholder
+import org.jetbrains.compose.resources.stringResource
+import ru.example.docmanager.viewmodel.DashboardDestination.Documents.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +90,7 @@ fun Dropdown(
         mode == DropdownMode.STRICT_VALUES_AND_INPUT &&
                 draft.isNotEmpty() &&
                 !strictValueIsValid ->
-            "Выберите значение из списка"
+            stringResource(Res.string.component_dropdown_placeholder)
         else -> null
     }
 

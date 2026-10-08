@@ -27,14 +27,13 @@ import ru.example.docmanager.di.getPlatform
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.components.Dropdown
 import ru.example.docmanager.ui.components.DropdownMode
-import ru.example.docmanager.viewmodel.AppViewModel
 import ru.example.docmanager.viewmodel.ConnectionState
 
 @Composable
 fun StartScreen (
-    viewModel: AppViewModel,
     state: ConnectionState,
-    onConnect: (String, String, String, String) -> Unit
+    onConnect: (String, String, String, String) -> Unit,
+    onError: (String) -> Unit
 ) {
     val platform = remember { getPlatform() }
     var jdbcUrl by remember { mutableStateOf("") }
@@ -123,7 +122,7 @@ fun StartScreen (
                 }
 
                 AnimatedVisibility(state is ConnectionState.Error) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(Modifier.height(8.dp))
                     Text(
                         (state as ConnectionState.Error).message,
                         color = MaterialTheme.colorScheme.error,
@@ -131,15 +130,17 @@ fun StartScreen (
                     )
                 }
 
-                Spacer(modifier = Modifier.heightIn(min = 16.dp))
+                Spacer(Modifier.heightIn(16.dp))
+                val jdbcEmpty = stringResource(Res.string.start_jdbc_empty)
+                val postgresUserAndPasswordEmpty = stringResource(Res.string.start_postgres_user_and_password_empty)
                 Button(
                     onClick = {
                         if (jdbcUrl.isBlank()) {
-                            viewModel.error("URL не может быть пустым")
+                            onError(jdbcEmpty)
                             return@Button
                         }
                         if (driver == Utils.POSTGRES_DRIVER && (user.isBlank() || password.isBlank())) {
-                            viewModel.error("Пользователь и пароль не могут быть пустыми для PostgreSQL")
+                            onError(postgresUserAndPasswordEmpty)
                             return@Button
                         }
 
@@ -148,7 +149,7 @@ fun StartScreen (
                     contentPadding = ButtonDefaults.LargeContentPadding,
                 ) {
                     Text(
-                        "Подключиться",
+                        stringResource(Res.string.start_connect_button),
                         style = ButtonDefaults.textStyleFor(ButtonDefaults.LargeContainerHeight)
                     )
                 }

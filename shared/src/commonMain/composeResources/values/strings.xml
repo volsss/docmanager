@@ -5,6 +5,11 @@
 
 <resources>
     <string name="start_title">docmanager</string>
+    <string name="start_jdbc_empty">JDBC URL не может быть пустым</string>
+    <string name="start_postgres_user_and_password_empty">
+        Пользователь и пароль не могут быть пустыми для PostgreSQL
+    </string>
+    <string name="start_connect_button">Подключиться</string>
 
     <string name="dashboard_project_name_fallback">Неназванный проект</string>
     <string name="dashboard_tabs_more">Ещё</string>
@@ -68,4 +73,6 @@
     <string name="input_organization">Организация</string>
     <string name="input_supplier">Поставщик</string>
     <string name="input_product">Материальная ценность</string>
+
+    <string name="component_dropdown_placeholder">Выберите значение</string>
 </resources>

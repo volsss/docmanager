@@ -29,10 +29,10 @@ import ru.example.docmanager.viewmodel.SettingsViewModel
 
 @Composable
 fun DashboardScreen(
-    dashboardViewModel: DashboardViewModel = koinInject(),
-    settingsViewModel: SettingsViewModel = koinInject(),
     onDisconnect: () -> Unit
 ) {
+    val dashboardViewModel = koinInject<DashboardViewModel>()
+    val settingsViewModel = koinInject<SettingsViewModel>()
     val snackbarHostState = remember { SnackbarHostState() }
     val destination by dashboardViewModel.destination.collectAsState()
     val projectMetadata by settingsViewModel.metadata.collectAsState()
@@ -112,10 +112,10 @@ fun DashboardContent (
                         SettingsTab()
                     }
                     DashboardDestination.Documents -> {
-                        DocumentsTab(dashboardViewModel)
+                        DocumentsTab(dashboardViewModel::navigateTo)
                     }
                     DashboardDestination.References -> {
-                        ReferencesTab(dashboardViewModel)
+                        ReferencesTab(dashboardViewModel::navigateTo)
                     }
 
                     is DashboardDestination.Document -> {

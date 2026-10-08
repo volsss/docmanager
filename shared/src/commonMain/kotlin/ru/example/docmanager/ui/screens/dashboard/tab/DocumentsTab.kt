@@ -18,11 +18,10 @@ import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
 import ru.example.docmanager.ui.components.ClickableItem
 import ru.example.docmanager.viewmodel.DashboardDestination
-import ru.example.docmanager.viewmodel.DashboardViewModel
 
 @Composable
 fun DocumentsTab(
-    dashboardViewModel: DashboardViewModel
+    navigateTo: (destination: DashboardDestination) -> Unit
 ) {
     LazyColumn (
         modifier = Modifier.fillMaxWidth()
@@ -33,7 +32,7 @@ fun DocumentsTab(
             ClickableItem(
                 title = stringResource(type.stringResource),
                 onClick = {
-                    dashboardViewModel.navigateTo(
+                    navigateTo(
                         DashboardDestination.Document(type)
                     )
                 }

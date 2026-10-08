@@ -37,10 +37,9 @@ import ru.example.docmanager.viewmodel.ReferenceViewModel
 @Composable
 fun ReferenceTab(
     destination: DashboardDestination.Reference,
-    snackbarHostState: SnackbarHostState,
-    viewModel: ReferenceViewModel = koinInject()
+    snackbarHostState: SnackbarHostState
 ) {
-    val scope = rememberCoroutineScope()
+    val viewModel = koinInject<ReferenceViewModel>()
     val referenceState = viewModel.formState
     val referenceType = destination.type
     val referenceItems = referenceState.itemsByType[referenceType].orEmpty()
@@ -65,15 +64,14 @@ fun ReferenceTab(
     ) {
         ReferenceBanner(
             referenceType = referenceType,
-            scope = scope,
-            viewModel = viewModel
+            onSave = viewModel::saveAll,
+            onNew = viewModel::createItem,
         )
 
         ReferenceItems(
             referenceState = referenceState,
             references = referenceItems,
-            scope = scope,
-            viewModel = viewModel
+            onDelete = viewModel::deleteItem
         )
     }
 }
@@ -81,8 +79,8 @@ fun ReferenceTab(
 @Composable
 fun ReferenceBanner(
     referenceType: ReferenceType,
-    scope: CoroutineScope,
-    viewModel: ReferenceViewModel,
+    onSave: () -> Unit,
+    onNew: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -94,10 +92,7 @@ fun ReferenceBanner(
             style = MaterialTheme.typography.titleLarge
         )
 
-        ReferenceActions(
-            scope = scope,
-            viewModel = viewModel
-        )
+        ReferenceActions(onSave, onNew)
     }
 }
 
@@ -105,8 +100,7 @@ fun ReferenceBanner(
 fun ReferenceItems(
     referenceState: ReferenceState,
     references: List<Reference>,
-    scope: CoroutineScope,
-    viewModel: ReferenceViewModel,
+    onDelete: (Reference) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
@@ -127,11 +121,7 @@ fun ReferenceItems(
                 item = item,
                 currentValues = referenceState.fieldValues[item.id].orEmpty(),
                 onFieldChange = referenceState::updateField,
-                onRemove = {
-                    scope.launch {
-                        viewModel.deleteItem(item)
-                    }
-                }
+                onRemove = { onDelete(item) }
             )
         }
     }
@@ -139,31 +129,19 @@ fun ReferenceItems(
 
 @Composable
 fun ReferenceActions(
-    scope: CoroutineScope,
-    viewModel: ReferenceViewModel,
+    onSave: () -> Unit,
+    onNew: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Button(
-            onClick = {
-                scope.launch {
-                    viewModel.saveAll()
-                }
-            }
-        ) {
+        Button(onClick = onSave) {
             Text(stringResource(Res.string.reference_save_button))
         }
 
-        Button(
-            onClick = {
-                scope.launch {
-                    viewModel.createItem()
-                }
-            }
-        ) {
+        Button(onClick = onNew) {
             Text(stringResource(Res.string.reference_new_item_button))
         }
     }

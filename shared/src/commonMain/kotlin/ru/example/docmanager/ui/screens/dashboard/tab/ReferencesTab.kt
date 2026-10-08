@@ -18,11 +18,10 @@ import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.reference.ReferenceType
 import ru.example.docmanager.ui.components.ClickableItem
 import ru.example.docmanager.viewmodel.DashboardDestination
-import ru.example.docmanager.viewmodel.DashboardViewModel
 
 @Composable
 fun ReferencesTab(
-    dashboardViewModel: DashboardViewModel,
+    navigateTo: (destination: DashboardDestination) -> Unit
 ) {
     LazyColumn (
         modifier = Modifier.fillMaxWidth()
@@ -36,7 +35,7 @@ fun ReferencesTab(
             ClickableItem(
                 title = stringResource(reference.stringResource),
                 onClick = {
-                    dashboardViewModel.navigateTo(
+                    navigateTo(
                         DashboardDestination.Reference(reference)
                     )
                 }

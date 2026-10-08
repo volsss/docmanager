@@ -6,6 +6,8 @@
 package ru.example.docmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import ru.example.docmanager.database.repositories.references.*
 import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.reference.ReferenceType
@@ -39,34 +41,40 @@ class ReferenceViewModel(
         formState.statusMessage = null
     }
 
-    suspend fun createItem() {
-        val referenceType = formState.referenceType
-        val repository = repositories[referenceType] ?: return
+    fun createItem() {
+        viewModelScope.launch {
+            val referenceType = formState.referenceType
+            val repository = repositories[referenceType] ?: return@launch
 
-        val created = repository.createItem()
-        formState.addItem(referenceType, created)
-        formState.statusMessage = "Запись создана"
-    }
-
-    suspend fun deleteItem(item: Reference) {
-        val referenceType = formState.referenceType
-        val repository = repositories[referenceType] ?: return
-
-        repository.deleteItem(item.id)
-        formState.removeItem(referenceType, item)
-        formState.statusMessage = "Запись удалена"
-    }
-
-    suspend fun saveAll() {
-        val referenceType = formState.referenceType
-        val repository = repositories[referenceType] ?: return
-
-        val updatedItems = formState.buildUpdatedItems()
-        updatedItems.forEach { item ->
-            updateItem(repository, item)
+            val created = repository.createItem()
+            formState.addItem(referenceType, created)
+            formState.statusMessage = "Запись создана"
         }
-        formState.setItems(referenceType, updatedItems)
-        formState.statusMessage = "Изменения сохранены"
+    }
+
+    fun deleteItem(item: Reference) {
+        viewModelScope.launch {
+            val referenceType = formState.referenceType
+            val repository = repositories[referenceType] ?: return@launch
+
+            repository.deleteItem(item.id)
+            formState.removeItem(referenceType, item)
+            formState.statusMessage = "Запись удалена"
+        }
+    }
+
+    fun saveAll() {
+        viewModelScope.launch {
+            val referenceType = formState.referenceType
+            val repository = repositories[referenceType] ?: return@launch
+
+            val updatedItems = formState.buildUpdatedItems()
+            updatedItems.forEach { item ->
+                updateItem(repository, item)
+            }
+            formState.setItems(referenceType, updatedItems)
+            formState.statusMessage = "Изменения сохранены"
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -26,18 +26,17 @@ import ru.example.docmanager.viewmodel.ConnectionState
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun App(
-    viewModel: AppViewModel = koinInject()
-) {
+fun App() {
+    val viewModel = koinInject<AppViewModel>()
     val state by viewModel.state.collectAsState()
 
     when (state) {
         ConnectionState.Disconnected,
         is ConnectionState.Error -> {
             StartScreen(
-                viewModel = viewModel,
                 state = state,
-                onConnect = viewModel::connect
+                onConnect = viewModel::connect,
+                onError = viewModel::error
             )
         }
         ConnectionState.Connected -> {
