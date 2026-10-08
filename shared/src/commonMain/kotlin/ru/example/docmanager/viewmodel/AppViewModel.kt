@@ -15,7 +15,6 @@ import kotlinx.coroutines.withContext
 import ru.example.docmanager.database.DatabaseFactory
 
 class AppViewModel (
-    private val settingsViewModel: SettingsViewModel,
     private val referenceViewModel: ReferenceViewModel,
 ): ViewModel() {
     val state: StateFlow<ConnectionState>
@@ -46,7 +45,6 @@ class AppViewModel (
                     )
                 }
 
-                settingsViewModel.loadMetadata()
                 referenceViewModel.loadReferenceItems()
             }.onSuccess {
                 state.value = ConnectionState.Connected

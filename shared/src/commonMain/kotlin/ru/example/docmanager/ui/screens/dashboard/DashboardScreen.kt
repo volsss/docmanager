@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.dashboard_project_name_fallback
 import org.jetbrains.compose.resources.stringResource
@@ -34,15 +35,13 @@ fun DashboardScreen(
     val dashboardViewModel = koinInject<DashboardViewModel>()
     val settingsViewModel = koinInject<SettingsViewModel>()
     val snackbarHostState = remember { SnackbarHostState() }
-    val destination by dashboardViewModel.destination.collectAsState()
-    val projectMetadata by settingsViewModel.metadata.collectAsState()
+    val destination by dashboardViewModel.destination.collectAsStateWithLifecycle()
+    val projectMetadata by settingsViewModel.metadata.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             DashboardTopBar(
-                title = projectMetadata?.name ?: stringResource(
-                    Res.string.dashboard_project_name_fallback
-                ),
+                title = projectMetadata?.name ?: stringResource(Res.string.dashboard_project_name_fallback),
                 onSettings = {
                     dashboardViewModel.navigateTo(
                         DashboardDestination.Settings
@@ -69,8 +68,7 @@ fun DashboardScreen(
         DashboardContent(
             modifier = Modifier.padding(paddingValues),
             destination = destination,
-            onTabSelected = dashboardViewModel::navigateTo,
-            dashboardViewModel = dashboardViewModel,
+            navigateTo = dashboardViewModel::navigateTo,
             snackbarHostState = snackbarHostState
         )
     }
@@ -79,8 +77,7 @@ fun DashboardScreen(
 @Composable
 fun DashboardContent (
     destination: DashboardDestination,
-    onTabSelected: (DashboardDestination) -> Unit,
-    dashboardViewModel: DashboardViewModel,
+    navigateTo: (DashboardDestination) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -91,7 +88,7 @@ fun DashboardContent (
     ) {
         DashboardTabs(
             destination = destination,
-            onTabSelected = onTabSelected
+            onTabSelected = navigateTo
         )
 
         Card(
@@ -112,10 +109,10 @@ fun DashboardContent (
                         SettingsTab()
                     }
                     DashboardDestination.Documents -> {
-                        DocumentsTab(dashboardViewModel::navigateTo)
+                        DocumentsTab(navigateTo)
                     }
                     DashboardDestination.References -> {
-                        ReferencesTab(dashboardViewModel::navigateTo)
+                        ReferencesTab(navigateTo)
                     }
 
                     is DashboardDestination.Document -> {

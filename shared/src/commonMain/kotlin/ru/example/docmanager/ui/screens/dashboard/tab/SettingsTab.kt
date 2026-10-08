@@ -28,11 +28,6 @@ import ru.example.docmanager.viewmodel.SettingsViewModel
 fun SettingsTab() {
     val viewModel = koinInject<SettingsViewModel>()
     val metadata by viewModel.metadata.collectAsState()
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        viewModel.loadMetadata()
-    }
 
     val current = metadata ?: return
 
@@ -76,15 +71,13 @@ fun SettingsTab() {
         )
 
         Button(onClick = {
-            scope.launch {
-                viewModel.updateMetadata(
-                    current.copy(
-                        name = projectName,
-                        version = version,
-                        author = author
-                    )
+            viewModel.updateMetadata(
+                current.copy(
+                    name = projectName,
+                    version = version,
+                    author = author
                 )
-            }
+            )
         }) {
             Text(stringResource(Res.string.settings_save_button))
         }

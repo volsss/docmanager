@@ -21,7 +21,7 @@ import ru.example.docmanager.viewmodel.DashboardDestination
 
 @Composable
 fun DocumentsTab(
-    navigateTo: (destination: DashboardDestination) -> Unit
+    navigateTo: (DashboardDestination) -> Unit
 ) {
     LazyColumn (
         modifier = Modifier.fillMaxWidth()

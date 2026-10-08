@@ -6,8 +6,10 @@
 package ru.example.docmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import ru.example.docmanager.database.Metadata
 import ru.example.docmanager.database.repositories.MetadataRepository
 
@@ -17,13 +19,21 @@ class SettingsViewModel(
     val metadata: StateFlow<Metadata?>
         field = MutableStateFlow<Metadata?>(null)
 
-    suspend fun loadMetadata() {
-        metadata.value = metadataRepository.getMetadata()
+    init {
+        loadMetadata()
     }
 
-    suspend fun updateMetadata(metadata: Metadata) {
-        metadataRepository.updateMetadata(metadata)
-        this.metadata.value = metadata
+    private fun loadMetadata() {
+        viewModelScope.launch {
+            metadata.value = metadataRepository.getMetadata()
+        }
+    }
+
+    fun updateMetadata(metadata: Metadata) {
+        viewModelScope.launch {
+            metadataRepository.updateMetadata(metadata)
+            this@SettingsViewModel.metadata.value = metadata
+        }
     }
 
     fun isMetadataLoaded() = metadata.value != null
