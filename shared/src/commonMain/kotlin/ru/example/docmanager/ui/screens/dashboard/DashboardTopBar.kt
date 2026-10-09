@@ -8,9 +8,9 @@ package ru.example.docmanager.ui.screens.dashboard
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,7 +38,7 @@ fun DashboardTopBar(
                 AnimatedVisibility(visible = canNavigateBack) {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = "Back",
                         )
                     }
@@ -57,14 +57,14 @@ fun DashboardTopBar(
         actions = {
             IconButton(onClick = onSettings) {
                 Icon(
-                    imageVector = Icons.Default.Settings,
+                    imageVector = Icons.Rounded.Settings,
                     contentDescription = stringResource(Res.string.dashboard_action_settings),
                 )
             }
 
             IconButton(onClick = onDisconnect) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    imageVector = Icons.AutoMirrored.Rounded.Logout,
                     contentDescription = stringResource(Res.string.dashboard_action_disconnect),
                 )
             }

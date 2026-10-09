@@ -6,16 +6,10 @@
 package ru.example.docmanager.viewmodel
 
 import androidx.navigation3.runtime.NavKey
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.tabs_document
-import docmanager.shared.generated.resources.tabs_documents
-import docmanager.shared.generated.resources.tabs_reference
-import docmanager.shared.generated.resources.tabs_references
-import docmanager.shared.generated.resources.tabs_settings
+import docmanager.shared.generated.resources.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
 import ru.example.docmanager.reference.ReferenceType
 

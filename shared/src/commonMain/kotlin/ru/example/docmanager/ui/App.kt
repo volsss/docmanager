@@ -14,14 +14,12 @@ import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
-import ru.example.docmanager.di.getColorScheme
 import ru.example.docmanager.ui.screens.StartScreen
 import ru.example.docmanager.ui.screens.dashboard.DashboardScreen
 import ru.example.docmanager.viewmodel.AppViewModel

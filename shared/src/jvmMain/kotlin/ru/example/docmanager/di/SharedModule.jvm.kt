@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.materialkolor.dynamiccolor.ColorSpec
-import com.materialkolor.dynamiccolor.ColorSpec2025
 import com.materialkolor.hct.Hct
 import com.materialkolor.ktx.from
 import com.materialkolor.scheme.SchemeExpressive
