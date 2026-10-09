@@ -27,18 +27,24 @@ class ReferenceViewModel(
         ReferenceType.SUPPLIER to suppliersRepository
     )
 
-    suspend fun loadReferenceItems() {
-        formState.setAllItems(
-            repositories.mapValues { (_, repository) ->
-                repository.getItems()
-            }
-        )
+    fun loadReferenceItems() {
+        viewModelScope.launch {
+            formState.setAllItems(
+                repositories.mapValues { (_, repository) ->
+                    repository.getItems()
+                }
+            )
+        }
+    }
+
+    fun clearStatusMessage() {
+        formState.clearStatusMessage()
     }
 
     fun setType(referenceType: ReferenceType) {
         formState.referenceType = referenceType
         formState.syncFieldValues()
-        formState.statusMessage = null
+        formState.clearStatusMessage()
     }
 
     fun createItem() {

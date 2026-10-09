@@ -14,6 +14,9 @@ import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
@@ -32,29 +35,33 @@ import ru.example.docmanager.viewmodel.ReferenceViewModel
 @Composable
 fun ReferenceTab(
     destination: DashboardDestination.Reference,
-    onStatusMessage: (String) -> Unit
+    onStatusMessage: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ReferenceViewModel = koinInject()
 ) {
-    val viewModel = koinInject<ReferenceViewModel>()
-    val referenceState = viewModel.formState
     val referenceType = destination.type
-    val referenceItems = referenceState.itemsByType[referenceType].orEmpty()
+    val referenceState = viewModel.formState
 
-    LaunchedEffect(destination) {
-        viewModel.setType(referenceType)
+    val referenceItems = remember(referenceState.itemsByType, referenceType) {
+        referenceState.itemsByType[referenceType].orEmpty()
     }
-    LaunchedEffect(Unit) {
+
+    LaunchedEffect(referenceType) {
+        viewModel.setType(referenceType)
         if (referenceState.itemsByType.isEmpty()) {
             viewModel.loadReferenceItems()
         }
     }
+    val currentOnStatusMessage by rememberUpdatedState(onStatusMessage)
     LaunchedEffect(referenceState.statusMessage) {
-        referenceState.statusMessage?.let {
-            onStatusMessage(it)
+        referenceState.statusMessage?.let { message ->
+            currentOnStatusMessage(message)
+            viewModel.clearStatusMessage()
         }
     }
 
     Card(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         shape = RoundedCornerShape(16.dp, 16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background

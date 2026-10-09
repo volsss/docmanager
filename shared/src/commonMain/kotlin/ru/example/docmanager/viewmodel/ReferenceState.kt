@@ -60,6 +60,10 @@ class ReferenceState (
         fieldValues = fieldValues + (item.id to item.toMap())
     }
 
+    fun clearStatusMessage() {
+        statusMessage = null
+    }
+
     fun buildUpdatedItems(): List<Reference> {
         return currentItems.map { item ->
             val fields = fieldValues[item.id].orEmpty()

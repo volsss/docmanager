@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -69,10 +71,14 @@ fun DashboardScreen(
         config,
         DashboardDestination.Documents
     )
+    val current by remember {
+        derivedStateOf {
+            backStack.last() as DashboardDestination
+        }
+    }
     val title by remember {
         derivedStateOf {
-            val lastDestination = backStack.lastOrNull() as? DashboardDestination
-            lastDestination?.stringResource ?: Res.string.start_title
+            (backStack.last() as DashboardDestination).stringResource
         }
     }
     val scope = rememberCoroutineScope()
@@ -109,7 +115,25 @@ fun DashboardScreen(
                 }
             )
         },
-        containerColor = MaterialTheme.colorScheme.primaryContainer
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = current is DashboardDestination.Reference,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
+                FloatingActionButton(
+                    onClick = {
+
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = null
+                    )
+                }
+            }
+        }
     ) { paddingValues ->
         DashboardContent(
             backStack = backStack,
