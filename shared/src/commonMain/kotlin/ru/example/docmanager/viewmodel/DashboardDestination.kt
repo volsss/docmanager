@@ -5,34 +5,20 @@
 
 package ru.example.docmanager.viewmodel
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.FindInPage
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.tabs_documents
-import docmanager.shared.generated.resources.tabs_references
-import docmanager.shared.generated.resources.tabs_settings
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
 import ru.example.docmanager.document.DocumentType
 import ru.example.docmanager.reference.ReferenceType
 
-sealed interface DashboardDestination {
-    data object Documents : DashboardDestination {
-        val stringResource = Res.string.tabs_documents
-        val icon = Icons.Default.FindInPage
-    }
-    data object References : DashboardDestination {
-        val stringResource = Res.string.tabs_references
-        val icon = Icons.Default.Book
-    }
-    data object Settings : DashboardDestination {
-        val stringResource = Res.string.tabs_settings
-    }
+@Serializable
+sealed interface DashboardDestination : NavKey {
+    @Serializable data object Documents : DashboardDestination
+    @Serializable data object References : DashboardDestination
+    @Serializable data object Settings : DashboardDestination
 
-    data class Document(
-        val type: DocumentType,
-    ) : DashboardDestination
+    @Serializable
+    data class Document(val type: DocumentType) : DashboardDestination
 
-    data class Reference(
-        val type: ReferenceType,
-    ) : DashboardDestination
+    @Serializable
+    data class Reference(val type: ReferenceType) : DashboardDestination
 }

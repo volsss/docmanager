@@ -24,19 +24,11 @@ import ru.example.docmanager.ui.App
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(0, 0))
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(0, 0))
+
         setContent {
-            val context = LocalContext.current
-            val useDynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-
-            val colorScheme = when {
-                useDynamicColor && isSystemInDarkTheme() -> dynamicDarkColorScheme(context)
-                useDynamicColor -> dynamicLightColorScheme(context)
-                else -> MaterialTheme.colorScheme
-            }
-
             if (GlobalContext.getOrNull() == null) {
                 startKoin {
                     androidContext(this@MainActivity)
@@ -44,9 +36,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            MaterialTheme(colorScheme) {
-                App()
-            }
+            App()
         }
     }
 }

@@ -5,6 +5,8 @@
 
 package ru.example.docmanager.di
 
+import androidx.compose.material3.ColorScheme
+import androidx.compose.runtime.Composable
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -15,7 +17,6 @@ import ru.example.docmanager.database.repositories.references.OrganizationsRepos
 import ru.example.docmanager.database.repositories.references.ProductsRepository
 import ru.example.docmanager.database.repositories.references.SuppliersRepository
 import ru.example.docmanager.viewmodel.AppViewModel
-import ru.example.docmanager.viewmodel.DashboardViewModel
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 import ru.example.docmanager.viewmodel.SettingsViewModel
 
@@ -29,7 +30,6 @@ val sharedModule = module {
 
     singleOf(::ReferenceViewModel)
     singleOf(::AppViewModel)
-    singleOf(::DashboardViewModel)
     factoryOf(::SettingsViewModel)
 }
 
@@ -39,3 +39,6 @@ enum class Platform {
 
 expect fun getPlatform(): Platform
 expect fun getDocumentProcessor(): DocumentProcessor
+
+@Composable
+expect fun getColorScheme(darkTheme: Boolean): ColorScheme

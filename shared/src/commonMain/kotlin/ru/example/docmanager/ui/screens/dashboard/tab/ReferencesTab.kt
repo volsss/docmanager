@@ -6,10 +6,15 @@
 package ru.example.docmanager.ui.screens.dashboard.tab
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,23 +28,31 @@ import ru.example.docmanager.viewmodel.DashboardDestination
 fun ReferencesTab(
     navigateTo: (DashboardDestination) -> Unit
 ) {
-    LazyColumn (
-        modifier = Modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+    Card(
+        modifier = Modifier.fillMaxSize(),
+        shape = RoundedCornerShape(16.dp, 16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
     ) {
-        items(
-            items = ReferenceType.entries,
-            key = { it.name }
-        ) { reference ->
-            ClickableItem(
-                title = stringResource(reference.stringResource),
-                onClick = {
-                    navigateTo(
-                        DashboardDestination.Reference(reference)
-                    )
-                }
-            )
+        LazyColumn (
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+                .clip(RoundedCornerShape(16.dp)),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items(
+                items = ReferenceType.entries,
+                key = { it.name }
+            ) { reference ->
+                ClickableItem(
+                    title = stringResource(reference.stringResource),
+                    onClick = {
+                        navigateTo(
+                            DashboardDestination.Reference(reference)
+                        )
+                    }
+                )
+            }
         }
     }
 }

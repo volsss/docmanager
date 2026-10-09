@@ -5,6 +5,7 @@
 
 package ru.example.docmanager.ui.screens.forms.powerOfAttorney
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -141,13 +142,19 @@ private fun PowerOfAttorneyBanner(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        formState.statusMessage?.let { msg ->
+        Text(
+            text = stringResource(Res.string.document_power_of_attorney),
+            style = MaterialTheme.typography.titleLarge
+        )
+        AnimatedVisibility(visible = formState.statusMessage != null) {
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = msg,
+                text = formState.statusMessage ?: "",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (formState.isEditing) {
             Row(

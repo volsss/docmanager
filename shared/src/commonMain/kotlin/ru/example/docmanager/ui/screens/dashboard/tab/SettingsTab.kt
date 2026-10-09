@@ -9,9 +9,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -35,51 +39,59 @@ fun SettingsTab() {
     var version by remember(current) { mutableStateOf(current.version) }
     var author by remember(current) { mutableStateOf(current.author) }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    Card(
+        modifier = Modifier.fillMaxSize(),
+        shape = RoundedCornerShape(16.dp, 16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
     ) {
-        Text(
-            text = stringResource(Res.string.settings_title),
-            style = MaterialTheme.typography.headlineSmall
-        )
-        OutlinedTextField(
-            value = projectName,
-            onValueChange = { projectName = it },
-            label = { Text(stringResource(Res.string.settings_field_project_name)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = version,
-            onValueChange = { version = it },
-            label = { Text(stringResource(Res.string.settings_field_version)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = author,
-            onValueChange = { author = it },
-            label = { Text(stringResource(Res.string.settings_field_author)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        OutlinedTextField(
-            value = current.creationDate,
-            onValueChange = {},
-            label = { Text(stringResource(Res.string.settings_field_creation_date)) },
-            enabled = false,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Button(onClick = {
-            viewModel.updateMetadata(
-                current.copy(
-                    name = projectName,
-                    version = version,
-                    author = author
-                )
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.settings_title),
+                style = MaterialTheme.typography.headlineSmall
             )
-        }) {
-            Text(stringResource(Res.string.settings_save_button))
+            OutlinedTextField(
+                value = projectName,
+                onValueChange = { projectName = it },
+                label = { Text(stringResource(Res.string.settings_field_project_name)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = version,
+                onValueChange = { version = it },
+                label = { Text(stringResource(Res.string.settings_field_version)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = author,
+                onValueChange = { author = it },
+                label = { Text(stringResource(Res.string.settings_field_author)) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = current.creationDate,
+                onValueChange = {},
+                label = { Text(stringResource(Res.string.settings_field_creation_date)) },
+                enabled = false,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(onClick = {
+                viewModel.updateMetadata(
+                    current.copy(
+                        name = projectName,
+                        version = version,
+                        author = author
+                    )
+                )
+            }) {
+                Text(stringResource(Res.string.settings_save_button))
+            }
         }
     }
 }

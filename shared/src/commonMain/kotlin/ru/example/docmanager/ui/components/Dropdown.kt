@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_dropdown_placeholder
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.viewmodel.DashboardDestination.Documents.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

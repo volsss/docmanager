@@ -9,8 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,19 +31,22 @@ fun DocumentTab (
     destination: DashboardDestination.Document
 ) {
     val type = destination.type
-    Text(
-        stringResource(type.stringResource),
-        style = MaterialTheme.typography.titleLarge
-    )
-    Spacer(Modifier.height(8.dp))
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Card(
+        modifier = Modifier.fillMaxSize(),
+        shape = RoundedCornerShape(16.dp, 16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
     ) {
-        when (type) {
-            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen()
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when (type) {
+                DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen()
+            }
         }
     }
 }

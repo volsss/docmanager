@@ -8,6 +8,8 @@ package ru.example.docmanager.ui.screens.dashboard
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.FindInPage
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.Icon
@@ -17,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.dashboard_tabs_more
+import docmanager.shared.generated.resources.tabs_documents
+import docmanager.shared.generated.resources.tabs_references
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.viewmodel.DashboardDestination
 
@@ -26,8 +30,8 @@ fun DashboardTabs(
     onTabSelected: (DashboardDestination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val documentsLabel = stringResource(DashboardDestination.Documents.stringResource)
-    val referencesLabel = stringResource(DashboardDestination.References.stringResource)
+    val documentsLabel = stringResource(Res.string.tabs_documents)
+    val referencesLabel = stringResource(Res.string.tabs_references)
 
     ButtonGroup(
         overflowIndicator = { menuState ->
@@ -49,26 +53,28 @@ fun DashboardTabs(
             .widthIn(max = 700.dp),
     ) {
         toggleableItem(
-            checked = destination == DashboardDestination.Documents || destination is DashboardDestination.Document,
+            checked = destination == DashboardDestination.Documents
+                    || destination is DashboardDestination.Document,
             onCheckedChange = { onTabSelected(DashboardDestination.Documents) },
             label = documentsLabel,
             weight = 0.5f,
             icon = {
                 Icon(
-                    DashboardDestination.Documents.icon,
-                    stringResource(DashboardDestination.Documents.stringResource)
+                    Icons.Default.FindInPage,
+                    documentsLabel
                 )
             }
         )
         toggleableItem(
-            checked = destination == DashboardDestination.References || destination is DashboardDestination.Reference,
+            checked = destination == DashboardDestination.References
+                    || destination is DashboardDestination.Reference,
             onCheckedChange = { onTabSelected(DashboardDestination.References) },
             label = referencesLabel,
             weight = 0.5f,
             icon = {
                 Icon(
-                    DashboardDestination.References.icon,
-                    stringResource(DashboardDestination.References.stringResource)
+                    Icons.Default.Book,
+                    referencesLabel
                 )
             }
         )

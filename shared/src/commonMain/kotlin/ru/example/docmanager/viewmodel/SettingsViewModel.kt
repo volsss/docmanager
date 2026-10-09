@@ -35,6 +35,4 @@ class SettingsViewModel(
             this@SettingsViewModel.metadata.value = metadata
         }
     }
-
-    fun isMetadataLoaded() = metadata.value != null
 }
