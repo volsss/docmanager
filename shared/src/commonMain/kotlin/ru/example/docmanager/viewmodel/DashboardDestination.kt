@@ -6,19 +6,52 @@
 package ru.example.docmanager.viewmodel
 
 import androidx.navigation3.runtime.NavKey
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.tabs_document
+import docmanager.shared.generated.resources.tabs_documents
+import docmanager.shared.generated.resources.tabs_reference
+import docmanager.shared.generated.resources.tabs_references
+import docmanager.shared.generated.resources.tabs_settings
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
 import ru.example.docmanager.reference.ReferenceType
 
 @Serializable
 sealed interface DashboardDestination : NavKey {
-    @Serializable data object Documents : DashboardDestination
-    @Serializable data object References : DashboardDestination
-    @Serializable data object Settings : DashboardDestination
+    @Contextual
+    val stringResource: StringResource
 
     @Serializable
-    data class Document(val type: DocumentType) : DashboardDestination
+    data object Documents : DashboardDestination {
+        @Contextual
+        override val stringResource = Res.string.tabs_documents
+    }
 
     @Serializable
-    data class Reference(val type: ReferenceType) : DashboardDestination
+    data object References : DashboardDestination {
+        @Contextual
+        override val stringResource = Res.string.tabs_references
+    }
+    @Serializable
+    data object Settings : DashboardDestination {
+        @Contextual
+        override val stringResource = Res.string.tabs_settings
+    }
+
+    @Serializable
+    data class Document(
+        val type: DocumentType,
+        @Contextual
+        override val stringResource: StringResource = Res.string.tabs_document,
+    ) : DashboardDestination
+
+    @Serializable
+    data class Reference(
+        val type: ReferenceType,
+        @Contextual
+        override val stringResource: StringResource = Res.string.tabs_reference,
+    ) : DashboardDestination
 }

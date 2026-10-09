@@ -15,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.dashboard_action_disconnect
 import docmanager.shared.generated.resources.dashboard_action_settings

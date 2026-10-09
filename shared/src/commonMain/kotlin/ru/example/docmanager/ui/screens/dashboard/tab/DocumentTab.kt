@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
 import ru.example.docmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScreen
@@ -46,6 +48,9 @@ fun DocumentTab (
         ) {
             when (type) {
                 DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen()
+                DocumentType.TEST -> {
+                    Text(stringResource(Res.string.document_test))
+                }
             }
         }
     }

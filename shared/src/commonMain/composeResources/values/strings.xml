@@ -39,6 +39,7 @@
     <string name="tabs_settings">Настройки</string>
 
     <string name="document_power_of_attorney">Доверенность</string>
+    <string name="document_test">Тестовый документ</string>
 
     <string name="reference_individuals">Физические лица</string>
     <string name="reference_organizations">Организации</string>

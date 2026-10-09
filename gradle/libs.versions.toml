@@ -20,6 +20,8 @@ material3Adaptive = "1.2.0"
 poi-ooxml = "5.5.1"
 multiplatform-nav3-ui = "1.1.2"
 kotlinx-serialization = "1.11.0"
+jna = "5.19.1"
+materialColor = "5.0.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
@@ -50,6 +52,9 @@ h2 = { module = "com.h2database:h2", version.ref = "h2" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Version" }
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi-ooxml" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+jna-platform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
+material-color = { module = "com.materialkolor:material-kolor", version.ref = "materialColor" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

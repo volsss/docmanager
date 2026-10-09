@@ -11,10 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +29,7 @@ import ru.example.docmanager.reference.ReferenceType
 import ru.example.docmanager.ui.components.ClickableItem
 import ru.example.docmanager.viewmodel.DashboardDestination
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ReferencesTab(
     navigateTo: (DashboardDestination) -> Unit
@@ -36,22 +42,26 @@ fun ReferencesTab(
         )
     ) {
         LazyColumn (
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
-            items(
-                items = ReferenceType.entries,
-                key = { it.name }
-            ) { reference ->
-                ClickableItem(
-                    title = stringResource(reference.stringResource),
+            itemsIndexed(ReferenceType.entries) { index, type ->
+                SegmentedListItem(
+                    shapes = ListItemDefaults.segmentedShapes(
+                        index = index,
+                        count = ReferenceType.entries.size
+                    ),
+                    colors = ListItemDefaults.segmentedColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
                     onClick = {
                         navigateTo(
-                            DashboardDestination.Reference(reference)
+                            DashboardDestination.Reference(type)
                         )
                     }
-                )
+                ) {
+                    Text(stringResource(type.stringResource))
+                }
             }
         }
     }
