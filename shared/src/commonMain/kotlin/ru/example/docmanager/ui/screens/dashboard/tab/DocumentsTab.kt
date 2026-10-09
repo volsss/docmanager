@@ -15,7 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
@@ -51,6 +51,12 @@ fun DocumentsTab(
                         navigateTo(
                             DashboardDestination.Document(type)
                         )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = type.icon,
+                            contentDescription = null
+                        )
                     }
                 ) {
                     Text(stringResource(type.stringResource))
@@ -60,24 +66,20 @@ fun DocumentsTab(
     }
 }
 
-@PreviewDynamicColors
+@Preview
 @Composable
 fun DocumentsTypePreview() {
-    AppTheme (
-        darkTheme = false
-    ) {
+    AppTheme (darkTheme = false) {
         DocumentsTab(
             navigateTo = { }
         )
     }
 }
 
-@PreviewDynamicColors
+@Preview
 @Composable
 fun DocumentsTypeDarkThemePreview() {
-    AppTheme (
-        darkTheme = true
-    ) {
+    AppTheme (darkTheme = true) {
         DocumentsTab(
             navigateTo = { }
         )
