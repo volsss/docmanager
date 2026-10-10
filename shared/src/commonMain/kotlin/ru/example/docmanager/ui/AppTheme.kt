@@ -5,7 +5,7 @@
 
 package ru.example.docmanager.ui
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.runtime.Composable
 import ru.example.docmanager.di.getColorScheme
 
@@ -16,7 +16,7 @@ fun AppTheme(
 ) {
     val colorScheme = getColorScheme(darkTheme)
 
-    MaterialTheme(
+    MaterialExpressiveTheme(
         colorScheme = colorScheme,
         content = content
     )

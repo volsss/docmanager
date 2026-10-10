@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
-import ru.example.docmanager.ui.screens.StartScreen
+import ru.example.docmanager.ui.screens.ConnectionScreen
 import ru.example.docmanager.ui.screens.dashboard.DashboardScreen
 import ru.example.docmanager.viewmodel.AppViewModel
 import ru.example.docmanager.viewmodel.ConnectionState
@@ -39,7 +39,7 @@ fun App(
         when (state) {
             ConnectionState.Disconnected,
             is ConnectionState.Error -> {
-                StartScreen(
+                ConnectionScreen(
                     state = state,
                     onConnect = viewModel::connect,
                     onError = viewModel::error

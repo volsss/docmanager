@@ -30,7 +30,7 @@ import ru.example.docmanager.ui.components.DropdownMode
 import ru.example.docmanager.viewmodel.ConnectionState
 
 @Composable
-fun StartScreen (
+fun ConnectionScreen (
     state: ConnectionState,
     onConnect: (String, String, String, String) -> Unit,
     onError: (String) -> Unit
