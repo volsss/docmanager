@@ -2,32 +2,42 @@
 
 - [Главная](/)
 ---
-- [✅ Лабораторная работа 1](lab1/index.md)
+- [Лабораторная работа 1](lab1/)
   - [Установка IDE](lab1/getting-started.md)
   - [Настройка IDE и плагинов](lab1/install-plugins.md)
   - [Практическое задание ](lab1/practice.md)
 ---
-- [✅ Лабораторная работа 2](lab2/index.md)
+- [Лабораторная работа 2](lab2/)
   - [Теория Kotlin: Часть 1](lab2/kotlin-1.md)
   - [Теория Kotlin: Часть 2](lab2/kotlin-2.md)
   - [Практическое задание ](lab2/practice.md)
 ---
-- [Лабораторная работа 3](lab3/index.md)
+- [Лабораторная работа 3](lab3/)
   - [Теория Kotlin: Часть 3](lab3/kotlin-3.md)
   - [Теория Kotlin: Часть 4](lab3/kotlin-4.md)
   - [⚠️ Практическое задание ](lab3/practice.md)
 ---
-- [Лабораторная работа 4](lab4/index.md)
+- [Лабораторная работа 4](lab4/)
   - [Теория Kotlin: Часть 5](lab4/kotlin-5.md)
   - [⚠️ Практическое задание ](lab4/practice.md)
 ---
-- [⚠️ Лабораторная работа 5](lab5/index.md)
+- [⚠️ Лабораторная работа 5](lab5/)
   - [Теория Gradle: Часть 1](lab5/gradle-1.md)
   - [Теория Gradle: Часть 2](lab5/gradle-2.md)
-  - [Практическое задание ](lab5/practice.md)
+  - [⚠️ Практическое задание ](lab5/practice.md)
 ---
-- [Лабораторная работа 6](lab6/index.md)
-  - [Теория Корутин](lab6/corutines.md)
+- [Лабораторная работа 6](lab6/)
+  - [⚠️ Теория Корутин](lab6/corutines.md)
   - [⚠️ Практическое задание ](lab6/practice.md)
+---
+- [Лабораторная работа 7](lab7/)
+  - [⚠️ Теория Android 1](lab7/android1.md)
+  - [⚠️ Теория Android 2](lab7/android2.md)
+  - [⚠️ Практическое задание ](lab6/practice.md)
+---
+- [Лабораторная работа 8](lab8/)
+  - [⚠️ Теория Compose 1](lab8/compose1.md)
+  - [⚠️ Теория Compose 2](lab8/compose2.md)
+  - [⚠️ Практическое задание ](lab8/practice.md)
 ---
 * [GitHub](https://github.com/volsss/docmanager)
