@@ -1,0 +1,98 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
+package ru.example.docmanager.ui.screens
+
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
+import ru.example.docmanager.ui.navigation.Screen
+
+@Composable
+fun StartScreen(
+    onDisconnect: () -> Unit,
+    navigateTo: (Screen) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        listOf(
+            Screen.Documents,
+            Screen.References,
+            Screen.Settings
+        ).forEach { screen ->
+            StartScreenItem(
+                screen = screen,
+                navigateTo = navigateTo
+            )
+        }
+    }
+}
+
+@Composable
+fun ColumnScope.StartScreenItem(
+    screen: Screen,
+    navigateTo: (Screen) -> Unit
+) {
+    val text = screen.stringResource?.let { stringResource(it) } ?: return
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val cornerRadius by animateDpAsState(
+        targetValue = if (isPressed) 128.dp else 32.dp,
+        label = "BorderRadiusAnimation"
+    )
+
+    Box(
+        modifier = Modifier.fillMaxWidth()
+            .weight(1f)
+    ) {
+        Button(
+            modifier = Modifier.fillMaxSize(),
+            onClick = { navigateTo(screen) },
+            shape = RoundedCornerShape(cornerRadius),
+            interactionSource = interactionSource,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
+        ) {
+            Icon(
+                imageVector = screen.icon,
+                contentDescription = text,
+                modifier = Modifier.size(ButtonDefaults.ExtraLargeIconSize)
+            )
+            Spacer(Modifier.width(ButtonDefaults.ExtraLargeIconSpacing))
+            Text(
+                text = text,
+                style = ButtonDefaults.textStyleFor(
+                    ButtonDefaults.ExtraLargeContainerHeight
+                ),
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun StartScreenPreview() {
+    StartScreen(
+        onDisconnect = { },
+        navigateTo = { }
+    )
+}

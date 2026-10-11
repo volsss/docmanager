@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.dashboard.tab
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -12,11 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
@@ -28,13 +24,13 @@ import ru.example.docmanager.reference.Reference
 import ru.example.docmanager.reference.ReferenceType
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.components.ReferenceInput
-import ru.example.docmanager.viewmodel.DashboardDestination
+import ru.example.docmanager.ui.navigation.Screen
 import ru.example.docmanager.viewmodel.ReferenceState
 import ru.example.docmanager.viewmodel.ReferenceViewModel
 
 @Composable
-fun ReferenceTab(
-    destination: DashboardDestination.Reference,
+fun ReferenceScreen(
+    destination: Screen.Reference,
     onStatusMessage: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReferenceViewModel = koinInject()

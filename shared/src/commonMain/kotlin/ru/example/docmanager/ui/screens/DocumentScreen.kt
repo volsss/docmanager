@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.dashboard.tab
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,12 +23,12 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
+import ru.example.docmanager.ui.navigation.Screen
 import ru.example.docmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScreen
-import ru.example.docmanager.viewmodel.DashboardDestination
 
 @Composable
-fun DocumentTab (
-    destination: DashboardDestination.Document
+fun DocumentScreen (
+    destination: Screen.Document
 ) {
     val type = destination.type
 

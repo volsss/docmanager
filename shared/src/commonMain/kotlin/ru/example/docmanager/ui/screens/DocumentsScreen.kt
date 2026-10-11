@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.dashboard.tab
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,14 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.reference.ReferenceType
+import ru.example.docmanager.document.DocumentType
 import ru.example.docmanager.ui.AppTheme
-import ru.example.docmanager.viewmodel.DashboardDestination
+import ru.example.docmanager.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ReferencesTab(
-    navigateTo: (DashboardDestination) -> Unit
+fun DocumentsScreen(
+    navigateTo: (Screen) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxSize(),
@@ -38,18 +38,18 @@ fun ReferencesTab(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
-            itemsIndexed(ReferenceType.entries) { index, type ->
+            itemsIndexed(DocumentType.entries) { index, type ->
                 SegmentedListItem(
                     shapes = ListItemDefaults.segmentedShapes(
                         index = index,
-                        count = ReferenceType.entries.size
+                        count = DocumentType.entries.size
                     ),
                     colors = ListItemDefaults.segmentedColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     onClick = {
                         navigateTo(
-                            DashboardDestination.Reference(type)
+                            Screen.Document(type)
                         )
                     },
                     leadingContent = {
@@ -68,9 +68,9 @@ fun ReferencesTab(
 
 @Preview
 @Composable
-fun ReferencesTabPreview() {
+fun DocumentsTypePreview() {
     AppTheme (darkTheme = false) {
-        ReferencesTab(
+        DocumentsScreen(
             navigateTo = { }
         )
     }
@@ -78,9 +78,9 @@ fun ReferencesTabPreview() {
 
 @Preview
 @Composable
-fun ReferencesTabDarkThemePreview() {
+fun DocumentsTypeDarkThemePreview() {
     AppTheme (darkTheme = true) {
-        ReferencesTab(
+        DocumentsScreen(
             navigateTo = { }
         )
     }

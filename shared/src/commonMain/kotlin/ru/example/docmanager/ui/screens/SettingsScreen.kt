@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.dashboard.tab
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -19,7 +19,7 @@ import org.koin.compose.koinInject
 import ru.example.docmanager.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsTab() {
+fun SettingsScreen() {
     val viewModel = koinInject<SettingsViewModel>()
     val metadata by viewModel.metadata.collectAsState()
 
