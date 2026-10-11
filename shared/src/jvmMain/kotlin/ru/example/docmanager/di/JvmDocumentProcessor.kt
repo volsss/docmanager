@@ -5,6 +5,8 @@
 
 package ru.example.docmanager.di
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.jetbrains.compose.resources.getString
@@ -16,6 +18,7 @@ import java.awt.Frame
 import java.awt.GraphicsEnvironment
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import javax.print.PrintServiceLookup
@@ -40,12 +43,24 @@ class JvmDocumentProcessor : DocumentProcessor {
     ) {
         if (isPrintingAvailable()) {
             try {
-                val tempFile = File.createTempFile("${documentName}_", ".docx").apply { deleteOnExit() }
+                val tempFile = withContext(Dispatchers.IO) {
+                    File.createTempFile("${documentName}_", ".docx").apply {
+                        deleteOnExit()
+                    }
+                }
+
                 processSaveToFile(tempFile, documentResourceFile, document)
-                Desktop.getDesktop().print(tempFile)
+
+                withContext(Dispatchers.IO) {
+                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.PRINT)) {
+                        Desktop.getDesktop().print(tempFile)
+                    } else {
+                        throw UnsupportedOperationException("Print action is not supported on this platform/desktop.")
+                    }
+                }
                 return
             } catch (e: Exception) {
-                println("Printing failed: ${e.message}, falling back to saving to file")
+                System.err.println("Printing failed: ${e.message}, falling back to saving to file")
             }
         }
         processSave(documentName, documentResourceFile, document)
@@ -75,7 +90,7 @@ class JvmDocumentProcessor : DocumentProcessor {
                 val selected = File(dir, file)
                 return if (!selected.name.endsWith(".docx", ignoreCase = true)) File(dir, "$file.docx") else selected
             }
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             try {
                 val chooser = JFileChooser().apply {
                     dialogTitle = "Сохранить документ"
@@ -86,7 +101,7 @@ class JvmDocumentProcessor : DocumentProcessor {
                     val file = chooser.selectedFile
                     return if (!file.name.endsWith(".docx", ignoreCase = true)) File(file.parentFile, "${file.name}.docx") else file
                 }
-            } catch (ignored: Throwable) {}
+            } catch (_: Throwable) { }
         }
         return null
     }
@@ -95,12 +110,18 @@ class JvmDocumentProcessor : DocumentProcessor {
         destination: File,
         documentResourceFile: String,
         document: Document
-    ) {
-        destination.parentFile?.mkdirs()
-        val blank = object {}.javaClass.getResourceAsStream("/$documentResourceFile") ?: run {
-            println("Form not found: $documentResourceFile")
-            return
+    ) = withContext(Dispatchers.IO) {
+        val parent = destination.parentFile
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw IOException("Failed to create directories for path: ${parent.absolutePath}")
         }
+
+        val blank = object {}.javaClass.getResourceAsStream("/$documentResourceFile")
+        if (blank == null) {
+            System.err.println("Form not found: $documentResourceFile")
+            return@withContext
+        }
+
         blank.use { input ->
             FileOutputStream(destination).use { fos ->
                 processDocument(input, fos, document)
