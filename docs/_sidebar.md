@@ -5,6 +5,7 @@
 - [Лабораторная работа 1](lab1/)
   - [Установка IDE](lab1/getting-started.md)
   - [Настройка IDE и плагинов](lab1/install-plugins.md)
+  - [Создание проекта](lab1/new-project.md)
   - [Практическое задание ](lab1/practice.md)
 ---
 - [Лабораторная работа 2](lab2/)
