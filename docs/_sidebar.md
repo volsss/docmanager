@@ -16,7 +16,7 @@
 - [Лабораторная работа 3](lab3/)
   - [Теория Kotlin III](lab3/kotlin-3.md)
   - [Теория Kotlin IV](lab3/kotlin-4.md)
-  - [⚠️ Практическое задание ](lab3/practice.md)
+  - [Практическое задание ](lab3/practice.md)
 ---
 - [Лабораторная работа 4](lab4/)
   - [Теория Kotlin V](lab4/kotlin-5.md)
@@ -34,13 +34,13 @@
   - [⚠️ Практическое задание ](lab6/practice.md)
 ---
 - [Лабораторная работа 7](lab7/)
-  - [⚠️ Теория Android 1](lab7/android1.md)
-  - [⚠️ Теория Android 2](lab7/android2.md)
+  - [⚠️ Теория Android I](lab7/android-1.md)
+  - [⚠️ Теория Android II](lab7/android-2.md)
   - [⚠️ Практическое задание ](lab6/practice.md)
 ---
 - [Лабораторная работа 8](lab8/)
-  - [⚠️ Теория Compose 1](lab8/compose1.md)
-  - [⚠️ Теория Compose 2](lab8/compose2.md)
+  - [⚠️ Теория Compose I](lab8/compose-1.md)
+  - [⚠️ Теория Compose II](lab8/compose-2.md)
   - [⚠️ Практическое задание ](lab8/practice.md)
 ---
 * [GitHub](https://github.com/volsss/docmanager)
