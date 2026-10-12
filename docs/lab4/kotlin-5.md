@@ -1,4 +1,4 @@
-# Теория Kotlin: Часть 5
+# Теория Kotlin V
 
 ## enum class
 

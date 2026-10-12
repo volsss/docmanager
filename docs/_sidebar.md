@@ -8,23 +8,24 @@
   - [Практическое задание ](lab1/practice.md)
 ---
 - [Лабораторная работа 2](lab2/)
-  - [Теория Kotlin: Часть 1](lab2/kotlin-1.md)
-  - [Теория Kotlin: Часть 2](lab2/kotlin-2.md)
+  - [Теория Kotlin I](lab2/kotlin-1.md)
+  - [Теория Kotlin II](lab2/kotlin-2.md)
   - [Практическое задание ](lab2/practice.md)
 ---
 - [Лабораторная работа 3](lab3/)
-  - [Теория Kotlin: Часть 3](lab3/kotlin-3.md)
-  - [Теория Kotlin: Часть 4](lab3/kotlin-4.md)
+  - [Теория Kotlin III](lab3/kotlin-3.md)
+  - [Теория Kotlin IV](lab3/kotlin-4.md)
   - [⚠️ Практическое задание ](lab3/practice.md)
 ---
 - [Лабораторная работа 4](lab4/)
-  - [Теория Kotlin: Часть 5](lab4/kotlin-5.md)
+  - [Теория Kotlin V](lab4/kotlin-5.md)
   - [⚠️ Практическое задание ](lab4/practice.md)
 ---
 - [Лабораторная работа 5](lab5/)
   - [Предисловие Kotlin](lab5/preface.md)
-  - [Теория Gradle: Часть 1](lab5/gradle-1.md)
-  - [Теория Gradle: Часть 2](lab5/gradle-2.md)
+  - [Теория Gradle I](lab5/gradle-1.md)
+  - [Теория Gradle II](lab5/gradle-2.md)
+  - [Теория Gradle III](lab5/gradle-3.md)
   - [⚠️ Практическое задание ](lab5/practice.md)
 ---
 - [Лабораторная работа 6](lab6/)
