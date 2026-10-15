@@ -8,6 +8,7 @@ on:
       - "desktopApp/**"
       - "shared/**"
       - "gradle/**"
+      - ".github/workflows/**"
       - "**.kts"
   pull_request:
     branches: ["master"]
