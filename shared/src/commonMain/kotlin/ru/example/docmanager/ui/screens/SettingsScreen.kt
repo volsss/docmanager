@@ -7,19 +7,24 @@ package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import ru.example.docmanager.ui.components.ScreenTopBar
 import ru.example.docmanager.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val viewModel = koinInject<SettingsViewModel>()
     val metadata by viewModel.metadata.collectAsState()
 
@@ -29,22 +34,19 @@ fun SettingsScreen() {
     var version by remember(current) { mutableStateOf(current.version) }
     var author by remember(current) { mutableStateOf(current.author) }
 
-    Card(
-        modifier = Modifier.fillMaxSize(),
-        shape = RoundedCornerShape(16.dp, 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+    Column(
+        modifier = modifier.fillMaxSize()
     ) {
+        ScreenTopBar(
+            title = stringResource(Res.string.screen_settings),
+            onBack = onBack
+        )
+
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = stringResource(Res.string.settings_title),
-                style = MaterialTheme.typography.headlineSmall
-            )
             OutlinedTextField(
                 value = projectName,
                 onValueChange = { projectName = it },

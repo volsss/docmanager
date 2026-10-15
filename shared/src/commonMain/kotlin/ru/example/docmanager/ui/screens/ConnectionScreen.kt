@@ -33,7 +33,8 @@ import ru.example.docmanager.viewmodel.ConnectionState
 fun ConnectionScreen (
     state: ConnectionState,
     onConnect: (String, String, String, String) -> Unit,
-    onError: (String) -> Unit
+    onError: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val platform = remember { getPlatform() }
     var jdbcUrl by remember { mutableStateOf("") }
@@ -43,7 +44,7 @@ fun ConnectionScreen (
 
     Scaffold { paddingValues ->
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)

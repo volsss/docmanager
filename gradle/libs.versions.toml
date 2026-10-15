@@ -7,16 +7,15 @@ android-targetSdk = "37"
 androidx-activity = "1.13.0"
 composeMultiplatform = "1.12.1"
 material3 = "1.12.0-alpha03"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 kotlinx-coroutines = "1.11.0"
 materialIconsExtended = "1.7.8"
 koin = "4.2.2"
-exposed = "1.5.0"
-hikaricp = "7.1.0"
+exposed = "1.5.1"
 h2 = "2.5.252"
-postgresql = "42.7.13"
+postgresql = "42.7.14"
 material3Version = "1.4.0"
-material3Adaptive = "1.2.0"
+material3Adaptive = "1.3.0"
 poi-ooxml = "5.5.1"
 multiplatform-nav3-ui = "1.1.2"
 kotlinx-serialization = "1.11.0"
@@ -47,7 +46,6 @@ exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "e
 exposed-migration-core = { module = "org.jetbrains.exposed:exposed-migration-core", version.ref = "exposed" }
 exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdbc", version.ref = "exposed" }
 exposed-javatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
-hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Version" }

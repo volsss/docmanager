@@ -8,5 +8,6 @@ package ru.example.docmanager.document
 import ru.example.docmanager.document.header.DocumentHeader
 
 interface Document {
+    val type: DocumentType
     val header: DocumentHeader
 }

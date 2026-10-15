@@ -23,22 +23,25 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.document.DocumentType
+import ru.example.docmanager.ui.components.ScreenTopBar
 import ru.example.docmanager.ui.navigation.Screen
 import ru.example.docmanager.ui.screens.forms.powerOfAttorney.PowerOfAttorneyScreen
 
 @Composable
 fun DocumentScreen (
-    destination: Screen.Document
+    destination: Screen.Document,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val type = destination.type
 
-    Card(
-        modifier = Modifier.fillMaxSize(),
-        shape = RoundedCornerShape(16.dp, 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+    Column(
+        modifier = modifier.fillMaxSize()
     ) {
+        ScreenTopBar(
+            title = stringResource(destination.type.stringResource),
+            onBack = onBack
+        )
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp)
                 .verticalScroll(rememberScrollState()),

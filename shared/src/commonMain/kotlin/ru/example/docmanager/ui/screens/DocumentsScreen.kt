@@ -5,40 +5,56 @@
 
 package ru.example.docmanager.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.screen_documents
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import ru.example.docmanager.document.DocumentType
-import ru.example.docmanager.ui.AppTheme
+import ru.example.docmanager.ui.Utils.DATE_FORMAT
+import ru.example.docmanager.ui.components.ScreenTopBar
 import ru.example.docmanager.ui.navigation.Screen
+import ru.example.docmanager.viewmodel.DocumentsViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DocumentsScreen(
-    navigateTo: (Screen) -> Unit
+    destination: Screen.Documents,
+    navigateTo: (Screen) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: DocumentsViewModel = koinInject()
 ) {
-    Card(
-        modifier = Modifier.fillMaxSize(),
-        shape = RoundedCornerShape(16.dp, 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+    val documents = viewModel.documents.collectAsState()
+
+    Column(
+        modifier = modifier.fillMaxSize()
     ) {
+        ScreenTopBar(
+            title = stringResource(Res.string.screen_documents),
+            onBack = onBack
+        )
+
+        Text(text = stringResource(destination.type.stringResource))
+
         LazyColumn (
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
-            itemsIndexed(DocumentType.entries) { index, type ->
+            itemsIndexed(
+                items = documents.value,
+                key = { index, document -> "$index-${document.header.id}" }
+            ) { index, document ->
                 SegmentedListItem(
                     shapes = ListItemDefaults.segmentedShapes(
                         index = index,
@@ -49,39 +65,42 @@ fun DocumentsScreen(
                     ),
                     onClick = {
                         navigateTo(
-                            Screen.Document(type)
+                            Screen.Document(document.type)
                         )
                     },
                     leadingContent = {
                         Icon(
-                            imageVector = type.icon,
+                            imageVector = Icons.Rounded.Description,
                             contentDescription = null
                         )
                     }
                 ) {
-                    Text(stringResource(type.stringResource))
+                    Text(
+                        text = "№ ${document.header.number}"
+                    )
+                    Text(
+                        text = "от ${DATE_FORMAT.format(document.header.dischargeDate)}"
+                    )
+                }
+            }
+
+            item {
+                Button(
+                    onClick = {
+                        navigateTo(
+                            Screen.Document(destination.type)
+                        )
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = null
+                    )
+                    Text(
+                        text = "Новый документ"
+                    )
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun DocumentsTypePreview() {
-    AppTheme (darkTheme = false) {
-        DocumentsScreen(
-            navigateTo = { }
-        )
-    }
-}
-
-@Preview
-@Composable
-fun DocumentsTypeDarkThemePreview() {
-    AppTheme (darkTheme = true) {
-        DocumentsScreen(
-            navigateTo = { }
-        )
     }
 }

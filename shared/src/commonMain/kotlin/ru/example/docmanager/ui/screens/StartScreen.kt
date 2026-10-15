@@ -16,8 +16,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.screen_document_types
+import docmanager.shared.generated.resources.screen_documents
+import docmanager.shared.generated.resources.screen_references
+import docmanager.shared.generated.resources.screen_settings
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.ui.navigation.Screen
 
@@ -30,31 +36,35 @@ fun StartScreen(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        listOf(
-            Screen.Documents,
-            Screen.References,
-            Screen.Settings
-        ).forEach { screen ->
-            StartScreenItem(
-                screen = screen,
-                navigateTo = navigateTo
-            )
-        }
+        StartScreenItem(
+            screen = Screen.DocumentTypes,
+            text = stringResource(Res.string.screen_document_types),
+            navigateTo = navigateTo
+        )
+        StartScreenItem(
+            screen = Screen.References,
+            text = stringResource(Res.string.screen_references),
+            navigateTo = navigateTo
+        )
+        StartScreenItem(
+            screen = Screen.Settings,
+            text = stringResource(Res.string.screen_settings),
+            navigateTo = navigateTo
+        )
     }
 }
 
 @Composable
 fun ColumnScope.StartScreenItem(
     screen: Screen,
+    text: String,
     navigateTo: (Screen) -> Unit
 ) {
-    val text = screen.stringResource?.let { stringResource(it) } ?: return
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val cornerRadius by animateDpAsState(
-        targetValue = if (isPressed) 128.dp else 32.dp,
-        label = "BorderRadiusAnimation"
+        targetValue = if (isPressed) 128.dp else 32.dp
     )
 
     Box(
@@ -82,7 +92,8 @@ fun ColumnScope.StartScreenItem(
                 style = ButtonDefaults.textStyleFor(
                     ButtonDefaults.ExtraLargeContainerHeight
                 ),
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
             )
         }
     }

@@ -8,28 +8,28 @@ package ru.example.docmanager.database.repositories.documents
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.*
 import ru.example.docmanager.database.dbQuery
-import ru.example.docmanager.database.repositories.references.IndividualsRepository
-import ru.example.docmanager.database.repositories.references.OrganizationsRepository
-import ru.example.docmanager.database.repositories.references.ProductsRepository
-import ru.example.docmanager.database.repositories.references.SuppliersRepository
-import ru.example.docmanager.database.tables.PowerOfAttorneyTables.BodiesTable
-import ru.example.docmanager.database.tables.PowerOfAttorneyTables.HeadersTable
+import ru.example.docmanager.database.tables.documents.powerofattorney.PowerOfAttorneyBodiesTable
+import ru.example.docmanager.database.tables.documents.powerofattorney.PowerOfAttorneyHeadersTable
+import ru.example.docmanager.database.tables.references.IndividualsTable
+import ru.example.docmanager.database.tables.references.OrganizationsTable
+import ru.example.docmanager.database.tables.references.ProductsTable
+import ru.example.docmanager.database.tables.references.SuppliersTable
 import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyBody
 import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyBodyItem
 import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorneyHeader
+import ru.example.docmanager.reference.Individual
+import ru.example.docmanager.reference.Organization
+import ru.example.docmanager.reference.Product
+import ru.example.docmanager.reference.Supplier
 
-class PowerOfAttorneyRepository(
-    val individualsRepository: IndividualsRepository,
-    val organizationsRepository: OrganizationsRepository,
-    val productsRepository: ProductsRepository,
-    val suppliersRepository: SuppliersRepository
-) : DocumentRepository<PowerOfAttorney> {
+class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
 
     override suspend fun createDocument(document: PowerOfAttorney): Unit = dbQuery {
-        val headerId = HeadersTable.insertAndGetId {
+        val headerId = PowerOfAttorneyHeadersTable.insertAndGetId {
             it[organizationId] = document.header.organization.id
             it[number] = document.header.number
             it[dischargeDate] = document.header.dischargeDate.toJavaLocalDate()
@@ -39,17 +39,19 @@ class PowerOfAttorneyRepository(
             it[supplierAgreement] = document.header.supplierAgreement
         }.value
         document.body.items.forEach { body ->
-            BodiesTable.insert {
+            PowerOfAttorneyBodiesTable.insert {
                 it[count] = body.count
                 it[unit] = body.unit
-                it[BodiesTable.headerId] = headerId
+                it[PowerOfAttorneyBodiesTable.headerId] = headerId
                 it[productId] = body.product.id
             }
         }
     }
 
     override suspend fun updateDocument(document: PowerOfAttorney): Unit = dbQuery {
-        HeadersTable.update({ HeadersTable.id eq document.header.id }) {
+        PowerOfAttorneyHeadersTable.update({
+            PowerOfAttorneyHeadersTable.id eq document.header.id
+        }) {
             it[organizationId] = document.header.organization.id
             it[number] = document.header.number
             it[dischargeDate] = document.header.dischargeDate.toJavaLocalDate()
@@ -58,61 +60,170 @@ class PowerOfAttorneyRepository(
             it[supplierId] = document.header.supplier.id
             it[supplierAgreement] = document.header.supplierAgreement
         }
-        BodiesTable.deleteWhere { BodiesTable.headerId eq document.header.id }
+        PowerOfAttorneyBodiesTable.deleteWhere {
+            PowerOfAttorneyBodiesTable.headerId eq document.header.id
+        }
         document.body.items.forEach { body ->
-            BodiesTable.insert {
+            PowerOfAttorneyBodiesTable.insert {
                 it[count] = body.count
                 it[unit] = body.unit
-                it[BodiesTable.headerId] = document.header.id
+                it[PowerOfAttorneyBodiesTable.headerId] = document.header.id
                 it[productId] = body.product.id
             }
         }
     }
 
     override suspend fun deleteDocument(id: Int): Unit = dbQuery {
-        BodiesTable.deleteWhere { BodiesTable.headerId eq id }
-        HeadersTable.deleteWhere { HeadersTable.id eq id }
+        PowerOfAttorneyBodiesTable.deleteWhere {
+            PowerOfAttorneyBodiesTable.headerId eq id
+        }
+        PowerOfAttorneyHeadersTable.deleteWhere {
+            PowerOfAttorneyHeadersTable.id eq id
+        }
     }
 
-    override suspend fun getAllDocuments(): List<PowerOfAttorney> {
-        val headerIds = dbQuery { HeadersTable.selectAll().map { it[HeadersTable.id].value } }
-        return headerIds.map { getDocument(it) }
-    }
+    override suspend fun getAllDocuments(): List<PowerOfAttorney> = dbQuery {
+        val headerRows = PowerOfAttorneyHeadersTable.selectAll().toList()
+        if (headerRows.isEmpty()) return@dbQuery emptyList()
 
-    override suspend fun getDocument(id: Int): PowerOfAttorney {
-        val (headerRow, bodyRows) = dbQuery {
-            val header = HeadersTable.selectAll().where { HeadersTable.id eq id }.first()
-            val bodies = BodiesTable.selectAll().where { BodiesTable.headerId eq id }.toList()
-            header to bodies
+        val bodyRows = PowerOfAttorneyBodiesTable.selectAll().toList().groupBy {
+            it[PowerOfAttorneyBodiesTable.headerId]
         }
 
-        val organization = organizationsRepository.getItem(headerRow[HeadersTable.organizationId])
-        val individual = individualsRepository.getItem(headerRow[HeadersTable.individualId])
-        val supplier = suppliersRepository.getItem(headerRow[HeadersTable.supplierId])
+        val orgMap = OrganizationsTable.selectAll().associate {
+            it[OrganizationsTable.id].value to Organization(
+                id = it[OrganizationsTable.id].value,
+                name = it[OrganizationsTable.name],
+                consumer = it[OrganizationsTable.consumer],
+                payer = it[OrganizationsTable.payer],
+                account = it[OrganizationsTable.account]
+            )
+        }
+        val indMap = IndividualsTable.selectAll().associate {
+            it[IndividualsTable.id].value to Individual(
+                id = it[IndividualsTable.id].value,
+                job = it[IndividualsTable.job],
+                name = it[IndividualsTable.name],
+                series = it[IndividualsTable.series],
+                number = it[IndividualsTable.number],
+                issued = it[IndividualsTable.issued],
+                date = it[IndividualsTable.date].toKotlinLocalDate()
+            )
+        }
+        val supMap = SuppliersTable.selectAll().associate {
+            it[SuppliersTable.id].value to Supplier(
+                id = it[SuppliersTable.id].value,
+                name = it[SuppliersTable.name]
+            )
+        }
+        val prodMap = ProductsTable.selectAll().associate {
+            it[ProductsTable.id].value to Product(
+                id = it[ProductsTable.id].value,
+                name = it[ProductsTable.name]
+            )
+        }
+
+        headerRows.map { headerRow ->
+            val id = headerRow[PowerOfAttorneyHeadersTable.id].value
+            val header = PowerOfAttorneyHeader(
+                id = id,
+                organization = orgMap[headerRow[PowerOfAttorneyHeadersTable.organizationId]] ?: Organization(),
+                number = headerRow[PowerOfAttorneyHeadersTable.number],
+                dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate].toKotlinLocalDate(),
+                endDate = headerRow[PowerOfAttorneyHeadersTable.endDate].toKotlinLocalDate(),
+                individual = indMap[headerRow[PowerOfAttorneyHeadersTable.individualId]] ?: Individual(),
+                supplier = supMap[headerRow[PowerOfAttorneyHeadersTable.supplierId]] ?: Supplier(),
+                supplierAgreement = headerRow[PowerOfAttorneyHeadersTable.supplierAgreement]
+            )
+            val docBodies = bodyRows[id].orEmpty().map { bRow ->
+                PowerOfAttorneyBodyItem(
+                    id = bRow[PowerOfAttorneyBodiesTable.id].value,
+                    count = bRow[PowerOfAttorneyBodiesTable.count],
+                    unit = bRow[PowerOfAttorneyBodiesTable.unit],
+                    product = prodMap[bRow[PowerOfAttorneyBodiesTable.productId]] ?: Product()
+                )
+            }
+            PowerOfAttorney(header = header, body = PowerOfAttorneyBody(docBodies))
+        }
+    }
+
+    override suspend fun getDocument(id: Int): PowerOfAttorney = dbQuery {
+        val headerRow = PowerOfAttorneyHeadersTable.selectAll().where {
+            PowerOfAttorneyHeadersTable.id eq id
+        }.first()
+        val bodyRows = PowerOfAttorneyBodiesTable.selectAll().where {
+            PowerOfAttorneyBodiesTable.headerId eq id
+        }.toList()
+
+        val orgRow = OrganizationsTable.selectAll().where {
+            OrganizationsTable.id eq headerRow[PowerOfAttorneyHeadersTable.organizationId]
+        }.firstOrNull()
+        val indRow = IndividualsTable.selectAll().where {
+            IndividualsTable.id eq headerRow[PowerOfAttorneyHeadersTable.individualId]
+        }.firstOrNull()
+        val supRow = SuppliersTable.selectAll().where {
+            SuppliersTable.id eq headerRow[PowerOfAttorneyHeadersTable.supplierId]
+        }.firstOrNull()
+
+        val productIds = bodyRows.map {
+            it[PowerOfAttorneyBodiesTable.productId]
+        }.distinct()
+        val prodMap = if (productIds.isNotEmpty()) {
+            ProductsTable.selectAll().where { ProductsTable.id inList productIds }.associate {
+                it[ProductsTable.id].value to Product(id = it[ProductsTable.id].value, name = it[ProductsTable.name])
+            }
+        } else emptyMap()
+
+        val organization = orgRow?.let {
+            Organization(
+                id = it[OrganizationsTable.id].value,
+                name = it[OrganizationsTable.name],
+                consumer = it[OrganizationsTable.consumer],
+                payer = it[OrganizationsTable.payer],
+                account = it[OrganizationsTable.account]
+            )
+        } ?: Organization()
+
+        val individual = indRow?.let {
+            Individual(
+                id = it[IndividualsTable.id].value,
+                job = it[IndividualsTable.job],
+                name = it[IndividualsTable.name],
+                series = it[IndividualsTable.series],
+                number = it[IndividualsTable.number],
+                issued = it[IndividualsTable.issued],
+                date = it[IndividualsTable.date].toKotlinLocalDate()
+            )
+        } ?: Individual()
+
+        val supplier = supRow?.let {
+            Supplier(
+                id = it[SuppliersTable.id].value,
+                name = it[SuppliersTable.name]
+            )
+        } ?: Supplier()
 
         val header = PowerOfAttorneyHeader(
             id = id,
             organization = organization,
-            number = headerRow[HeadersTable.number],
-            dischargeDate = headerRow[HeadersTable.dischargeDate].toKotlinLocalDate(),
-            endDate = headerRow[HeadersTable.endDate].toKotlinLocalDate(),
+            number = headerRow[PowerOfAttorneyHeadersTable.number],
+            dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate].toKotlinLocalDate(),
+            endDate = headerRow[PowerOfAttorneyHeadersTable.endDate].toKotlinLocalDate(),
             individual = individual,
             supplier = supplier,
-            supplierAgreement = headerRow[HeadersTable.supplierAgreement]
+            supplierAgreement = headerRow[PowerOfAttorneyHeadersTable.supplierAgreement]
         )
 
         val bodyItemList = bodyRows.map { row ->
-            val product = productsRepository.getItem(row[BodiesTable.productId])
+            val prod = prodMap[row[PowerOfAttorneyBodiesTable.productId]] ?: Product()
             PowerOfAttorneyBodyItem(
-                id = row[BodiesTable.id].value,
-                count = row[BodiesTable.count],
-                unit = row[BodiesTable.unit],
-                product = product
+                id = row[PowerOfAttorneyBodiesTable.id].value,
+                count = row[PowerOfAttorneyBodiesTable.count],
+                unit = row[PowerOfAttorneyBodiesTable.unit],
+                product = prod
             )
         }
 
-        val body = PowerOfAttorneyBody(bodyItemList)
-
-        return PowerOfAttorney(header = header, body = body)
+        PowerOfAttorney(header = header, body = PowerOfAttorneyBody(bodyItemList))
     }
 }

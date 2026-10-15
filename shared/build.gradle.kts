@@ -55,7 +55,6 @@ kotlin {
             implementation(libs.exposed.migration.core)
             implementation(libs.exposed.migration.jdbc)
             implementation(libs.poi.ooxml)
-            implementation(libs.hikaricp)
             implementation(libs.koin.core)
             implementation(libs.h2)
             implementation(libs.postgresql)

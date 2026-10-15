@@ -9,9 +9,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,9 +20,9 @@ import docmanager.shared.generated.resources.reference_save_button
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import ru.example.docmanager.reference.Reference
-import ru.example.docmanager.reference.ReferenceType
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.components.ReferenceInput
+import ru.example.docmanager.ui.components.ScreenTopBar
 import ru.example.docmanager.ui.navigation.Screen
 import ru.example.docmanager.viewmodel.ReferenceState
 import ru.example.docmanager.viewmodel.ReferenceViewModel
@@ -31,6 +30,7 @@ import ru.example.docmanager.viewmodel.ReferenceViewModel
 @Composable
 fun ReferenceScreen(
     destination: Screen.Reference,
+    onBack: () -> Unit,
     onStatusMessage: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReferenceViewModel = koinInject()
@@ -56,21 +56,21 @@ fun ReferenceScreen(
         }
     }
 
-    Card(
-        modifier = modifier.fillMaxSize(),
-        shape = RoundedCornerShape(16.dp, 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+    Column(
+        modifier = modifier.fillMaxSize()
     ) {
+        ScreenTopBar(
+            title = stringResource(destination.type.stringResource),
+            onBack = onBack
+        )
+
         Column (
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ReferenceBanner(
-                referenceType = referenceType,
+            ReferenceActions(
                 onSave = viewModel::saveAll,
-                onNew = viewModel::createItem,
+                onNew = viewModel::createItem
             )
 
             ReferenceItems(
@@ -83,33 +83,13 @@ fun ReferenceScreen(
 }
 
 @Composable
-fun ReferenceBanner(
-    referenceType: ReferenceType,
-    onSave: () -> Unit,
-    onNew: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            stringResource(referenceType.stringResource),
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        ReferenceActions(onSave, onNew)
-    }
-}
-
-@Composable
 fun ReferenceItems(
     referenceState: ReferenceState,
     references: List<Reference>,
     onDelete: (Reference) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
     val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
     LazyColumn(
         modifier = modifier.fillMaxSize().then(
@@ -140,7 +120,7 @@ fun ReferenceActions(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Button(onClick = onSave) {

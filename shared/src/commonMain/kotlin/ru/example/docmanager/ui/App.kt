@@ -5,14 +5,9 @@
 
 package ru.example.docmanager.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,12 +18,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import ru.example.docmanager.ui.navigation.Screen
-import ru.example.docmanager.ui.navigation.navigationConfig
-import ru.example.docmanager.ui.navigation.navigationTransition
-import ru.example.docmanager.ui.navigation.popTransition
+import ru.example.docmanager.ui.navigation.*
 import ru.example.docmanager.ui.screens.*
 import ru.example.docmanager.viewmodel.AppViewModel
 import ru.example.docmanager.viewmodel.ConnectionState
@@ -55,14 +46,6 @@ fun App(
         }
     }
 
-    val currentTitleResource by remember(backStack) {
-        derivedStateOf {
-            (backStack.lastOrNull() as? Screen)?.stringResource
-        }
-    }
-
-    val canNavigateBack = backStack.size > 1
-
     val onBack: () -> Unit = remember(backStack) {
         {
             if (backStack.size > 1)
@@ -74,41 +57,6 @@ fun App(
         darkTheme = darkTheme
     ) {
         Scaffold (
-            topBar = {
-                AnimatedVisibility(currentTitleResource != null) {
-                    TopAppBar(
-                        title = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                AnimatedVisibility(
-                                    visible = currentTitleResource != null,
-                                    enter = fadeIn(),
-                                    exit = fadeOut()
-                                ) {
-                                    currentTitleResource?.let {
-                                        Text(stringResource(it))
-                                    }
-                                }
-                            }
-                        },
-                        navigationIcon = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                AnimatedVisibility(visible = canNavigateBack) {
-                                    IconButton(onClick = onBack) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                            contentDescription = "Back",
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    )
-                }
-            },
             snackbarHost = {
                 SnackbarHost(
                     hostState = snackbarHostState,
@@ -132,6 +80,7 @@ fun App(
                     onBack = onBack,
                     transitionSpec = navigationTransition,
                     popTransitionSpec = popTransition,
+                    predictivePopTransitionSpec = predictiveTransition,
                     entryProvider = entryProvider {
                         entry <Screen.Connection> {
                             when (state) {
@@ -161,20 +110,39 @@ fun App(
                             )
                         }
                         entry <Screen.Settings> {
-                            SettingsScreen()
+                            SettingsScreen(
+                                onBack = onBack
+                            )
+                        }
+                        entry <Screen.DocumentTypes> {
+                            DocumentTypesScreen(
+                                navigateTo = { backStack.add(it) },
+                                onBack = onBack
+                            )
                         }
                         entry <Screen.Documents> {
-                            DocumentsScreen(navigateTo = { backStack.add(it) })
-                        }
-                        entry <Screen.References> {
-                            ReferencesScreen(navigateTo = { backStack.add(it) })
+                            DocumentsScreen(
+                                destination = it,
+                                navigateTo = { backStack.add(it) },
+                                onBack = onBack
+                            )
                         }
                         entry <Screen.Document> {
-                            DocumentScreen(it)
+                            DocumentScreen(
+                                destination = it,
+                                onBack = onBack
+                            )
+                        }
+                        entry <Screen.References> {
+                            ReferencesScreen(
+                                navigateTo = { backStack.add(it) },
+                                onBack = onBack
+                            )
                         }
                         entry <Screen.Reference> {
                             ReferenceScreen(
                                 destination = it,
+                                onBack = onBack,
                                 onStatusMessage = {
                                     scope.launch {
                                         snackbarHostState.showSnackbar(it)

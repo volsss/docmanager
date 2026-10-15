@@ -12,10 +12,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.example.docmanager.database.DatabaseFactory
+import ru.example.docmanager.database.DatabaseManager
+import ru.example.docmanager.database.DefaultDatabaseManager
 
 class AppViewModel (
     private val referenceViewModel: ReferenceViewModel,
+    private val databaseManager: DatabaseManager = DefaultDatabaseManager(),
 ): ViewModel() {
     val state: StateFlow<ConnectionState>
         field = MutableStateFlow<ConnectionState>(ConnectionState.Disconnected)
@@ -37,7 +39,7 @@ class AppViewModel (
 
             runCatching {
                 withContext(Dispatchers.IO) {
-                    DatabaseFactory.init(
+                    databaseManager.init(
                         jdbcUrl = url,
                         driver = driver,
                         user = user,
@@ -49,7 +51,7 @@ class AppViewModel (
             }.onSuccess {
                 state.value = ConnectionState.Connected
             }.onFailure { error ->
-                DatabaseFactory.disconnect()
+                databaseManager.disconnect()
                 state.value = ConnectionState.Error(
                     error.message ?: "Connection failed"
                 )
@@ -58,7 +60,7 @@ class AppViewModel (
     }
 
     fun disconnect() {
-        DatabaseFactory.disconnect()
+        databaseManager.disconnect()
         state.value = ConnectionState.Disconnected
     }
 }

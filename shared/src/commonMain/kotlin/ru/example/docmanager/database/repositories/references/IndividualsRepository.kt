@@ -14,7 +14,7 @@ import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.database.dbQuery
-import ru.example.docmanager.database.tables.PowerOfAttorneyTables.IndividualsTable
+import ru.example.docmanager.database.tables.references.IndividualsTable
 import ru.example.docmanager.reference.Individual
 
 class IndividualsRepository : ReferenceRepository<Individual>("individuals") {

@@ -5,35 +5,37 @@
 
 package ru.example.docmanager.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.screen_references
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.reference.ReferenceType
 import ru.example.docmanager.ui.AppTheme
+import ru.example.docmanager.ui.components.ScreenTopBar
 import ru.example.docmanager.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ReferencesScreen(
-    navigateTo: (Screen) -> Unit
+    navigateTo: (Screen) -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = Modifier.fillMaxSize(),
-        shape = RoundedCornerShape(16.dp, 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
+    Column(
+        modifier = modifier.fillMaxSize()
     ) {
+        ScreenTopBar(
+            title = stringResource(Res.string.screen_references),
+            onBack = onBack
+        )
+
         LazyColumn (
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
@@ -71,7 +73,8 @@ fun ReferencesScreen(
 fun ReferencesScreenPreview() {
     AppTheme (darkTheme = false) {
         ReferencesScreen(
-            navigateTo = { }
+            navigateTo = { },
+            onBack = { }
         )
     }
 }
@@ -81,7 +84,8 @@ fun ReferencesScreenPreview() {
 fun ReferencesScreenDarkThemePreview() {
     AppTheme (darkTheme = true) {
         ReferencesScreen(
-            navigateTo = { }
+            navigateTo = { },
+            onBack = { }
         )
     }
 }

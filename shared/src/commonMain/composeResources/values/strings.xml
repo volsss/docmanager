@@ -19,7 +19,6 @@
     <string name="reference_save_button">Сохранить</string>
     <string name="reference_new_item_button">Новое поле</string>
 
-    <string name="settings_title">Настройки проекта</string>
     <string name="settings_field_project_name">Название</string>
     <string name="settings_field_version">Версия</string>
     <string name="settings_field_author">Автор</string>
@@ -32,11 +31,10 @@
     <string name="input_user">Пользователь</string>
     <string name="input_password">Пароль</string>
 
-    <string name="tabs_documents">Документы</string>
-    <string name="tabs_document">Документ</string>
-    <string name="tabs_references">Справочники</string>
-    <string name="tabs_reference">Справочник</string>
-    <string name="tabs_settings">Настройки</string>
+    <string name="screen_documents">Документы</string>
+    <string name="screen_document_types">Типы документов</string>
+    <string name="screen_references">Справочники</string>
+    <string name="screen_settings">Настройки</string>
 
     <string name="document_power_of_attorney">Доверенность</string>
     <string name="document_test">Тестовый документ</string>
@@ -76,4 +74,5 @@
     <string name="input_product">Материальная ценность</string>
 
     <string name="component_dropdown_placeholder">Выберите значение</string>
+    <string name="component_back_button">Назад</string>
 </resources>
