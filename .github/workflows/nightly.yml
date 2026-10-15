@@ -19,7 +19,7 @@ jobs:
         id: make_prefix
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "prefix=${{ env.app_name }}-${{ env.app_version }}-$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "prefix=${{ env.app_name }}-${{ env.app_version }}-$SHORT_SHA-nightly" >> $GITHUB_OUTPUT
 
   android:
     runs-on: ubuntu-latest
