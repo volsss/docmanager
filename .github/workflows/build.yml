@@ -29,6 +29,7 @@ jobs:
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "prefix=${{ env.app_name }}-${{ env.app_version }}-$SHORT_SHA" >> $GITHUB_OUTPUT
 
+
   android:
     runs-on: ubuntu-latest
     needs: init
@@ -76,7 +77,7 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  dmg-arm:
+  macos-arm:
     runs-on: macos-latest
     needs: init
     steps:
@@ -123,7 +124,7 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  dmg:
+  macos:
     runs-on: macos-26-intel
     needs: init
     steps:
@@ -170,7 +171,7 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  deb:
+  linux:
     runs-on: ubuntu-latest
     needs: init
     steps:
@@ -217,7 +218,7 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  msi:
+  windows:
     runs-on: windows-latest
     needs: init
     steps:
@@ -263,7 +264,7 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  msi-arm:
+  windows-arm:
     runs-on: windows-11-arm
     needs: init
     steps:
@@ -340,7 +341,7 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  distributable-exe:
+  windows-dist:
     runs-on: windows-latest
     needs: init
     steps:
