@@ -13,11 +13,13 @@ jobs:
   init:
     runs-on: ubuntu-latest
     outputs:
-      prefix: ${{ steps.vars.outputs.prefix }}
+      prefix: ${{ steps.make_prefix.outputs.prefix }}
     steps:
       - name: Making prefix
         id: make_prefix
-        run: echo "prefix=${{ env.app_name }}-${{ env.app_version }}-release" >> $GITHUB_OUTPUT
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "prefix=${{ env.app_name }}-${{ env.app_version }}-$SHORT_SHA" >> $GITHUB_OUTPUT
 
   android:
     runs-on: ubuntu-latest
