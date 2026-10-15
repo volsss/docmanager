@@ -8,32 +8,39 @@ package ru.example.docmanager.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import ru.example.docmanager.database.repositories.references.*
-import ru.example.docmanager.reference.Reference
-import ru.example.docmanager.reference.ReferenceType
+import ru.example.docmanager.database.repositories.references.ReferenceRepository
+import ru.example.docmanager.reference.*
 
 class ReferenceViewModel(
-    val individualsRepository: IndividualsRepository,
-    val organizationsRepository: OrganizationsRepository,
-    val productsRepository: ProductsRepository,
-    val suppliersRepository: SuppliersRepository
+    individualsRepository: ReferenceRepository<Individual>,
+    organizationsRepository: ReferenceRepository<Organization>,
+    productsRepository: ReferenceRepository<Product>,
+    suppliersRepository: ReferenceRepository<Supplier>
 ): ViewModel() {
     val formState = ReferenceState()
 
-    private val repositories = mapOf(
+    private val repositories: Map<ReferenceType, ReferenceRepository<out Reference>> = mapOf(
         ReferenceType.INDIVIDUAL to individualsRepository,
         ReferenceType.ORGANIZATION to organizationsRepository,
         ReferenceType.PRODUCT to productsRepository,
         ReferenceType.SUPPLIER to suppliersRepository
     )
 
+    init {
+        loadReferenceItems()
+    }
+
     fun loadReferenceItems() {
         viewModelScope.launch {
-            formState.setAllItems(
+            runCatching {
                 repositories.mapValues { (_, repository) ->
                     repository.getItems()
                 }
-            )
+            }.onSuccess { items ->
+                formState.setAllItems(items)
+            }.onFailure { error ->
+                formState.statusMessage = "Ошибка при загрузке справочников: ${error.message}"
+            }
         }
     }
 
@@ -49,37 +56,64 @@ class ReferenceViewModel(
 
     fun createItem() {
         viewModelScope.launch {
-            val referenceType = formState.referenceType
-            val repository = repositories[referenceType] ?: return@launch
+            createItemSuspend()
+        }
+    }
 
-            val created = repository.createItem()
+    suspend fun createItemSuspend() {
+        val referenceType = formState.referenceType
+        val repository = repositories[referenceType] ?: return
+
+        runCatching {
+            repository.createItem()
+        }.onSuccess { created ->
             formState.addItem(referenceType, created)
             formState.statusMessage = "Запись создана"
+        }.onFailure { error ->
+            formState.statusMessage = "Ошибка при создании записи: ${error.message}"
         }
     }
 
     fun deleteItem(item: Reference) {
         viewModelScope.launch {
-            val referenceType = formState.referenceType
-            val repository = repositories[referenceType] ?: return@launch
+            deleteItemSuspend(item)
+        }
+    }
 
+    suspend fun deleteItemSuspend(item: Reference) {
+        val referenceType = formState.referenceType
+        val repository = repositories[referenceType] ?: return
+
+        runCatching {
             repository.deleteItem(item.id)
+        }.onSuccess {
             formState.removeItem(referenceType, item)
             formState.statusMessage = "Запись удалена"
+        }.onFailure { error ->
+            formState.statusMessage = "Ошибка при удалении записи: ${error.message}"
         }
     }
 
     fun saveAll() {
         viewModelScope.launch {
-            val referenceType = formState.referenceType
-            val repository = repositories[referenceType] ?: return@launch
+            saveAllSuspend()
+        }
+    }
 
+    suspend fun saveAllSuspend() {
+        val referenceType = formState.referenceType
+        val repository = repositories[referenceType] ?: return
+
+        runCatching {
             val updatedItems = formState.buildUpdatedItems()
             updatedItems.forEach { item ->
                 updateItem(repository, item)
             }
             formState.setItems(referenceType, updatedItems)
+        }.onSuccess {
             formState.statusMessage = "Изменения сохранены"
+        }.onFailure { error ->
+            formState.statusMessage = "Ошибка при сохранении изменений: ${error.message}"
         }
     }
 

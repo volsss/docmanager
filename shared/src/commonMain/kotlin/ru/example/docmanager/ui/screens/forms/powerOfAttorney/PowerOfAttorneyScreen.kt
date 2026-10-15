@@ -13,46 +13,30 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
-import ru.example.docmanager.di.getDocumentProcessor
 import ru.example.docmanager.document.header.HeaderFieldType
 import ru.example.docmanager.reference.*
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.screens.forms.DocumentNumberDropdown
 import ru.example.docmanager.ui.screens.forms.ReferenceDropdown
-import ru.example.docmanager.viewmodel.ReferenceViewModel
-import kotlin.time.Clock
+import ru.example.docmanager.viewmodel.PowerOfAttorneyViewModel
 
 @Composable
 fun PowerOfAttorneyScreen(
-    referenceViewModel: ReferenceViewModel = koinInject()
+    viewModel: PowerOfAttorneyViewModel = koinInject()
 ) {
-    val scope = rememberCoroutineScope()
-    val powerOfAttorneyRepository = remember {
-        PowerOfAttorneyRepository(
-            referenceViewModel.individualsRepository,
-            referenceViewModel.organizationsRepository,
-            referenceViewModel.productsRepository,
-            referenceViewModel.suppliersRepository
-        )
-    }
+    val formState = viewModel.formState
+    val referencesItems = viewModel.referenceViewModel.formState.itemsByType
 
-    val referencesItems = referenceViewModel.formState.itemsByType
     val organizations = remember(referencesItems) {
         referencesItems[ReferenceType.ORGANIZATION]?.filterIsInstance<Organization>().orEmpty()
     }
@@ -66,42 +50,12 @@ fun PowerOfAttorneyScreen(
         referencesItems[ReferenceType.PRODUCT]?.filterIsInstance<Product>().orEmpty()
     }
 
-    val today = remember { Clock.System.todayIn(TimeZone.currentSystemDefault()) }
-    val formState = remember { PowerOfAttorneyFormState(today) }
-
-    fun reloadDocuments() {
-        scope.launch {
-            runCatching { formState.existingDocuments = powerOfAttorneyRepository.getAllDocuments() }
-        }
-    }
-
     LaunchedEffect(Unit) {
-        if (referenceViewModel.formState.itemsByType.isEmpty()) {
-            referenceViewModel.loadReferenceItems()
-        }
-        reloadDocuments()
+        viewModel.loadInitialData()
     }
-    LaunchedEffect(organizations) {
-        if (formState.selectedOrganization == null && organizations.isNotEmpty()) {
-            formState.selectedOrganization = organizations.first()
-        }
-    }
-    LaunchedEffect(individuals) {
-        if (formState.selectedIndividual == null && individuals.isNotEmpty()) {
-            formState.selectedIndividual = individuals.first()
-        }
-    }
-    LaunchedEffect(suppliers) {
-        if (formState.selectedSupplier == null && suppliers.isNotEmpty()) {
-            formState.selectedSupplier = suppliers.first()
-        }
-    }
-    LaunchedEffect(products) {
-        if (products.isNotEmpty()) {
-            formState.bodyItems = formState.bodyItems.map { item ->
-                if (item.product == null) item.copy(product = products.first()) else item
-            }
-        }
+
+    LaunchedEffect(organizations, individuals, suppliers, products) {
+        viewModel.autoPopulateDefaults(organizations, individuals, suppliers, products)
     }
 
     Column(
@@ -111,7 +65,7 @@ fun PowerOfAttorneyScreen(
     ) {
         PowerOfAttorneyBanner(
             formState = formState,
-            onResetForm = { formState.resetForm(referencesItems) }
+            onResetForm = viewModel::resetForm
         )
 
         PowerOfAttorneyHeaderSection(
@@ -120,17 +74,14 @@ fun PowerOfAttorneyScreen(
             organizations = organizations,
             individuals = individuals,
             suppliers = suppliers,
-            onResetForm = { formState.resetForm(referencesItems) }
+            onResetForm = viewModel::resetForm
         )
 
         PowerOfAttorneyBodySection(formState = formState, products = products)
 
         PowerOfAttorneyActions(
-            formState = formState,
-            scope = scope,
-            repository = powerOfAttorneyRepository,
-            onDocumentChanged = ::reloadDocuments,
-            onResetForm = { formState.resetForm(referencesItems) }
+            viewModel = viewModel,
+            formState = formState
         )
     }
 }
@@ -142,19 +93,14 @@ private fun PowerOfAttorneyBanner(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(Res.string.document_power_of_attorney),
-            style = MaterialTheme.typography.titleLarge
-        )
         AnimatedVisibility(visible = formState.statusMessage != null) {
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = formState.statusMessage ?: "",
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyMedium
             )
+            Spacer(modifier = Modifier.height(16.dp))
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
         if (formState.isEditing) {
             Row(
@@ -273,7 +219,7 @@ private fun PowerOfAttorneyBodySection(
     products: List<Product>,
     modifier: Modifier = Modifier
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
     val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
 
     Column(
@@ -367,11 +313,8 @@ private fun BodyItemRow(
 
 @Composable
 private fun PowerOfAttorneyActions(
+    viewModel: PowerOfAttorneyViewModel,
     formState: PowerOfAttorneyFormState,
-    scope: CoroutineScope,
-    repository: PowerOfAttorneyRepository,
-    onDocumentChanged: () -> Unit,
-    onResetForm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     FlowRow(
@@ -381,119 +324,33 @@ private fun PowerOfAttorneyActions(
         itemVerticalAlignment = Alignment.CenterVertically
     ) {
         Button(
-            onClick = {
-                val document = formState.toDocument()
-                if (document == null) {
-                    formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
-                    return@Button
-                }
-
-                scope.launch {
-                    try {
-                        if (formState.isEditing) {
-                            repository.updateDocument(document)
-                            formState.statusMessage = "Документ № ${document.header.number} успешно обновлен"
-                        } else {
-                            repository.createDocument(document)
-                            formState.statusMessage = "Документ № ${document.header.number} успешно сохранен в базу данных"
-                        }
-                        onDocumentChanged()
-                    } catch (e: Exception) {
-                        formState.statusMessage = "Ошибка при сохранении: ${e.message}"
-                    }
-                }
-            }
+            onClick = { viewModel.saveDocument() }
         ) {
             Text(if (formState.isEditing) "Сохранить (обновить)" else "Сохранить")
         }
 
         if (formState.isEditing) {
             OutlinedButton(
-                onClick = {
-                    val document = formState.toDocument()
-                    if (document == null) {
-                        formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
-                        return@OutlinedButton
-                    }
-
-                    scope.launch {
-                        try {
-                            repository.createDocument(document)
-                            formState.statusMessage = "Документ № ${document.header.number} сохранен как новый"
-                            formState.selectedDocumentId = null
-                            onDocumentChanged()
-                        } catch (e: Exception) {
-                            formState.statusMessage = "Ошибка при сохранении: ${e.message}"
-                        }
-                    }
-                }
+                onClick = { viewModel.saveAsNewDocument() }
             ) {
                 Text("Сохранить как новый")
             }
 
             OutlinedButton(
-                onClick = {
-                    val docId = formState.selectedDocumentId ?: return@OutlinedButton
-                    scope.launch {
-                        try {
-                            repository.deleteDocument(docId)
-                            formState.statusMessage = "Документ удален из базы данных"
-                            onResetForm()
-                            onDocumentChanged()
-                        } catch (e: Exception) {
-                            formState.statusMessage = "Ошибка при удалении: ${e.message}"
-                        }
-                    }
-                }
+                onClick = { viewModel.deleteCurrentDocument() }
             ) {
                 Text("Удалить")
             }
         }
 
         Button(
-            onClick = {
-                scope.launch {
-                    try {
-                        val document = formState.toDocument()
-                        if (document == null) {
-                            formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
-                            return@launch
-                        }
-                        getDocumentProcessor().processSave(
-                            documentName = "Доверенность",
-                            documentResourceFile = "Доверенность.docx",
-                            document = document
-                        )
-                        formState.statusMessage = "Документ сохранен в файл"
-                    } catch (e: Exception) {
-                        formState.statusMessage = "Ошибка при сохранении в файл: ${e.message}"
-                    }
-                }
-            }
+            onClick = { viewModel.exportToFile() }
         ) {
             Text("Сохранить в файл")
         }
 
         Button(
-            onClick = {
-                scope.launch {
-                    try {
-                        val document = formState.toDocument()
-                        if (document == null) {
-                            formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
-                            return@launch
-                        }
-                        getDocumentProcessor().processPrint(
-                            documentName = "Доверенность",
-                            documentResourceFile = "Доверенность.docx",
-                            document = document
-                        )
-                        formState.statusMessage = "Запрос на печать документа отправлен"
-                    } catch (e: Exception) {
-                        formState.statusMessage = "Ошибка при формировании документа для печати: ${e.message}"
-                    }
-                }
-            }
+            onClick = { viewModel.printDocument() }
         ) {
             Text("Печать")
         }

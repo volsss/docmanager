@@ -98,7 +98,7 @@ class PowerOfAttorneyFormState(
             .getOrElse { runCatching { LocalDate.parse(endDate) }.getOrElse { defaultEndDate } }
 
         val header = PowerOfAttorneyHeader(
-            id = selectedDocumentId ?: return null,
+            id = selectedDocumentId ?: 0,
             organization = org,
             number = number.toIntOrNull() ?: 0,
             dischargeDate = dis,

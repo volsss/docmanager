@@ -21,7 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.screen_document_types
-import docmanager.shared.generated.resources.screen_documents
 import docmanager.shared.generated.resources.screen_references
 import docmanager.shared.generated.resources.screen_settings
 import org.jetbrains.compose.resources.stringResource
