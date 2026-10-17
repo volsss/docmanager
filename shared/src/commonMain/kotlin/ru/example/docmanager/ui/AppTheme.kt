@@ -6,8 +6,12 @@
 package ru.example.docmanager.ui
 
 import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import ru.example.docmanager.di.getColorScheme
+import ru.example.docmanager.di.getPlatform
 
 @Composable
 fun AppTheme(
@@ -18,6 +22,8 @@ fun AppTheme(
 
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
+        motionScheme = MotionScheme.expressive(),
+        shapes = Shapes(),
         content = content
     )
 }

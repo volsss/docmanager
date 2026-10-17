@@ -59,11 +59,6 @@ kotlin {
             implementation(libs.h2)
             implementation(libs.postgresql)
         }
-        jvmMain.dependencies {
-            implementation(libs.jna)
-            implementation(libs.jna.platform)
-            implementation(libs.material.color)
-        }
     }
 }
 
