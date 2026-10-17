@@ -13,12 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.example.docmanager.data.document.header.HeaderFieldType
-import ru.example.docmanager.data.reference.*
-import ru.example.docmanager.data.repositories.references.IndividualsRepository
-import ru.example.docmanager.data.repositories.references.OrganizationsRepository
-import ru.example.docmanager.data.repositories.references.ProductsRepository
-import ru.example.docmanager.data.repositories.references.ReferenceRepository
-import ru.example.docmanager.data.repositories.references.SuppliersRepository
+import ru.example.docmanager.data.reference.Reference
+import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.data.repositories.references.*
 
 class ReferenceViewModel(
     individualsRepository: IndividualsRepository,

@@ -10,7 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,7 +29,7 @@ fun SettingsScreen(
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
 
-    SettingsContent (
+    SettingsContent(
         state = state.value,
         onProjectNameChanged = viewModel::onProjectNameChanged,
         onVersionChanged = viewModel::onVersionChanged,
@@ -40,7 +40,7 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsContent (
+fun SettingsContent(
     state: SettingsUiState,
     onProjectNameChanged: (String) -> Unit,
     onVersionChanged: (String) -> Unit,

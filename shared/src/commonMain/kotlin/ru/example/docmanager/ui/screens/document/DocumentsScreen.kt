@@ -71,7 +71,7 @@ fun DocumentsScreen(
                         )
                     },
                     leadingContent = {
-                        Box (
+                        Box(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clip(MaterialShapes.Slanted.toShape())

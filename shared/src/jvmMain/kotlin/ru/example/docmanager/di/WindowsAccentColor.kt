@@ -19,7 +19,8 @@ fun getWindowsAccentColor(): Color? {
 
     return try {
         if (Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER, explorerAccentPath, "AccentPalette")) {
-            val paletteBytes = Advapi32Util.registryGetBinaryValue(WinReg.HKEY_CURRENT_USER, explorerAccentPath, "AccentPalette")
+            val paletteBytes =
+                Advapi32Util.registryGetBinaryValue(WinReg.HKEY_CURRENT_USER, explorerAccentPath, "AccentPalette")
             if (paletteBytes.size >= 4) {
                 val r = paletteBytes[0].toInt() and 0xFF
                 val g = paletteBytes[1].toInt() and 0xFF
@@ -32,12 +33,15 @@ fun getWindowsAccentColor(): Color? {
             Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER, themePath, "AccentColor") -> {
                 Advapi32Util.registryGetIntValue(WinReg.HKEY_CURRENT_USER, themePath, "AccentColor")
             }
+
             Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER, dwmPath, "ColorizationColor") -> {
                 Advapi32Util.registryGetIntValue(WinReg.HKEY_CURRENT_USER, dwmPath, "ColorizationColor")
             }
+
             Advapi32Util.registryValueExists(WinReg.HKEY_CURRENT_USER, dwmPath, "AccentColor") -> {
                 Advapi32Util.registryGetIntValue(WinReg.HKEY_CURRENT_USER, dwmPath, "AccentColor")
             }
+
             else -> return null
         }
 

@@ -67,7 +67,7 @@ class JvmDocumentProcessor : DocumentProcessor {
         if (!Desktop.getDesktop().isSupported(Desktop.Action.PRINT)) return false
         return runCatching {
             PrintServiceLookup.lookupDefaultPrintService() != null ||
-                PrintServiceLookup.lookupPrintServices(null, null).isNotEmpty()
+                    PrintServiceLookup.lookupPrintServices(null, null).isNotEmpty()
         }.getOrDefault(false)
     }
 
@@ -95,9 +95,13 @@ class JvmDocumentProcessor : DocumentProcessor {
                 }
                 if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION && chooser.selectedFile != null) {
                     val file = chooser.selectedFile
-                    return if (!file.name.endsWith(".docx", ignoreCase = true)) File(file.parentFile, "${file.name}.docx") else file
+                    return if (!file.name.endsWith(".docx", ignoreCase = true)) File(
+                        file.parentFile,
+                        "${file.name}.docx"
+                    ) else file
                 }
-            } catch (_: Throwable) { }
+            } catch (_: Throwable) {
+            }
         }
         return null
     }
@@ -201,8 +205,8 @@ class JvmDocumentProcessor : DocumentProcessor {
             val matchedEntry = bodyParts.entries.firstOrNull { (key, _) ->
                 val cleanKey = key.trim()
                 cellText.contains(cleanKey, ignoreCase = true) ||
-                    cleanKey.contains(cellText, ignoreCase = true) ||
-                    cellText.replace(" ", "").equals(cleanKey.replace(" ", ""), ignoreCase = true)
+                        cleanKey.contains(cellText, ignoreCase = true) ||
+                        cellText.replace(" ", "").equals(cleanKey.replace(" ", ""), ignoreCase = true)
             }
             matchedEntry?.value ?: bodyParts.values.elementAtOrNull(colIdx) ?: emptyList()
         }
@@ -210,7 +214,8 @@ class JvmDocumentProcessor : DocumentProcessor {
         val startRowIdx = if (table.rows.size > 2) 2 else table.rows.size
 
         for (rowIndex in 0 until maxRows) {
-            val row = if (rowIndex == 0 && table.rows.size > startRowIdx) table.getRow(startRowIdx) else table.createRow()
+            val row =
+                if (rowIndex == 0 && table.rows.size > startRowIdx) table.getRow(startRowIdx) else table.createRow()
             for (colIdx in headerCells.indices) {
                 val value = columnData[colIdx]?.getOrNull(rowIndex) ?: ""
                 val cell = if (colIdx < row.tableCells.size) row.tableCells[colIdx] else row.addNewTableCell()

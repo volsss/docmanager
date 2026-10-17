@@ -16,8 +16,12 @@ import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.repositories.MetadataRepository
 import ru.example.docmanager.data.repositories.documents.DocumentRepository
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
-import ru.example.docmanager.data.repositories.references.*
-import ru.example.docmanager.ui.viewmodel.*
+import ru.example.docmanager.data.repositories.references.IndividualsRepository
+import ru.example.docmanager.data.repositories.references.OrganizationsRepository
+import ru.example.docmanager.data.repositories.references.ProductsRepository
+import ru.example.docmanager.data.repositories.references.SuppliersRepository
+import ru.example.docmanager.ui.viewmodel.DocumentsViewModel
+import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
 import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
 import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel

@@ -17,8 +17,6 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.jetbrains.compose.resources.getString
 import org.koin.core.context.GlobalContext
-import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.document.WithBody
 import java.io.*
 
 class AndroidDocumentProcessor : DocumentProcessor {
@@ -40,9 +38,10 @@ class AndroidDocumentProcessor : DocumentProcessor {
         val fileName = if (documentName.endsWith(".docx", ignoreCase = true)) documentName else "$documentName.docx"
         val context = getContext()
         val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
-        val bodyParts = if (document is ru.example.docmanager.data.document.WithBody<*>) document.body.toMapByColumns().mapKeys {
-            getString(it.key.stringResource)
-        } else null
+        val bodyParts =
+            if (document is ru.example.docmanager.data.document.WithBody<*>) document.body.toMapByColumns().mapKeys {
+                getString(it.key.stringResource)
+            } else null
 
         val generatedBytes = generateDocumentBytes(documentResourceFile, headReplacements, bodyParts)
         if (generatedBytes == null || generatedBytes.isEmpty()) {
@@ -54,7 +53,10 @@ class AndroidDocumentProcessor : DocumentProcessor {
         if (context != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                put(
+                    MediaStore.MediaColumns.MIME_TYPE,
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS)
                 put(MediaStore.MediaColumns.IS_PENDING, 1)
             }
@@ -226,8 +228,8 @@ class AndroidDocumentProcessor : DocumentProcessor {
             val matchedEntry = bodyParts.entries.firstOrNull { (key, _) ->
                 val cleanKey = key.trim()
                 cellText.contains(cleanKey, ignoreCase = true) ||
-                    cleanKey.contains(cellText, ignoreCase = true) ||
-                    cellText.replace(" ", "").equals(cleanKey.replace(" ", ""), ignoreCase = true)
+                        cleanKey.contains(cellText, ignoreCase = true) ||
+                        cellText.replace(" ", "").equals(cleanKey.replace(" ", ""), ignoreCase = true)
             }
             matchedEntry?.value ?: bodyParts.values.elementAtOrNull(colIdx) ?: emptyList()
         }
@@ -235,7 +237,8 @@ class AndroidDocumentProcessor : DocumentProcessor {
         val startRowIdx = if (table.rows.size > 2) 2 else table.rows.size
 
         for (rowIndex in 0 until maxRows) {
-            val row = if (rowIndex == 0 && table.rows.size > startRowIdx) table.getRow(startRowIdx) else table.createRow()
+            val row =
+                if (rowIndex == 0 && table.rows.size > startRowIdx) table.getRow(startRowIdx) else table.createRow()
             for (colIdx in headerCells.indices) {
                 val value = columnData[colIdx]?.getOrNull(rowIndex) ?: ""
                 val cell = if (colIdx < row.tableCells.size) row.tableCells[colIdx] else row.addNewTableCell()

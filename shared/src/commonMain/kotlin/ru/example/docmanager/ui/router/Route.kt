@@ -13,14 +13,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.screen_document
-import docmanager.shared.generated.resources.screen_document_types
-import docmanager.shared.generated.resources.screen_documents
-import docmanager.shared.generated.resources.screen_home
-import docmanager.shared.generated.resources.screen_reference
-import docmanager.shared.generated.resources.screen_references
-import docmanager.shared.generated.resources.screen_settings
+import docmanager.shared.generated.resources.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
@@ -29,6 +22,7 @@ import org.jetbrains.compose.resources.StringResource
 sealed interface Route : NavKey {
     @Contextual
     val stringResource: StringResource
+
     @Contextual
     val icon: ImageVector
 
@@ -36,6 +30,7 @@ sealed interface Route : NavKey {
     data object Start : Route {
         @Contextual
         override val stringResource = Res.string.screen_home
+
         @Contextual
         override val icon = Icons.Rounded.Home
     }
@@ -44,6 +39,7 @@ sealed interface Route : NavKey {
     data object DocumentTypes : Route {
         @Contextual
         override val stringResource = Res.string.screen_document_types
+
         @Contextual
         override val icon = Icons.Rounded.Description
     }
@@ -52,6 +48,7 @@ sealed interface Route : NavKey {
     data object References : Route {
         @Contextual
         override val stringResource = Res.string.screen_references
+
         @Contextual
         override val icon = Icons.AutoMirrored.Rounded.ViewList
     }
@@ -60,6 +57,7 @@ sealed interface Route : NavKey {
     data object Settings : Route {
         @Contextual
         override val stringResource = Res.string.screen_settings
+
         @Contextual
         override val icon = Icons.Rounded.Settings
     }

@@ -5,36 +5,15 @@
 
 package ru.example.docmanager.ui.router
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -45,13 +24,13 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import ru.example.docmanager.ui.screens.SettingsScreen
+import ru.example.docmanager.ui.screens.StartScreen
 import ru.example.docmanager.ui.screens.document.DocumentScreen
 import ru.example.docmanager.ui.screens.document.DocumentTypesScreen
 import ru.example.docmanager.ui.screens.document.DocumentsScreen
 import ru.example.docmanager.ui.screens.reference.ReferenceScreen
 import ru.example.docmanager.ui.screens.reference.ReferencesScreen
-import ru.example.docmanager.ui.screens.SettingsScreen
-import ru.example.docmanager.ui.screens.StartScreen
 
 @Composable
 fun Router(

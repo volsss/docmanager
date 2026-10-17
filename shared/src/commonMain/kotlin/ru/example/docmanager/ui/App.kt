@@ -6,9 +6,11 @@
 package ru.example.docmanager.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import ru.example.docmanager.ui.router.Router
-import ru.example.docmanager.ui.screens.*
+import ru.example.docmanager.ui.screens.ConnectionScreen
 
 @Composable
 fun App(
