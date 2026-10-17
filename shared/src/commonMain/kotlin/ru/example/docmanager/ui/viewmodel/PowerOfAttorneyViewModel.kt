@@ -13,6 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
+import ru.example.docmanager.data.reference.Individual
+import ru.example.docmanager.data.reference.Organization
+import ru.example.docmanager.data.reference.Product
+import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.data.repositories.documents.DocumentRepository
 import ru.example.docmanager.di.DocumentProcessor
 import ru.example.docmanager.di.getDocumentProcessor
@@ -21,7 +26,7 @@ import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
 import kotlin.time.Clock
 
 class PowerOfAttorneyViewModel(
-    val repository: DocumentRepository<ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney>,
+    val repository: DocumentRepository<PowerOfAttorney>,
     val referenceViewModel: ReferenceViewModel
 ) : ViewModel() {
     private val documentProcessor: DocumentProcessor = getDocumentProcessor()
@@ -29,8 +34,8 @@ class PowerOfAttorneyViewModel(
     val formState = PowerOfAttorneyFormState(Clock.System.todayIn(TimeZone.currentSystemDefault()))
 
     private val _documents =
-        MutableStateFlow<List<ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney>>(emptyList())
-    val documents: StateFlow<List<ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney>> =
+        MutableStateFlow<List<PowerOfAttorney>>(emptyList())
+    val documents: StateFlow<List<PowerOfAttorney>> =
         _documents.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
@@ -202,10 +207,10 @@ class PowerOfAttorneyViewModel(
     }
 
     fun autoPopulateDefaults(
-        organizations: List<ru.example.docmanager.data.reference.Organization>,
-        individuals: List<ru.example.docmanager.data.reference.Individual>,
-        suppliers: List<ru.example.docmanager.data.reference.Supplier>,
-        products: List<ru.example.docmanager.data.reference.Product>
+        organizations: List<Organization>,
+        individuals: List<Individual>,
+        suppliers: List<Supplier>,
+        products: List<Product>
     ) {
         if (formState.isEditing) return
         if (formState.selectedOrganization == null && organizations.isNotEmpty()) {

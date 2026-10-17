@@ -5,16 +5,18 @@
 
 package ru.example.docmanager.di
 
+import ru.example.docmanager.data.document.Document
+
 interface DocumentProcessor {
     suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
-        document: ru.example.docmanager.data.document.Document
+        document: Document
     )
 
     suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        document: ru.example.docmanager.data.document.Document
+        document: Document
     )
 }

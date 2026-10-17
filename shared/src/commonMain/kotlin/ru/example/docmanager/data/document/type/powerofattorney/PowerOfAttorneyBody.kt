@@ -6,10 +6,11 @@
 package ru.example.docmanager.data.document.type.powerofattorney
 
 import ru.example.docmanager.data.document.body.BodyFieldType
+import ru.example.docmanager.data.document.body.DocumentBody
 
 data class PowerOfAttorneyBody(
     override val items: List<PowerOfAttorneyBodyItem>
-) : ru.example.docmanager.data.document.body.DocumentBody<PowerOfAttorneyBodyItem> {
+) : DocumentBody<PowerOfAttorneyBodyItem> {
     override fun toMapByColumns() = mapOf(
         BodyFieldType.NUMBER_SORTED to List(items.size) { idx -> (idx + 1).toString() },
         BodyFieldType.PRODUCTS to items.map { it.product.name },

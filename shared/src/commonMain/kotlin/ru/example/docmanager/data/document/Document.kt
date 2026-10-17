@@ -5,7 +5,9 @@
 
 package ru.example.docmanager.data.document
 
+import ru.example.docmanager.data.document.header.DocumentHeader
+
 interface Document {
     val type: DocumentType
-    val header: ru.example.docmanager.data.document.header.DocumentHeader
+    val header: DocumentHeader
 }

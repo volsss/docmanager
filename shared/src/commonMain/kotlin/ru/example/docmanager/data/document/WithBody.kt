@@ -5,6 +5,9 @@
 
 package ru.example.docmanager.data.document
 
-interface WithBody<T : ru.example.docmanager.data.document.body.DocumentBodyItem> {
-    val body: ru.example.docmanager.data.document.body.DocumentBody<T>
+import ru.example.docmanager.data.document.body.DocumentBody
+import ru.example.docmanager.data.document.body.DocumentBodyItem
+
+interface WithBody<T : DocumentBodyItem> {
+    val body: DocumentBody<T>
 }

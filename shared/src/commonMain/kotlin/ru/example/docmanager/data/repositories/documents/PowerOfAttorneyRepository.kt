@@ -26,8 +26,7 @@ import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 
-class PowerOfAttorneyRepository :
-    DocumentRepository<PowerOfAttorney> {
+class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
 
     override suspend fun createDocument(document: PowerOfAttorney): Unit =
         dbQuery {

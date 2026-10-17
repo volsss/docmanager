@@ -5,7 +5,9 @@
 
 package ru.example.docmanager.data.repositories.documents
 
-interface DocumentRepository<T : ru.example.docmanager.data.document.Document> {
+import ru.example.docmanager.data.document.Document
+
+interface DocumentRepository<T : Document> {
     suspend fun createDocument(document: T)
     suspend fun updateDocument(document: T)
     suspend fun deleteDocument(id: Int)
