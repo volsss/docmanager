@@ -16,9 +16,5 @@ object Utils {
     const val H2_DRIVER = "org.h2.Driver"
     const val POSTGRES_DRIVER = "org.postgresql.Driver"
 
-    val DATE_FORMAT = LocalDate.Format {
-        day(); char('.'); monthNumber(); char('.'); year()
-    }
-
     const val WIDE_BREAKPOINT = 840
 }

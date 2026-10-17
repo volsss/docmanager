@@ -17,8 +17,9 @@ import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyB
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBodyItem
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyHeader
 import ru.example.docmanager.data.reference.*
-import ru.example.docmanager.ui.Utils
+import ru.example.docmanager.ui.DATE_FORMAT
 import ru.example.docmanager.ui.screens.document.forms.FormState
+import ru.example.docmanager.ui.toRussianString
 
 class PowerOfAttorneyFormState(
     today: LocalDate
@@ -26,7 +27,7 @@ class PowerOfAttorneyFormState(
     today
 ) {
     val defaultEndDate = today.plus(DatePeriod(days = 30))
-    var endDate by mutableStateOf(Utils.DATE_FORMAT.format(defaultEndDate))
+    var endDate by mutableStateOf(defaultEndDate.toRussianString())
     var selectedOrganization by mutableStateOf<Organization?>(null)
     var selectedIndividual by mutableStateOf<Individual?>(null)
     var selectedSupplier by mutableStateOf<Supplier?>(null)
@@ -44,8 +45,8 @@ class PowerOfAttorneyFormState(
             (existingDocuments.maxOfOrNull { it.header.number } ?: 0) + 1
         } else 1
         number = nextNumber.toString()
-        dischargeDate = Utils.DATE_FORMAT.format(today)
-        endDate = Utils.DATE_FORMAT.format(defaultEndDate)
+        dischargeDate = today.toRussianString()
+        endDate = defaultEndDate.toRussianString()
         selectedOrganization =
             references[ReferenceType.ORGANIZATION]?.firstOrNull() as Organization?
         selectedIndividual =
@@ -63,8 +64,8 @@ class PowerOfAttorneyFormState(
     ) {
         selectedDocumentId = document.header.id
         number = document.header.number.toString()
-        dischargeDate = Utils.DATE_FORMAT.format(document.header.dischargeDate)
-        endDate = Utils.DATE_FORMAT.format(document.header.endDate)
+        dischargeDate = document.header.dischargeDate.toRussianString()
+        endDate = document.header.endDate.toRussianString()
         selectedOrganization =
             references[ReferenceType.ORGANIZATION]?.firstOrNull {
                 it.id == document.header.organization.id
@@ -99,11 +100,21 @@ class PowerOfAttorneyFormState(
         val ind = selectedIndividual ?: return null
         val sup = selectedSupplier ?: return null
 
-        val dis = runCatching { Utils.DATE_FORMAT.parse(dischargeDate) }
-            .getOrElse { runCatching { LocalDate.parse(dischargeDate) }.getOrElse { today } }
+        val dis = runCatching {
+            DATE_FORMAT.parse(dischargeDate)
+        }.getOrElse {
+            runCatching {
+                LocalDate.parse(dischargeDate)
+            }.getOrElse { today }
+        }
 
-        val end = runCatching { Utils.DATE_FORMAT.parse(endDate) }
-            .getOrElse { runCatching { LocalDate.parse(endDate) }.getOrElse { defaultEndDate } }
+        val end = runCatching {
+            DATE_FORMAT.parse(endDate)
+        }.getOrElse {
+            runCatching {
+                LocalDate.parse(endDate)
+            }.getOrElse { defaultEndDate }
+        }
 
         val header = PowerOfAttorneyHeader(
             id = selectedDocumentId ?: 0,

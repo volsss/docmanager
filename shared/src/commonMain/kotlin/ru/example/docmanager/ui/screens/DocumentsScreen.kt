@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import ru.example.docmanager.ui.Utils.DATE_FORMAT
+import ru.example.docmanager.ui.DATE_FORMAT
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 

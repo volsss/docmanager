@@ -10,7 +10,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.todayIn
 import ru.example.docmanager.data.document.header.HeaderFieldType
-import ru.example.docmanager.ui.Utils
+import ru.example.docmanager.ui.DATE_FORMAT
 import kotlin.time.Clock
 
 data class Individual(
@@ -28,7 +28,7 @@ data class Individual(
         HeaderFieldType.INDIVIDUAL_SERIES to series,
         HeaderFieldType.INDIVIDUAL_NUMBER to number,
         HeaderFieldType.INDIVIDUAL_ISSUED to issued,
-        HeaderFieldType.INDIVIDUAL_DATE to date.format(Utils.DATE_FORMAT),
+        HeaderFieldType.INDIVIDUAL_DATE to date.format(DATE_FORMAT),
     )
 
     override fun copyWithFields(fields: Map<HeaderFieldType, String>) = copy(
@@ -37,7 +37,7 @@ data class Individual(
         series = (fields[HeaderFieldType.INDIVIDUAL_SERIES] ?: series),
         number = (fields[HeaderFieldType.INDIVIDUAL_NUMBER] ?: number),
         issued = (fields[HeaderFieldType.INDIVIDUAL_ISSUED] ?: issued),
-        date = (Utils.DATE_FORMAT.parseOrNull(
+        date = (DATE_FORMAT.parseOrNull(
             fields[HeaderFieldType.INDIVIDUAL_DATE] ?: ""
         ) ?: date),
     )

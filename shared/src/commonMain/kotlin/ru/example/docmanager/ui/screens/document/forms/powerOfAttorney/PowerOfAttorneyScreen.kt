@@ -28,8 +28,14 @@ import org.koin.compose.koinInject
 import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.*
 import ru.example.docmanager.ui.Utils
+import ru.example.docmanager.ui.components.DateInput
+import ru.example.docmanager.ui.components.ModalDatePicker
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.toRussianString
 import ru.example.docmanager.ui.screens.document.forms.ReferenceDropdown
+import ru.example.docmanager.ui.toEpochMillisUtc
+import ru.example.docmanager.ui.toLocalDateFromUtc
+import ru.example.docmanager.ui.toLocalDateOrNull
 import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
 
 @Composable
@@ -154,22 +160,21 @@ private fun PowerOfAttorneyHeaderSection(
         TextInput(
             value = formState.number,
             onValueChange = { formState.number = it },
-            label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource)
-        )
-
-        OutlinedTextField(
-            value = formState.dischargeDate,
-            onValueChange = { formState.dischargeDate = it },
-            label = { Text(stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource)) },
-            singleLine = true,
+            label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
+        DateInput(
+            value = formState.dischargeDate,
+            onValueChange = { formState.dischargeDate = it },
+            label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        DateInput(
             value = formState.endDate,
             onValueChange = { formState.endDate = it },
-            label = { Text(stringResource(HeaderFieldType.END_DATE.stringResource)) },
-            singleLine = true,
+            label = stringResource(HeaderFieldType.END_DATE.stringResource),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -203,11 +208,10 @@ private fun PowerOfAttorneyHeaderSection(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
+        TextInput(
             value = formState.supplierAgreement,
             onValueChange = { formState.supplierAgreement = it },
-            label = { Text(stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource)) },
-            singleLine = true,
+            label = stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource),
             modifier = Modifier.fillMaxWidth()
         )
     }

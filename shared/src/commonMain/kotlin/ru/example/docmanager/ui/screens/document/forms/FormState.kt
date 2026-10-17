@@ -12,6 +12,7 @@ import kotlinx.datetime.LocalDate
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.reference.Reference
 import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.ui.DATE_FORMAT
 import ru.example.docmanager.ui.Utils
 
 abstract class FormState<D : Document, B : BodyItem>(
@@ -27,7 +28,7 @@ abstract class FormState<D : Document, B : BodyItem>(
     var statusMessage by mutableStateOf<String?>(null)
 
     var number by mutableStateOf("1")
-    var dischargeDate by mutableStateOf(Utils.DATE_FORMAT.format(today))
+    var dischargeDate by mutableStateOf(DATE_FORMAT.format(today))
 
     var bodyItems: List<B> by mutableStateOf(emptyList())
 

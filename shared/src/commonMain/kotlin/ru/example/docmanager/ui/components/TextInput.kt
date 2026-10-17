@@ -25,6 +25,7 @@ fun TextInput(
     singleLine: Boolean = true,
     required: Boolean = false,
     enabled: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     OutlinedTextField(
@@ -38,6 +39,7 @@ fun TextInput(
         },
         singleLine = singleLine,
         shape = RoundedCornerShape(16.dp),
+        trailingIcon = trailingIcon,
         visualTransformation = visualTransformation,
         modifier = modifier
     )

@@ -79,5 +79,8 @@
     <string name="component_dropdown_placeholder">Выберите значение</string>
     <string name="component_back_button">Назад</string>
 
+    <string name="component_cancel_button">Отмена</string>
+    <string name="component_ok_button">ОК</string>
+
     <string name="unknown_error">Неизвестная ошибка</string>
 </resources>
