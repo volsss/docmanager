@@ -17,8 +17,8 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.jetbrains.compose.resources.getString
 import org.koin.core.context.GlobalContext
-import ru.example.docmanager.document.Document
-import ru.example.docmanager.document.WithBody
+import ru.example.docmanager.data.document.Document
+import ru.example.docmanager.data.document.WithBody
 import java.io.*
 
 class AndroidDocumentProcessor : DocumentProcessor {
@@ -35,12 +35,12 @@ class AndroidDocumentProcessor : DocumentProcessor {
     override suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: ru.example.docmanager.data.document.Document
     ) {
         val fileName = if (documentName.endsWith(".docx", ignoreCase = true)) documentName else "$documentName.docx"
         val context = getContext()
         val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
-        val bodyParts = if (document is WithBody<*>) document.body.toMapByColumns().mapKeys {
+        val bodyParts = if (document is ru.example.docmanager.data.document.WithBody<*>) document.body.toMapByColumns().mapKeys {
             getString(it.key.stringResource)
         } else null
 
@@ -106,7 +106,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
     override suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: ru.example.docmanager.data.document.Document
     ) {
         processSave(documentName, documentResourceFile, document)
     }

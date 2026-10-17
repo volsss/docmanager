@@ -54,12 +54,16 @@ fun Dropdown(
     val text = when (mode) {
         DropdownMode.VALUES_ONLY,
         DropdownMode.VALUES_AND_INPUT -> value
+
         DropdownMode.STRICT_VALUES_AND_INPUT -> draft
     }
 
     val filteredItems = remember(items, text, mode) {
         when (mode) {
-            DropdownMode.VALUES_ONLY -> { items }
+            DropdownMode.VALUES_ONLY -> {
+                items
+            }
+
             DropdownMode.VALUES_AND_INPUT,
             DropdownMode.STRICT_VALUES_AND_INPUT -> {
                 if (text.isBlank()) {
@@ -90,6 +94,7 @@ fun Dropdown(
                 draft.isNotEmpty() &&
                 !strictValueIsValid ->
             stringResource(Res.string.component_dropdown_placeholder)
+
         else -> null
     }
 
@@ -104,10 +109,12 @@ fun Dropdown(
             DropdownMode.VALUES_ONLY -> {
                 expanded = false
             }
+
             DropdownMode.VALUES_AND_INPUT -> {
                 onValueChange(text)
                 expanded = false
             }
+
             DropdownMode.STRICT_VALUES_AND_INPUT -> {
                 val exactItem = items.firstOrNull { it == draft }
                 if (exactItem != null) {
@@ -142,6 +149,7 @@ fun Dropdown(
                         onValueChange(newValue)
                         expanded = true
                     }
+
                     DropdownMode.STRICT_VALUES_AND_INPUT -> {
                         draft = newValue
                         expanded = true
@@ -191,6 +199,7 @@ fun Dropdown(
                         }
                         draft = value
                     }
+
                     else -> Unit
                 }
                 expanded = false

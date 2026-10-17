@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
+package ru.example.docmanager.data.repositories.references
+
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.insertAndGetId
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.update
+import ru.example.docmanager.data.database.dbQuery
+import ru.example.docmanager.data.database.tables.references.ProductsTable
+import ru.example.docmanager.data.reference.Product
+
+class ProductsRepository : ReferenceRepository<Product>("products") {
+
+    private fun ResultRow.toProduct() = Product(
+        id = this[ProductsTable.id].value,
+        name = this[ProductsTable.name]
+    )
+
+    override suspend fun getItem(id: Int): Product = dbQuery {
+        ProductsTable.selectAll().where { ProductsTable.id eq id }.first().toProduct()
+    }
+
+    override suspend fun getItems(): List<Product> = dbQuery {
+        ProductsTable.selectAll().map { it.toProduct() }
+    }
+
+    override suspend fun createItem(): Product = createItem(Product())
+
+    override suspend fun createItem(item: Product): Product =
+        dbQuery {
+            val newId = ProductsTable.insertAndGetId { it[name] = item.name }.value
+            item.id = newId
+            item
+        }
+
+    override suspend fun updateItem(item: Product): Unit = dbQuery {
+        ProductsTable.update({ ProductsTable.id eq item.id }) {
+            it[name] = item.name
+        }
+    }
+
+    override suspend fun deleteItem(id: Int): Unit = dbQuery {
+        ProductsTable.deleteWhere { ProductsTable.id eq id }
+    }
+}

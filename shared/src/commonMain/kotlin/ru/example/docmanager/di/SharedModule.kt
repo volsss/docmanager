@@ -10,43 +10,36 @@ import androidx.compose.runtime.Composable
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-import ru.example.docmanager.database.DatabaseManager
-import ru.example.docmanager.database.DefaultDatabaseManager
-import ru.example.docmanager.database.repositories.MetadataRepository
-import ru.example.docmanager.database.repositories.documents.DocumentRepository
-import ru.example.docmanager.database.repositories.documents.PowerOfAttorneyRepository
-import ru.example.docmanager.database.repositories.references.*
-import ru.example.docmanager.document.type.powerofattorney.PowerOfAttorney
-import ru.example.docmanager.reference.Individual
-import ru.example.docmanager.reference.Organization
-import ru.example.docmanager.reference.Product
-import ru.example.docmanager.reference.Supplier
-import ru.example.docmanager.viewmodel.*
+import ru.example.docmanager.data.database.DatabaseManager
+import ru.example.docmanager.data.database.DefaultDatabaseManager
+import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
+import ru.example.docmanager.data.repositories.MetadataRepository
+import ru.example.docmanager.data.repositories.documents.DocumentRepository
+import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
+import ru.example.docmanager.data.repositories.references.*
+import ru.example.docmanager.ui.viewmodel.*
+import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
+import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
+import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
 
 val sharedModule = module {
+    singleOf(::ConnectionViewModel)
+    singleOf(::SettingsViewModel)
     single<DatabaseManager> { DefaultDatabaseManager() }
+
     singleOf(::MetadataRepository)
-    single<ReferenceRepository<Individual>> { IndividualsRepository() }
-    single<ReferenceRepository<Organization>> { OrganizationsRepository() }
-    single<ReferenceRepository<Product>> { ProductsRepository() }
-    single<ReferenceRepository<Supplier>> { SuppliersRepository() }
     singleOf(::IndividualsRepository)
     singleOf(::OrganizationsRepository)
     singleOf(::ProductsRepository)
     singleOf(::SuppliersRepository)
 
+    // TODO:
     factory<DocumentRepository<PowerOfAttorney>> { PowerOfAttorneyRepository() }
     factoryOf(::PowerOfAttorneyRepository)
 
     singleOf(::DocumentsViewModel)
     singleOf(::ReferenceViewModel)
-    singleOf(::AppViewModel)
     factoryOf(::PowerOfAttorneyViewModel)
-    factoryOf(::SettingsViewModel)
-}
-
-enum class Platform {
-    ANDROID, JVM
 }
 
 expect fun getPlatform(): Platform

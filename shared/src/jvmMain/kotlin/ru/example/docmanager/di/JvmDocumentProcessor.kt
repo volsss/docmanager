@@ -10,8 +10,8 @@ import kotlinx.coroutines.withContext
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.jetbrains.compose.resources.getString
-import ru.example.docmanager.document.Document
-import ru.example.docmanager.document.WithBody
+import ru.example.docmanager.data.document.Document
+import ru.example.docmanager.data.document.WithBody
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame

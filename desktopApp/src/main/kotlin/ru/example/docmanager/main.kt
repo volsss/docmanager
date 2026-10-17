@@ -31,7 +31,7 @@ fun main() {
                 width = 1000.dp,
                 height = 800.dp
             ),
-            title = "Документооборот",
+            title = "docmanager",
             icon = painterResource(Res.drawable.icon)
         ) {
             App()

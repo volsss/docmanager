@@ -31,8 +31,11 @@
     <string name="input_user">Пользователь</string>
     <string name="input_password">Пароль</string>
 
+    <string name="screen_home">Главная</string>
+    <string name="screen_document">Документ</string>
     <string name="screen_documents">Документы</string>
-    <string name="screen_document_types">Типы документов</string>
+    <string name="screen_document_types">Виды документов</string>
+    <string name="screen_reference">Справочник</string>
     <string name="screen_references">Справочники</string>
     <string name="screen_settings">Настройки</string>
 
@@ -75,4 +78,6 @@
 
     <string name="component_dropdown_placeholder">Выберите значение</string>
     <string name="component_back_button">Назад</string>
+
+    <string name="unknown_error">Неизвестная ошибка</string>
 </resources>

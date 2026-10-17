@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2026 Andrew Z.
+ * docmanager — a scalable document management system.
+ */
+
+package ru.example.docmanager.data.reference
+
+import ru.example.docmanager.data.document.header.HeaderFieldType
+
+data class Organization(
+    override var id: Int = -1,
+    val name: String = "",
+    val consumer: String = "",
+    val payer: String = "",
+    val account: String = ""
+) : Reference(id, ReferenceType.ORGANIZATION) {
+    override fun toMap() = mapOf(
+        HeaderFieldType.ORGANIZATION_NAME to name,
+        HeaderFieldType.ORGANIZATION_CONSUMER to consumer,
+        HeaderFieldType.ORGANIZATION_PAYER to payer,
+        HeaderFieldType.ORGANIZATION_ACCOUNT to account,
+    )
+
+    override fun copyWithFields(fields: Map<HeaderFieldType, String>) = copy(
+        name = (fields[HeaderFieldType.ORGANIZATION_NAME] ?: name),
+        consumer = (fields[HeaderFieldType.ORGANIZATION_CONSUMER] ?: consumer),
+        payer = (fields[HeaderFieldType.ORGANIZATION_PAYER] ?: payer),
+        account = (fields[HeaderFieldType.ORGANIZATION_ACCOUNT] ?: account)
+    )
+}

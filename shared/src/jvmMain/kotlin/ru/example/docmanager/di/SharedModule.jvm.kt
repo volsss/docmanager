@@ -28,7 +28,7 @@ actual fun getColorScheme(darkTheme: Boolean): ColorScheme {
             SchemeExpressive(
                 sourceColorHct = Hct.from(it),
                 isDark = false,
-                contrastLevel = 0.25,
+                contrastLevel = -0.5,
                 specVersion = ColorSpec.SpecVersion.SPEC_2025
             )
         }
