@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.document
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,7 +21,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import ru.example.docmanager.ui.Utils.DATE_FORMAT
 import ru.example.docmanager.ui.router.Route
-import ru.example.docmanager.ui.viewmodel.DocumentsViewModel
+import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -35,7 +35,7 @@ fun DocumentsScreen(
     val documents = viewModel.documents.collectAsState()
 
     LaunchedEffect(destination) {
-        viewModel.loadDocuments()
+        viewModel.loadDocuments(destination.type)
     }
 
     LaunchedEffect(Unit) {

@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.reference
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,16 +13,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.data.reference.ReferenceType
-import ru.example.docmanager.ui.AppTheme
+import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.ui.router.Route
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ReferencesScreen(
+fun DocumentTypesScreen(
     navigateTo: (Route) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -30,18 +28,18 @@ fun ReferencesScreen(
         modifier = modifier.fillMaxWidth().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
     ) {
-        itemsIndexed(ReferenceType.entries) { index, type ->
+        itemsIndexed(DocumentType.entries) { index, type ->
             SegmentedListItem(
                 shapes = ListItemDefaults.segmentedShapes(
                     index = index,
-                    count = ReferenceType.entries.size
+                    count = DocumentType.entries.size
                 ),
                 colors = ListItemDefaults.segmentedColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
                 onClick = {
                     navigateTo(
-                        Route.Reference(type)
+                        Route.Documents(type)
                     )
                 },
                 leadingContent = {
@@ -54,25 +52,5 @@ fun ReferencesScreen(
                 Text(stringResource(type.stringResource))
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ReferencesScreenPreview() {
-    AppTheme(darkTheme = false) {
-        ReferencesScreen(
-            navigateTo = { }
-        )
-    }
-}
-
-@Preview
-@Composable
-fun ReferencesScreenDarkThemePreview() {
-    AppTheme(darkTheme = true) {
-        ReferencesScreen(
-            navigateTo = { }
-        )
     }
 }

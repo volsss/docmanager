@@ -9,18 +9,19 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import ru.example.docmanager.data.database.DatabaseManager
 import ru.example.docmanager.data.database.DefaultDatabaseManager
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
+import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.repositories.MetadataRepository
-import ru.example.docmanager.data.repositories.documents.DocumentRepository
+import ru.example.docmanager.data.repositories.documents.BaseDocumentRepository
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.data.repositories.references.IndividualsRepository
 import ru.example.docmanager.data.repositories.references.OrganizationsRepository
 import ru.example.docmanager.data.repositories.references.ProductsRepository
 import ru.example.docmanager.data.repositories.references.SuppliersRepository
-import ru.example.docmanager.ui.viewmodel.DocumentsViewModel
+import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
 import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
@@ -37,11 +38,15 @@ val sharedModule = module {
     singleOf(::ProductsRepository)
     singleOf(::SuppliersRepository)
 
-    // TODO:
-    factory<DocumentRepository<PowerOfAttorney>> { PowerOfAttorneyRepository() }
-    factoryOf(::PowerOfAttorneyRepository)
+    singleOf(::PowerOfAttorneyRepository) bind BaseDocumentRepository::class
+
+    single<Map<DocumentType, BaseDocumentRepository>> {
+        getAll<BaseDocumentRepository>().associateBy { it.type }
+    }
 
     singleOf(::DocumentsViewModel)
+
+    // TODO:
     singleOf(::ReferenceViewModel)
     factoryOf(::PowerOfAttorneyViewModel)
 }

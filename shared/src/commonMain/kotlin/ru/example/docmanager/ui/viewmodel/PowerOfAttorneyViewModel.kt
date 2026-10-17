@@ -19,6 +19,7 @@ import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.data.repositories.documents.DocumentRepository
+import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.di.DocumentProcessor
 import ru.example.docmanager.di.getDocumentProcessor
 import ru.example.docmanager.ui.screens.document.forms.powerOfAttorney.PowerOfAttorneyFormState
@@ -26,7 +27,7 @@ import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
 import kotlin.time.Clock
 
 class PowerOfAttorneyViewModel(
-    val repository: DocumentRepository<PowerOfAttorney>,
+    val repository: PowerOfAttorneyRepository,
     val referenceViewModel: ReferenceViewModel
 ) : ViewModel() {
     private val documentProcessor: DocumentProcessor = getDocumentProcessor()

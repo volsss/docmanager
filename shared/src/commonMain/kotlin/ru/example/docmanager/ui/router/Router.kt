@@ -26,11 +26,11 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.ui.screens.SettingsScreen
 import ru.example.docmanager.ui.screens.StartScreen
-import ru.example.docmanager.ui.screens.document.DocumentScreen
-import ru.example.docmanager.ui.screens.document.DocumentTypesScreen
-import ru.example.docmanager.ui.screens.document.DocumentsScreen
-import ru.example.docmanager.ui.screens.reference.ReferenceScreen
-import ru.example.docmanager.ui.screens.reference.ReferencesScreen
+import ru.example.docmanager.ui.screens.DocumentScreen
+import ru.example.docmanager.ui.screens.DocumentTypesScreen
+import ru.example.docmanager.ui.screens.DocumentsScreen
+import ru.example.docmanager.ui.screens.ReferenceScreen
+import ru.example.docmanager.ui.screens.ReferencesScreen
 
 @Composable
 fun Router(

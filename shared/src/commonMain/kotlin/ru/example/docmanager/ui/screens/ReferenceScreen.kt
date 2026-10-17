@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.reference
+package ru.example.docmanager.ui.screens
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*

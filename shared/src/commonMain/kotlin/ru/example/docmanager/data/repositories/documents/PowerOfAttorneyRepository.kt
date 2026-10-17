@@ -17,6 +17,7 @@ import ru.example.docmanager.data.database.tables.references.IndividualsTable
 import ru.example.docmanager.data.database.tables.references.OrganizationsTable
 import ru.example.docmanager.data.database.tables.references.ProductsTable
 import ru.example.docmanager.data.database.tables.references.SuppliersTable
+import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBody
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBodyItem
@@ -27,6 +28,7 @@ import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 
 class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
+    override val type = DocumentType.POWER_OF_ATTORNEY
 
     override suspend fun createDocument(document: PowerOfAttorney): Unit =
         dbQuery {
