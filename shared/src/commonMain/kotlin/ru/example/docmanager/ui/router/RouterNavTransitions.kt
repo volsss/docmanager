@@ -38,7 +38,7 @@ val predictiveTransition: AnimatedContentTransitionScope<Scene<NavKey>>.(
 }
 
 val navigationTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform = {
-    val isTargetDetail = targetState.key is Route.Document ||
+    val isTargetDetail = targetState.key is Route.Form ||
             targetState.key is Route.Reference ||
             targetState.key is Route.Settings
 

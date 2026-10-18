@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.document.forms
+package ru.example.docmanager.ui.viewmodel.forms
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

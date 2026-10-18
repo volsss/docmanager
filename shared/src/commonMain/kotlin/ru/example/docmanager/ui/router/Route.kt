@@ -17,6 +17,7 @@ import docmanager.shared.generated.resources.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
+import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.reference.ReferenceType
 
@@ -74,9 +75,9 @@ sealed interface Route : NavKey {
     ) : Route
 
     @Serializable
-    data class Document(
+    data class Form(
         val type: DocumentType,
-        val documentId: Int? = null,
+        val document: Document? = null,
         @Contextual
         override val stringResource: StringResource = Res.string.screen_document,
         @Contextual

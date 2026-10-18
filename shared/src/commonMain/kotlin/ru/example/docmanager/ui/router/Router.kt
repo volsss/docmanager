@@ -28,6 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import ru.example.docmanager.ui.screens.*
+import ru.example.docmanager.ui.screens.forms.FormScreen
 
 @Composable
 fun Router(
@@ -184,8 +185,8 @@ private fun RouterNavDisplay(
                     }
                 )
             }
-            entry<Route.Document> {
-                DocumentScreen(
+            entry<Route.Form> {
+                FormScreen(
                     destination = it
                 )
             }

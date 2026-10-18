@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.document.forms
+package ru.example.docmanager.ui.viewmodel.forms
 
 abstract class BodyItem(
     open val id: Int

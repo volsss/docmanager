@@ -3,10 +3,10 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.document.forms.powerOfAttorney
+package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
 
 import ru.example.docmanager.data.reference.Product
-import ru.example.docmanager.ui.screens.document.forms.BodyItem
+import ru.example.docmanager.ui.viewmodel.forms.BodyItem
 
 data class PowerOfAttorneyBodyItemState(
     override val id: Int,

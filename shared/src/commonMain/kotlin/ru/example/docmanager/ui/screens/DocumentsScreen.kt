@@ -52,7 +52,7 @@ fun DocumentsScreen(
             return@LaunchedEffect
         }
         registerFabClickAction {
-            navigateTo(Route.Document(destination.type))
+            navigateTo(Route.Form(destination.type))
         }
     }
 
@@ -65,7 +65,7 @@ fun DocumentsScreen(
         documents!!.isEmpty() -> {
             EmptyContent(
                 onNewDocumentClick = {
-                    navigateTo(Route.Document(destination.type))
+                    navigateTo(Route.Form(destination.type))
                 },
                 modifier = modifier
             )
@@ -113,9 +113,9 @@ private fun DocumentsContent(
                     ),
                     onClick = {
                         navigateTo(
-                            Route.Document(
+                            Route.Form(
                                 type = document.type,
-                                documentId = document.header.id
+                                document = document
                             )
                         )
                     },

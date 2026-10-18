@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.document.forms.powerOfAttorney
+package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,11 +19,11 @@ import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.ui.DATE_FORMAT
-import ru.example.docmanager.ui.screens.document.forms.FormState
 import ru.example.docmanager.ui.toRussianString
+import ru.example.docmanager.ui.viewmodel.forms.FormState
 import kotlin.time.Clock
 
-data class PowerOfAttorneyFormState(
+data class PowerOfAttorneyUiState(
     val individuals: List<Individual> = emptyList(),
     val organizations: List<Organization> = emptyList(),
     val products: List<Product> = emptyList(),

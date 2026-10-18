@@ -30,8 +30,8 @@ val routerConfig = SavedStateConfiguration {
                 Route.Settings.serializer()
             )
             subclass(
-                Route.Document::class,
-                Route.Document.serializer()
+                Route.Form::class,
+                Route.Form.serializer()
             )
             subclass(
                 Route.Reference::class,

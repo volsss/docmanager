@@ -19,9 +19,9 @@ import ru.example.docmanager.data.repositories.MetadataRepository
 import ru.example.docmanager.data.repositories.documents.BaseDocumentRepository
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.data.repositories.references.*
-import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
 import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
 import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
+import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyViewModel
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
 import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
 

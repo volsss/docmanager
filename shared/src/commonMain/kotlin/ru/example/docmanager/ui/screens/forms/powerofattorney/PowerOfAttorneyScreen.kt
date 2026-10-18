@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens.document.forms.powerOfAttorney
+package ru.example.docmanager.ui.screens.forms.powerofattorney
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.horizontalScroll
@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
@@ -32,16 +33,18 @@ import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.components.DateInput
+import ru.example.docmanager.ui.components.ReferenceDropdown
 import ru.example.docmanager.ui.components.TextInput
-import ru.example.docmanager.ui.screens.document.forms.ReferenceDropdown
-import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
+import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyBodyItemState
+import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyUiState
+import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyViewModel
 
 @Composable
 fun PowerOfAttorneyScreen(
-    documentId: Int?,
+    document: Document?,
     viewModel: PowerOfAttorneyViewModel = koinInject()
 ) {
-    val formState by viewModel.formState.collectAsStateWithLifecycle()
+    val formState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val organizations = remember(formState) {
         formState.organizations
@@ -56,8 +59,8 @@ fun PowerOfAttorneyScreen(
         formState.products
     }
 
-    LaunchedEffect(documentId) {
-        viewModel.loadInitialData(documentId)
+    LaunchedEffect(document) {
+        viewModel.loadInitialData(document)
     }
 
     LaunchedEffect(organizations, individuals, suppliers, products) {
@@ -92,7 +95,7 @@ fun PowerOfAttorneyScreen(
 
 @Composable
 private fun PowerOfAttorneyBanner(
-    formState: PowerOfAttorneyFormState,
+    formState: PowerOfAttorneyUiState,
     onResetForm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -130,7 +133,7 @@ private fun PowerOfAttorneyBanner(
 
 @Composable
 private fun PowerOfAttorneyHeaderSection(
-    formState: PowerOfAttorneyFormState,
+    formState: PowerOfAttorneyUiState,
     organizations: List<Organization>,
     individuals: List<Individual>,
     suppliers: List<Supplier>,
@@ -208,7 +211,7 @@ private fun PowerOfAttorneyHeaderSection(
 
 @Composable
 private fun PowerOfAttorneyBodySection(
-    formState: PowerOfAttorneyFormState,
+    formState: PowerOfAttorneyUiState,
     products: List<Product>,
     modifier: Modifier = Modifier
 ) {
@@ -307,7 +310,7 @@ private fun BodyItemRow(
 @Composable
 private fun PowerOfAttorneyActions(
     viewModel: PowerOfAttorneyViewModel,
-    formState: PowerOfAttorneyFormState,
+    formState: PowerOfAttorneyUiState,
     modifier: Modifier = Modifier
 ) {
     FlowRow(

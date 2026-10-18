@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui.screens
+package ru.example.docmanager.ui.screens.forms
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,22 +20,22 @@ import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.ui.router.Route
-import ru.example.docmanager.ui.screens.document.forms.powerOfAttorney.PowerOfAttorneyScreen
+import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScreen
 
 @Composable
-fun DocumentScreen(
-    destination: Route.Document,
+fun FormScreen(
+    destination: Route.Form,
     modifier: Modifier = Modifier,
 ) {
     val type = destination.type
-    val documentId = destination.documentId
+    val document = destination.document
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (type) {
-            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(documentId)
+            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(document)
             DocumentType.TEST -> {
                 Text(stringResource(Res.string.document_test))
             }
