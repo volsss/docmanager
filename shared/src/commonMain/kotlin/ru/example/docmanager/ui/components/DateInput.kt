@@ -23,7 +23,7 @@ import docmanager.shared.generated.resources.input_supporting_required
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.ui.toEpochMillisUtc
 import ru.example.docmanager.ui.toLocalDateFromUtc
-import ru.example.docmanager.ui.toLocalDateOrNull
+import ru.example.docmanager.ui.parseRussianOrNull
 import ru.example.docmanager.ui.toRussianString
 
 
@@ -46,7 +46,7 @@ fun DateInput(
             if (it != null)
                 onValueChange(it.toLocalDateFromUtc().toRussianString())
         },
-        initialValue = value.toLocalDateOrNull()?.toEpochMillisUtc()
+        initialValue = value.parseRussianOrNull()?.toEpochMillisUtc()
     )
 
     OutlinedTextField(

@@ -16,7 +16,7 @@ val DATE_FORMAT = LocalDate.Format {
     day(); char('.'); monthNumber(); char('.'); year()
 }
 
-fun String.toLocalDateOrNull(): LocalDate? {
+fun String.parseRussianOrNull(): LocalDate? {
     return runCatching { DATE_FORMAT.parse(this) }.getOrNull()
 }
 

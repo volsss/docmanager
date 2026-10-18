@@ -135,8 +135,10 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
                     organization = orgMap[headerRow[PowerOfAttorneyHeadersTable.organizationId]]
                         ?: Organization(),
                     number = headerRow[PowerOfAttorneyHeadersTable.number],
-                    dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate].toKotlinLocalDate(),
-                    endDate = headerRow[PowerOfAttorneyHeadersTable.endDate].toKotlinLocalDate(),
+                    dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate]
+                        .toKotlinLocalDate(),
+                    endDate = headerRow[PowerOfAttorneyHeadersTable.endDate]
+                        .toKotlinLocalDate(),
                     individual = indMap[headerRow[PowerOfAttorneyHeadersTable.individualId]]
                         ?: Individual(),
                     supplier = supMap[headerRow[PowerOfAttorneyHeadersTable.supplierId]]

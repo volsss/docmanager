@@ -6,12 +6,12 @@
 package ru.example.docmanager.data.document.type.powerofattorney
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.format
 import ru.example.docmanager.data.document.header.DocumentHeader
 import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Supplier
+import ru.example.docmanager.ui.toRussianString
 
 data class PowerOfAttorneyHeader(
     override val id: Int,
@@ -25,8 +25,8 @@ data class PowerOfAttorneyHeader(
 ) : DocumentHeader {
     override fun toMap(): Map<HeaderFieldType, String> = mapOf(
         HeaderFieldType.NUMBER to number.toString(),
-        HeaderFieldType.DISCHARGE_DATE to dischargeDate.format(LocalDate.Formats.ISO),
-        HeaderFieldType.END_DATE to endDate.format(LocalDate.Formats.ISO),
+        HeaderFieldType.DISCHARGE_DATE to dischargeDate.toRussianString(),
+        HeaderFieldType.END_DATE to endDate.toRussianString(),
         HeaderFieldType.SUPPLIER_AGREEMENT to supplierAgreement,
     ) + organization.toMap() +
             individual.toMap() +
