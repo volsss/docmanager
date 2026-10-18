@@ -23,10 +23,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.koin.compose)
     implementation(libs.koin.core)
-
-    implementation(libs.compose.uiToolingPreview)
-    implementation(libs.androidx.material3)
-    debugImplementation(libs.compose.uiTooling)
 }
 
 android {

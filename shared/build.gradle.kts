@@ -22,7 +22,7 @@ kotlin {
         minSdk = libs.versions.android.minSdk.get().toInt()
 
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_21
+            jvmTarget = JvmTarget.JVM_25
         }
         androidResources {
             enable = true
@@ -69,6 +69,9 @@ kotlin {
 
             // Document processor
             implementation(libs.poi.ooxml)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.material3)
         }
     }
 }

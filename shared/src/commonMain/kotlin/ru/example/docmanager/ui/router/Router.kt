@@ -6,9 +6,10 @@
 package ru.example.docmanager.ui.router
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -49,8 +50,10 @@ fun Router(
     val currentRoute = backStack.last() as Route
 
     fun onBack() {
-        if (backStack.size > 1)
+        if (backStack.size > 1) {
             backStack.removeLastOrNull()
+            onFabClickAction = null
+        }
     }
 
     fun navigateToRoot(route: Route) {
@@ -291,7 +294,7 @@ private fun RouterFloatingActionButton(
         visible = currentRoute is Route.Documents
                 && onFabClickAction != null,
         enter = slideInVertically { it } + fadeIn(),
-        exit = ExitTransition.None
+        exit = slideOutVertically { it } + fadeOut(),
     ) {
         FloatingActionButton(onClick = { onFabClickAction?.invoke() }) {
             Icon(Icons.Rounded.Add, contentDescription = null)
