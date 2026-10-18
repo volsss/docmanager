@@ -32,7 +32,7 @@ sealed interface Route : NavKey {
     @Serializable
     data object Start : Route {
         @Contextual
-        override val stringResource = Res.string.screen_home
+        override val stringResource = Res.string.route_home
 
         @Contextual
         override val icon = Icons.Rounded.Home
@@ -41,7 +41,7 @@ sealed interface Route : NavKey {
     @Serializable
     data object DocumentTypes : Route {
         @Contextual
-        override val stringResource = Res.string.screen_document_types
+        override val stringResource = Res.string.route_document_types
 
         @Contextual
         override val icon = Icons.Rounded.Description
@@ -50,7 +50,7 @@ sealed interface Route : NavKey {
     @Serializable
     data object References : Route {
         @Contextual
-        override val stringResource = Res.string.screen_references
+        override val stringResource = Res.string.route_references
 
         @Contextual
         override val icon = Icons.AutoMirrored.Rounded.ViewList
@@ -59,7 +59,7 @@ sealed interface Route : NavKey {
     @Serializable
     data object Settings : Route {
         @Contextual
-        override val stringResource = Res.string.screen_settings
+        override val stringResource = Res.string.route_settings
 
         @Contextual
         override val icon = Icons.Rounded.Settings
@@ -69,7 +69,7 @@ sealed interface Route : NavKey {
     data class Documents(
         val type: DocumentType,
         @Contextual
-        override val stringResource: StringResource = Res.string.screen_documents,
+        override val stringResource: StringResource = Res.string.route_documents,
         @Contextual
         override val icon: ImageVector = Icons.Rounded.Description
     ) : Route
@@ -79,7 +79,7 @@ sealed interface Route : NavKey {
         val type: DocumentType,
         val document: Document? = null,
         @Contextual
-        override val stringResource: StringResource = Res.string.screen_document,
+        override val stringResource: StringResource = Res.string.route_form,
         @Contextual
         override val icon: ImageVector = Icons.Rounded.Person
     ) : Route
@@ -88,7 +88,7 @@ sealed interface Route : NavKey {
     data class Reference(
         val type: ReferenceType,
         @Contextual
-        override val stringResource: StringResource = Res.string.screen_reference,
+        override val stringResource: StringResource = Res.string.route_reference,
         @Contextual
         override val icon: ImageVector = Icons.Rounded.Person
     ) : Route

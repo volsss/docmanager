@@ -5,22 +5,29 @@
 
 package ru.example.docmanager.ui.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_dropdown_placeholder
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun Dropdown(
     value: String,
@@ -204,27 +211,88 @@ fun Dropdown(
                 }
                 expanded = false
             },
-            modifier = Modifier.exposedDropdownSize(),
+            containerColor = Color.Transparent,
+            tonalElevation = 0.dp,
+            shadowElevation = 0.dp,
+            modifier = Modifier
+                .exposedDropdownSize()
+                .animateContentSize(
+                    animationSpec = tween(durationMillis = 200)
+                ),
         ) {
-            filteredItems.forEach { item ->
-                DropdownMenuItem(
-                    text = {
-                        Text(item)
-                    },
-                    onClick = {
-                        selectItem(item)
-                    },
-                    trailingIcon = if (item == value) {
-                        {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null,
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn(
+                    animationSpec = tween(180)
+                ) + expandVertically(
+                    animationSpec = tween(220)
+                ),
+                exit = fadeOut(
+                    animationSpec = tween(120)
+                ) + shrinkVertically(
+                    animationSpec = tween(180)
+                ),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize(),
+                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+                ) {
+                    filteredItems.forEachIndexed { index, item ->
+                        val selected = item == value
+
+                        SegmentedListItem(
+                            selected = selected,
+                            shapes = ListItemDefaults.segmentedShapes(
+                                index = index,
+                                count = filteredItems.size
+                            ),
+                            colors = ListItemDefaults.segmentedColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            onClick = { selectItem(item) },
+                            trailingContent = {
+                                AnimatedVisibility(
+                                    visible = selected,
+                                    enter = fadeIn(tween(160)) +
+                                            expandVertically(tween(160)),
+                                    exit = fadeOut(tween(100)) +
+                                            shrinkVertically(tween(100)),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Check,
+                                        contentDescription = "Selected",
+                                        modifier = Modifier
+                                            .padding(start = 12.dp)
+                                            .size(20.dp),
+                                    )
+                                }
+                            }
+                        ) {
+                            Text(text = item)
+                        }
+                    }
+
+                    if (filteredItems.isEmpty()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Элементов нет",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
-                    } else {
-                        null
-                    },
-                )
+                    }
+                }
             }
         }
     }

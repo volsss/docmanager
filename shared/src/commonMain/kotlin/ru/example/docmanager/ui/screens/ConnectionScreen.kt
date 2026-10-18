@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,9 +41,9 @@ fun ConnectionScreen(
     modifier: Modifier = Modifier,
     viewModel: ConnectionViewModel = koinViewModel()
 ) {
-    val state = viewModel.uiState.collectAsStateWithLifecycle()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (state.value.isLoading) {
+    if (state.isLoading) {
         LoadingContent()
         return
     }
@@ -62,11 +63,11 @@ fun ConnectionScreen(
                 }
             },
             onError = viewModel::onError,
-            jdbcUrl = state.value.jdbcUrl,
-            driver = state.value.driver,
-            username = state.value.username,
-            password = state.value.password,
-            errorMessage = state.value.errorMessage,
+            jdbcUrl = state.jdbcUrl,
+            driver = state.driver,
+            username = state.username,
+            password = state.password,
+            errorMessage = state.errorMessage,
         )
     }
 }
@@ -139,7 +140,7 @@ fun ConnectionContent(
                 value = driver,
                 items = listOf(Utils.H2_DRIVER, Utils.POSTGRES_DRIVER),
                 label = stringResource(Res.string.input_driver),
-                supportingText = stringResource(Res.string.input_supporting_required),
+                supportingText = stringResource(Res.string.component_input_required),
                 onValueChange = {
                     onDriverChanged(it)
                     if (it == Utils.POSTGRES_DRIVER)

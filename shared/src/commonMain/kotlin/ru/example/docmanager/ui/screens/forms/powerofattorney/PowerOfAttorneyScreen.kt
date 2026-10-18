@@ -61,10 +61,7 @@ fun PowerOfAttorneyScreen(
 
     LaunchedEffect(document) {
         viewModel.loadInitialData(document)
-    }
-
-    LaunchedEffect(organizations, individuals, suppliers, products) {
-        viewModel.autoPopulateDefaults(organizations, individuals, suppliers, products)
+        viewModel.autoPopulateDefaults()
     }
 
     Column(
@@ -171,32 +168,30 @@ private fun PowerOfAttorneyHeaderSection(
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.input_organization),
+            value = formState.selectedOrganization,
             items = organizations,
-            selectedItem = formState.selectedOrganization,
-            onItemSelected = { formState.selectedOrganization = it },
-            itemLabel = { it.name.ifBlank { "№ ${it.id}" } },
+            itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+            onValueChange = { formState.selectedOrganization = it },
+            label = stringResource(Res.string.input_organization),
             modifier = Modifier.fillMaxWidth()
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.input_individual),
+            value = formState.selectedIndividual,
             items = individuals,
-            selectedItem = formState.selectedIndividual,
-            onItemSelected = { formState.selectedIndividual = it },
-            itemLabel = {
-                val parts = listOfNotNull(it.name.ifBlank { null }, it.job.ifBlank { null })
-                if (parts.isNotEmpty()) parts.joinToString(" - ") else "№ ${it.id}"
-            },
+            itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+            itemSupportingText = { it?.job ?: "Unknown job" },
+            onValueChange = { formState.selectedIndividual = it },
+            label = stringResource(Res.string.input_individual),
             modifier = Modifier.fillMaxWidth()
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.input_supplier),
+            value = formState.selectedSupplier,
             items = suppliers,
-            selectedItem = formState.selectedSupplier,
-            onItemSelected = { formState.selectedSupplier = it },
-            itemLabel = { it.name.ifBlank { "№ ${it.id}" } },
+            itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+            onValueChange = { formState.selectedSupplier = it },
+            label = stringResource(Res.string.input_supplier),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -277,11 +272,11 @@ private fun BodyItemRow(
         )
 
         ReferenceDropdown(
-            label = stringResource(Res.string.input_product),
+            value = item.product,
             items = products,
-            selectedItem = item.product,
-            onItemSelected = { onItemChange(item.copy(product = it)) },
-            itemLabel = { it.name.ifBlank { "№ ${it.id}" } },
+            itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+            onValueChange = { onItemChange(item.copy(product = it)) },
+            label = stringResource(Res.string.input_product),
             modifier = if (isWide) Modifier.weight(2f) else Modifier.widthIn(min = 300.dp)
         )
 

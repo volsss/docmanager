@@ -13,10 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
-import ru.example.docmanager.data.reference.Individual
-import ru.example.docmanager.data.reference.Organization
-import ru.example.docmanager.data.reference.Product
-import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.data.repositories.references.IndividualsRepository
 import ru.example.docmanager.data.repositories.references.OrganizationsRepository
@@ -213,25 +209,20 @@ class PowerOfAttorneyViewModel(
         uiState.value.resetForm()
     }
 
-    fun autoPopulateDefaults(
-        organizations: List<Organization>,
-        individuals: List<Individual>,
-        suppliers: List<Supplier>,
-        products: List<Product>
-    ) {
+    fun autoPopulateDefaults() {
         if (uiState.value.isEditing) return
-        if (uiState.value.selectedOrganization == null && organizations.isNotEmpty()) {
-            uiState.value.selectedOrganization = organizations.first()
+        if (uiState.value.selectedOrganization == null && uiState.value.organizations.isNotEmpty()) {
+            uiState.value.selectedOrganization = uiState.value.organizations.first()
         }
-        if (uiState.value.selectedIndividual == null && individuals.isNotEmpty()) {
-            uiState.value.selectedIndividual = individuals.first()
+        if (uiState.value.selectedIndividual == null && uiState.value.individuals.isNotEmpty()) {
+            uiState.value.selectedIndividual = uiState.value.individuals.first()
         }
-        if (uiState.value.selectedSupplier == null && suppliers.isNotEmpty()) {
-            uiState.value.selectedSupplier = suppliers.first()
+        if (uiState.value.selectedSupplier == null && uiState.value.suppliers.isNotEmpty()) {
+            uiState.value.selectedSupplier = uiState.value.suppliers.first()
         }
-        if (products.isNotEmpty()) {
+        if (uiState.value.products.isNotEmpty()) {
             uiState.value.bodyItems = uiState.value.bodyItems.map { item ->
-                if (item.product == null) item.copy(product = products.first()) else item
+                if (item.product == null) item.copy(product = uiState.value.products.first()) else item
             }
         }
     }

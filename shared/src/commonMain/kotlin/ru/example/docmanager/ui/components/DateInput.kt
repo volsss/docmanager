@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.input_supporting_required
+import docmanager.shared.generated.resources.component_input_required
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.ui.parseRussianOrNull
 import ru.example.docmanager.ui.toEpochMillisUtc
@@ -56,7 +56,7 @@ fun DateInput(
         label = { Text(label) },
         supportingText = {
             if (required)
-                Text(stringResource(Res.string.input_supporting_required))
+                Text(stringResource(Res.string.component_input_required))
         },
         singleLine = true,
         shape = RoundedCornerShape(16.dp),
