@@ -6,8 +6,12 @@
 package ru.example.docmanager.ui.router
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateBounds
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
@@ -20,6 +24,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -202,7 +207,10 @@ private fun RouterNavDisplay(
             entry<Route.Reference> {
                 ReferenceScreen(
                     destination = it,
-                    onStatusMessage = showSnackbar
+                    onStatusMessage = showSnackbar,
+                    viewModel = koinViewModel(key = it.type.name) {
+                        parametersOf(it)
+                    }
                 )
             }
         }
@@ -237,32 +245,47 @@ private fun RouterBottomBar(
     currentRoute: Route,
     navigateToRoot: (Route) -> Unit
 ) {
-    NavigationBar {
-        RouterBarItem(
-            route = Route.Start,
-            selected = currentRoute is Route.Start,
-            onClick = { navigateToRoot(Route.Start) },
-        )
-        RouterBarItem(
-            route = Route.DocumentTypes,
-            selected = currentRoute is Route.DocumentTypes ||
-                    currentRoute is Route.Documents ||
-                    currentRoute is Route.Document,
-            onClick = { navigateToRoot(Route.DocumentTypes) },
-        )
-        RouterBarItem(
-            route = Route.References,
-            selected = currentRoute is Route.References ||
-                    currentRoute is Route.Reference,
-            onClick = { navigateToRoot(Route.References) },
-        )
-        RouterBarItem(
-            route = Route.Settings,
-            selected = currentRoute is Route.Settings,
-            onClick = { navigateToRoot(Route.Settings) },
-        )
+    AnimatedVisibility(
+        visible = currentRoute is Route.Start
+                || currentRoute is Route.Settings
+                || currentRoute is Route.DocumentTypes
+                || currentRoute is Route.References,
+        enter = slideInVertically(
+            initialOffsetY = { fullHeight -> fullHeight },
+        ) + expandVertically(
+            expandFrom = Alignment.Bottom
+        ) + fadeIn(),
+        exit = slideOutVertically(
+            targetOffsetY = { fullHeight -> fullHeight },
+        ) + shrinkVertically(
+            shrinkTowards = Alignment.Bottom
+        ) + fadeOut()
+    ) {
+        NavigationBar {
+            RouterBarItem(
+                route = Route.Start,
+                selected = currentRoute is Route.Start,
+                onClick = { navigateToRoot(Route.Start) },
+            )
+            RouterBarItem(
+                route = Route.DocumentTypes,
+                selected = currentRoute is Route.DocumentTypes,
+                onClick = { navigateToRoot(Route.DocumentTypes) },
+            )
+            RouterBarItem(
+                route = Route.References,
+                selected = currentRoute is Route.References,
+                onClick = { navigateToRoot(Route.References) },
+            )
+            RouterBarItem(
+                route = Route.Settings,
+                selected = currentRoute is Route.Settings,
+                onClick = { navigateToRoot(Route.Settings) },
+            )
+        }
     }
 }
+
 
 @Composable
 private fun RowScope.RouterBarItem(

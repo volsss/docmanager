@@ -28,14 +28,14 @@ fun DocumentScreen(
     modifier: Modifier = Modifier,
 ) {
     val type = destination.type
-
+    val documentId = destination.documentId
     Column(
         modifier = modifier.fillMaxSize().padding(16.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (type) {
-            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen()
+            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(documentId)
             DocumentType.TEST -> {
                 Text(stringResource(Res.string.document_test))
             }

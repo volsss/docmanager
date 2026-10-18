@@ -10,12 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
 import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.reference.Reference
-import ru.example.docmanager.data.reference.ReferenceType
-import ru.example.docmanager.ui.DATE_FORMAT
+import ru.example.docmanager.ui.toRussianString
 
 abstract class FormState<D : Document, B : BodyItem>(
-    protected val today: LocalDate,
+    open val today: LocalDate,
 ) {
     var existingDocuments by mutableStateOf<List<D>>(emptyList())
     var selectedDocumentId by mutableStateOf<Int?>(null)
@@ -27,7 +25,7 @@ abstract class FormState<D : Document, B : BodyItem>(
     var statusMessage by mutableStateOf<String?>(null)
 
     var number by mutableStateOf("1")
-    var dischargeDate by mutableStateOf(DATE_FORMAT.format(today))
+    var dischargeDate by mutableStateOf(today.toRussianString())
 
     var bodyItems: List<B> by mutableStateOf(emptyList())
 
@@ -46,11 +44,8 @@ abstract class FormState<D : Document, B : BodyItem>(
     }
 
     abstract fun addBodyItem()
-    abstract fun resetForm(references: Map<ReferenceType, List<Reference>>)
-    abstract fun populateFromDocument(
-        document: D,
-        references: Map<ReferenceType, List<Reference>>
-    )
+    abstract fun resetForm()
+    abstract fun populateFromDocument(document: D)
 
     abstract fun toDocument(): D?
 }

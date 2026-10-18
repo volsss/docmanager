@@ -14,8 +14,10 @@ import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.data.database.dbQuery
 import ru.example.docmanager.data.database.tables.references.ProductsTable
 import ru.example.docmanager.data.reference.Product
+import ru.example.docmanager.data.reference.ReferenceType
 
 class ProductsRepository : ReferenceRepository<Product>("products") {
+    override val type = ReferenceType.PRODUCT
 
     private fun ResultRow.toProduct() = Product(
         id = this[ProductsTable.id].value,

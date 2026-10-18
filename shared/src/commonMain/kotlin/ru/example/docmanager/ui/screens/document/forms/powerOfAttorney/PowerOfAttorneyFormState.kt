@@ -11,7 +11,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.fastFilteredMap
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBody
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBodyItem
@@ -20,11 +22,15 @@ import ru.example.docmanager.data.reference.*
 import ru.example.docmanager.ui.DATE_FORMAT
 import ru.example.docmanager.ui.screens.document.forms.FormState
 import ru.example.docmanager.ui.toRussianString
+import kotlin.time.Clock
 
-class PowerOfAttorneyFormState(
-    today: LocalDate
+data class PowerOfAttorneyFormState(
+    val individuals: List<Individual> = emptyList(),
+    val organizations: List<Organization> = emptyList(),
+    val products: List<Product> = emptyList(),
+    val suppliers: List<Supplier> = emptyList(),
 ) : FormState<PowerOfAttorney, PowerOfAttorneyBodyItemState>(
-    today
+    Clock.System.todayIn(TimeZone.currentSystemDefault())
 ) {
     val defaultEndDate = today.plus(DatePeriod(days = 30))
     var endDate by mutableStateOf(defaultEndDate.toRussianString())
@@ -39,7 +45,7 @@ class PowerOfAttorneyFormState(
         )
     }
 
-    override fun resetForm(references: Map<ReferenceType, List<Reference>>) {
+    override fun resetForm() {
         selectedDocumentId = null
         val nextNumber = if (existingDocuments.isNotEmpty()) {
             (existingDocuments.maxOfOrNull { it.header.number } ?: 0) + 1
@@ -47,45 +53,41 @@ class PowerOfAttorneyFormState(
         number = nextNumber.toString()
         dischargeDate = today.toRussianString()
         endDate = defaultEndDate.toRussianString()
-        selectedOrganization =
-            references[ReferenceType.ORGANIZATION]?.firstOrNull() as Organization?
-        selectedIndividual =
-            references[ReferenceType.INDIVIDUAL]?.firstOrNull() as Individual?
-        selectedSupplier =
-            references[ReferenceType.SUPPLIER]?.firstOrNull() as Supplier?
+        selectedOrganization = organizations.firstOrNull()
+        selectedIndividual = individuals.firstOrNull()
+        selectedSupplier = suppliers.firstOrNull()
         supplierAgreement = ""
         bodyItems = listOf()
         statusMessage = null
     }
 
     override fun populateFromDocument(
-        document: PowerOfAttorney,
-        references: Map<ReferenceType, List<Reference>>
+        document: PowerOfAttorney
     ) {
         selectedDocumentId = document.header.id
         number = document.header.number.toString()
         dischargeDate = document.header.dischargeDate.toRussianString()
         endDate = document.header.endDate.toRussianString()
         selectedOrganization =
-            references[ReferenceType.ORGANIZATION]?.firstOrNull {
+            organizations.firstOrNull {
                 it.id == document.header.organization.id
-            } as Organization? ?: document.header.organization
+            } ?: document.header.organization
         selectedIndividual =
-            references[ReferenceType.INDIVIDUAL]?.firstOrNull {
+            individuals.firstOrNull {
                 it.id == document.header.individual.id
-            } as Individual? ?: document.header.individual
+            } ?: document.header.individual
         selectedSupplier =
-            references[ReferenceType.SUPPLIER]?.firstOrNull {
+            suppliers.firstOrNull {
                 it.id == document.header.supplier.id
-            } as Supplier? ?: document.header.supplier
+            } ?: document.header.supplier
         supplierAgreement = document.header.supplierAgreement
         bodyItems = if (document.body.items.isNotEmpty()) {
             document.body.items.map { body ->
                 PowerOfAttorneyBodyItemState(
                     id = body.id,
-                    product = references[ReferenceType.PRODUCT]?.firstOrNull {
+                    product = products.firstOrNull {
                         it.id == body.product.id
-                    } as Product? ?: body.product,
+                    } ?: body.product,
                     unit = body.unit,
                     count = body.count
                 )

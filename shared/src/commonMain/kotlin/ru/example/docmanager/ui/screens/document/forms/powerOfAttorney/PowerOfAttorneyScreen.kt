@@ -35,31 +35,26 @@ import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
 
 @Composable
 fun PowerOfAttorneyScreen(
+    documentId: Int?,
     viewModel: PowerOfAttorneyViewModel = koinInject()
 ) {
-    val formState = viewModel.formState
-    val referenceUiState by viewModel.referenceViewModel.uiState.collectAsStateWithLifecycle()
-    val referencesItems = referenceUiState.itemsByType
+    val formState by viewModel.formState.collectAsStateWithLifecycle()
 
-    val organizations = remember(referencesItems) {
-        referencesItems[ReferenceType.ORGANIZATION]?.filterIsInstance<Organization>()
-            .orEmpty()
+    val organizations = remember(formState) {
+        formState.organizations
     }
-    val individuals = remember(referencesItems) {
-        referencesItems[ReferenceType.INDIVIDUAL]?.filterIsInstance<Individual>()
-            .orEmpty()
+    val individuals = remember(formState) {
+        formState.individuals
     }
-    val suppliers = remember(referencesItems) {
-        referencesItems[ReferenceType.SUPPLIER]?.filterIsInstance<Supplier>()
-            .orEmpty()
+    val suppliers = remember(formState) {
+        formState.suppliers
     }
-    val products = remember(referencesItems) {
-        referencesItems[ReferenceType.PRODUCT]?.filterIsInstance<Product>()
-            .orEmpty()
+    val products = remember(formState) {
+        formState.products
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadInitialData()
+    LaunchedEffect(documentId) {
+        viewModel.loadInitialData(documentId)
     }
 
     LaunchedEffect(organizations, individuals, suppliers, products) {
@@ -78,11 +73,9 @@ fun PowerOfAttorneyScreen(
 
         PowerOfAttorneyHeaderSection(
             formState = formState,
-            referencesItems = referencesItems,
             organizations = organizations,
             individuals = individuals,
-            suppliers = suppliers,
-            onResetForm = viewModel::resetForm
+            suppliers = suppliers
         )
 
         PowerOfAttorneyBodySection(formState = formState, products = products)
@@ -135,11 +128,9 @@ private fun PowerOfAttorneyBanner(
 @Composable
 private fun PowerOfAttorneyHeaderSection(
     formState: PowerOfAttorneyFormState,
-    referencesItems: Map<ReferenceType, List<Reference>>,
     organizations: List<Organization>,
     individuals: List<Individual>,
     suppliers: List<Supplier>,
-    onResetForm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -155,7 +146,7 @@ private fun PowerOfAttorneyHeaderSection(
         TextInput(
             value = formState.number,
             onValueChange = { formState.number = it },
-            label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
+            label = stringResource(HeaderFieldType.NUMBER.stringResource),
             modifier = Modifier.fillMaxWidth()
         )
 

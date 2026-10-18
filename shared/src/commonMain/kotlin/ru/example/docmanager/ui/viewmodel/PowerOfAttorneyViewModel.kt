@@ -17,8 +17,13 @@ import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
+import ru.example.docmanager.data.reference.ReferenceType
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
+import ru.example.docmanager.data.repositories.references.IndividualsRepository
+import ru.example.docmanager.data.repositories.references.OrganizationsRepository
+import ru.example.docmanager.data.repositories.references.ProductsRepository
+import ru.example.docmanager.data.repositories.references.SuppliersRepository
 import ru.example.docmanager.di.DocumentProcessor
 import ru.example.docmanager.di.getDocumentProcessor
 import ru.example.docmanager.ui.screens.document.forms.powerOfAttorney.PowerOfAttorneyFormState
@@ -27,11 +32,15 @@ import kotlin.time.Clock
 
 class PowerOfAttorneyViewModel(
     val repository: PowerOfAttorneyRepository,
-    val referenceViewModel: ReferenceViewModel
+    val individualsRepository: IndividualsRepository,
+    val organizationsRepository: OrganizationsRepository,
+    val productsRepository: ProductsRepository,
+    val suppliersRepository: SuppliersRepository
 ) : ViewModel() {
     private val documentProcessor: DocumentProcessor = getDocumentProcessor()
 
-    val formState = PowerOfAttorneyFormState(Clock.System.todayIn(TimeZone.currentSystemDefault()))
+    val formState: StateFlow<PowerOfAttorneyFormState>
+        field = MutableStateFlow(PowerOfAttorneyFormState())
 
     private val _documents =
         MutableStateFlow<List<PowerOfAttorney>>(emptyList())
@@ -48,20 +57,25 @@ class PowerOfAttorneyViewModel(
     }
 
     suspend fun loadInitialDataSuspend(documentId: Int? = null) {
-        if (referenceViewModel.formState.itemsByType.isEmpty()) {
-            referenceViewModel.loadReferenceItemsSuspend()
-        }
+        formState.value = formState.value.copy(
+            individuals = individualsRepository.getItems(),
+            suppliers = suppliersRepository.getItems(),
+            organizations = organizationsRepository.getItems(),
+            products = productsRepository.getItems()
+        )
+
         reloadDocumentsSuspend()
+
         if (documentId != null) {
             runCatching {
                 repository.getDocument(documentId)
             }.onSuccess { doc ->
-                formState.populateFromDocument(doc, referenceViewModel.formState.itemsByType)
+                formState.value.populateFromDocument(doc)
             }.onFailure { e ->
-                formState.statusMessage = "Ошибка при загрузке документа: ${e.message}"
+                formState.value.statusMessage = "Ошибка при загрузке документа: ${e.message}"
             }
         } else {
-            formState.resetForm(referenceViewModel.formState.itemsByType)
+            formState.value.resetForm()
         }
     }
 
@@ -76,9 +90,9 @@ class PowerOfAttorneyViewModel(
         runCatching {
             val list = repository.getAllDocuments()
             _documents.value = list
-            formState.existingDocuments = list
+            formState.value.existingDocuments = list
         }.onFailure { e ->
-            formState.statusMessage = "Ошибка при загрузке документов: ${e.message}"
+            formState.value.statusMessage = "Ошибка при загрузке документов: ${e.message}"
         }
         _isLoading.value = false
     }
@@ -90,25 +104,25 @@ class PowerOfAttorneyViewModel(
     }
 
     suspend fun saveDocumentSuspend(onDocumentSaved: (() -> Unit)? = null) {
-        val document = formState.toDocument()
+        val document = formState.value.toDocument()
         if (document == null) {
-            formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
+            formState.value.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
             return
         }
 
         _isLoading.value = true
         runCatching {
-            if (formState.isEditing) {
+            if (formState.value.isEditing) {
                 repository.updateDocument(document)
-                formState.statusMessage = "Документ № ${document.header.number} успешно обновлен"
+                formState.value.statusMessage = "Документ № ${document.header.number} успешно обновлен"
             } else {
                 repository.createDocument(document)
-                formState.statusMessage = "Документ № ${document.header.number} успешно сохранен в базу данных"
+                formState.value.statusMessage = "Документ № ${document.header.number} успешно сохранен в базу данных"
             }
             reloadDocumentsSuspend()
             onDocumentSaved?.invoke()
         }.onFailure { e ->
-            formState.statusMessage = "Ошибка при сохранении: ${e.message}"
+            formState.value.statusMessage = "Ошибка при сохранении: ${e.message}"
         }
         _isLoading.value = false
     }
@@ -120,21 +134,21 @@ class PowerOfAttorneyViewModel(
     }
 
     suspend fun saveAsNewDocumentSuspend(onDocumentSaved: (() -> Unit)? = null) {
-        val document = formState.toDocument()
+        val document = formState.value.toDocument()
         if (document == null) {
-            formState.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
+            formState.value.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
             return
         }
 
         _isLoading.value = true
         runCatching {
             repository.createDocument(document)
-            formState.statusMessage = "Документ № ${document.header.number} сохранен как новый"
-            formState.selectedDocumentId = null
+            formState.value.statusMessage = "Документ № ${document.header.number} сохранен как новый"
+            formState.value.selectedDocumentId = null
             reloadDocumentsSuspend()
             onDocumentSaved?.invoke()
         }.onFailure { e ->
-            formState.statusMessage = "Ошибка при сохранении: ${e.message}"
+            formState.value.statusMessage = "Ошибка при сохранении: ${e.message}"
         }
         _isLoading.value = false
     }
@@ -146,24 +160,24 @@ class PowerOfAttorneyViewModel(
     }
 
     suspend fun deleteCurrentDocumentSuspend(onDocumentDeleted: (() -> Unit)? = null) {
-        val docId = formState.selectedDocumentId ?: return
+        val docId = formState.value.selectedDocumentId ?: return
         _isLoading.value = true
         runCatching {
             repository.deleteDocument(docId)
-            formState.statusMessage = "Документ удален из базы данных"
+            formState.value.statusMessage = "Документ удален из базы данных"
             resetForm()
             reloadDocumentsSuspend()
             onDocumentDeleted?.invoke()
         }.onFailure { e ->
-            formState.statusMessage = "Ошибка при удалении: ${e.message}"
+            formState.value.statusMessage = "Ошибка при удалении: ${e.message}"
         }
         _isLoading.value = false
     }
 
     fun exportToFile() {
-        val document = formState.toDocument()
+        val document = formState.value.toDocument()
         if (document == null) {
-            formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
+            formState.value.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
             return
         }
 
@@ -174,17 +188,17 @@ class PowerOfAttorneyViewModel(
                     documentResourceFile = "Доверенность.docx",
                     document = document
                 )
-                formState.statusMessage = "Документ сохранен в файл"
+                formState.value.statusMessage = "Документ сохранен в файл"
             }.onFailure { e ->
-                formState.statusMessage = "Ошибка при сохранении в файл: ${e.message}"
+                formState.value.statusMessage = "Ошибка при сохранении в файл: ${e.message}"
             }
         }
     }
 
     fun printDocument() {
-        val document = formState.toDocument()
+        val document = formState.value.toDocument()
         if (document == null) {
-            formState.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
+            formState.value.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
             return
         }
 
@@ -195,15 +209,15 @@ class PowerOfAttorneyViewModel(
                     documentResourceFile = "Доверенность.docx",
                     document = document
                 )
-                formState.statusMessage = "Запрос на печать документа отправлен"
+                formState.value.statusMessage = "Запрос на печать документа отправлен"
             }.onFailure { e ->
-                formState.statusMessage = "Ошибка при формировании документа для печати: ${e.message}"
+                formState.value.statusMessage = "Ошибка при формировании документа для печати: ${e.message}"
             }
         }
     }
 
     fun resetForm() {
-        formState.resetForm(referenceViewModel.formState.itemsByType)
+        formState.value.resetForm()
     }
 
     fun autoPopulateDefaults(
@@ -212,18 +226,18 @@ class PowerOfAttorneyViewModel(
         suppliers: List<Supplier>,
         products: List<Product>
     ) {
-        if (formState.isEditing) return
-        if (formState.selectedOrganization == null && organizations.isNotEmpty()) {
-            formState.selectedOrganization = organizations.first()
+        if (formState.value.isEditing) return
+        if (formState.value.selectedOrganization == null && organizations.isNotEmpty()) {
+            formState.value.selectedOrganization = organizations.first()
         }
-        if (formState.selectedIndividual == null && individuals.isNotEmpty()) {
-            formState.selectedIndividual = individuals.first()
+        if (formState.value.selectedIndividual == null && individuals.isNotEmpty()) {
+            formState.value.selectedIndividual = individuals.first()
         }
-        if (formState.selectedSupplier == null && suppliers.isNotEmpty()) {
-            formState.selectedSupplier = suppliers.first()
+        if (formState.value.selectedSupplier == null && suppliers.isNotEmpty()) {
+            formState.value.selectedSupplier = suppliers.first()
         }
         if (products.isNotEmpty()) {
-            formState.bodyItems = formState.bodyItems.map { item ->
+            formState.value.bodyItems = formState.value.bodyItems.map { item ->
                 if (item.product == null) item.copy(product = products.first()) else item
             }
         }

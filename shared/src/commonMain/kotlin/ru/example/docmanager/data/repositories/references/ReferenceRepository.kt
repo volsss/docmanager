@@ -9,7 +9,7 @@ import ru.example.docmanager.data.reference.Reference
 
 abstract class ReferenceRepository<T : Reference>(
     val name: String
-) {
+) : BaseReferenceRepository {
     abstract suspend fun getItem(id: Int): T
     abstract suspend fun getItems(): List<T>
     abstract suspend fun createItem(item: T): T

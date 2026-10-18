@@ -11,14 +11,17 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ru.example.docmanager.data.database.DatabaseManager
 import ru.example.docmanager.data.database.DefaultDatabaseManager
 import ru.example.docmanager.data.document.DocumentType
+import ru.example.docmanager.data.reference.ReferenceType
 import ru.example.docmanager.data.repositories.MetadataRepository
 import ru.example.docmanager.data.repositories.documents.BaseDocumentRepository
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
+import ru.example.docmanager.data.repositories.references.BaseReferenceRepository
 import ru.example.docmanager.data.repositories.references.IndividualsRepository
 import ru.example.docmanager.data.repositories.references.OrganizationsRepository
 import ru.example.docmanager.data.repositories.references.ProductsRepository
@@ -33,29 +36,38 @@ val sharedModule = module {
     viewModelOf(::ConnectionViewModel)
     viewModelOf(::SettingsViewModel)
     single<DatabaseManager> { DefaultDatabaseManager() }
-
     singleOf(::MetadataRepository)
-    singleOf(::IndividualsRepository)
-    singleOf(::OrganizationsRepository)
-    singleOf(::ProductsRepository)
-    singleOf(::SuppliersRepository)
 
-    singleOf(::PowerOfAttorneyRepository) bind BaseDocumentRepository::class
-
-    single<Map<DocumentType, BaseDocumentRepository>> {
-        getAll<BaseDocumentRepository>().associateBy { it.type }
+    // References
+    singleOf(::IndividualsRepository) bind BaseReferenceRepository::class
+    singleOf(::OrganizationsRepository) bind BaseReferenceRepository::class
+    singleOf(::ProductsRepository) bind BaseReferenceRepository::class
+    singleOf(::SuppliersRepository) bind BaseReferenceRepository::class
+    single(named("references")) {
+        getAll<BaseReferenceRepository>().associateBy { it.type }
     }
 
     viewModel { params ->
-        DocumentsViewModel(
-            get(),
+        ReferenceViewModel(
+            repositories = get(named("references")),
             destination = params.get()
         )
     }
 
-    // TODO:
-    singleOf(::ReferenceViewModel)
-    factoryOf(::PowerOfAttorneyViewModel)
+    // Documents
+    singleOf(::PowerOfAttorneyRepository) bind BaseDocumentRepository::class
+    single(named("documents")) {
+        getAll<BaseDocumentRepository>().associateBy { it.type }
+    }
+
+    viewModelOf(::PowerOfAttorneyViewModel)
+
+    viewModel { params ->
+        DocumentsViewModel(
+            repositories = get(named("documents")),
+            destination = params.get()
+        )
+    }
 }
 
 expect fun getPlatform(): Platform

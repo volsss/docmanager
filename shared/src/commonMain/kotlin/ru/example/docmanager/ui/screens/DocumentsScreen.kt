@@ -26,6 +26,8 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.documents_empty_content
 import docmanager.shared.generated.resources.documents_empty_new_button
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.ui.DATE_FORMAT
@@ -113,7 +115,10 @@ private fun DocumentsContent(
                     ),
                     onClick = {
                         navigateTo(
-                            Route.Document(document.type)
+                            Route.Document(
+                                type = document.type,
+                                documentId = document.header.id
+                            )
                         )
                     },
                     leadingContent = {
