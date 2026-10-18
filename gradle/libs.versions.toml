@@ -13,7 +13,6 @@ koin = "4.2.2"
 exposed = "1.5.1"
 h2 = "2.5.252"
 postgresql = "42.7.14"
-material3Version = "1.4.0"
 material3Adaptive = "1.3.0"
 poi-ooxml = "5.5.1"
 multiplatform-nav3-ui = "1.1.2"
@@ -45,7 +44,6 @@ exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdb
 exposed-javatime = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3Version" }
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi-ooxml" }
 
 [plugins]

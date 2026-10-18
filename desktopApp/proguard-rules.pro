@@ -1,6 +1,5 @@
 # ProGuard configuration for Compose Desktop Release packaging
 
-# Ignore unresolved references, notes and warnings from 3rd party libraries
 -dontwarn **
 -dontnote **
 -ignorewarnings
@@ -17,22 +16,16 @@
 -keep class org.jetbrains.skiko.** { *; }
 
 # Keep Coroutines
--keep class kotlinx.coroutines.** { *; }
 -keep class kotlinx.datetime.** { *; }
 
 # Keep Koin
--keep class io.insert.koin.** { *; }
 -keep class org.koin.** { *; }
 
-# Keep Apache POI & XMLBeans
+# Keep Apache POI
 -keep class org.apache.poi.** { *; }
--keep class org.apache.xmlbeans.** { *; }
--keep class org.openxmlformats.schemas.** { *; }
--keep class schemaorg_apache_xmlbeans.** { *; }
 
-# Keep Database drivers and ORM (Exposed, HikariCP, PostgreSQL, H2)
+# Keep Database drivers and ORM (Exposed, PostgreSQL, H2)
 -keep class org.jetbrains.exposed.** { *; }
--keep class com.zaxxer.hikari.** { *; }
 -keep class org.postgresql.** { *; }
 -keep class org.h2.** { *; }
 -keep class java.sql.** { *; }

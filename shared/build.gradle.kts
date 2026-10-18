@@ -70,9 +70,6 @@ kotlin {
             // Document processor
             implementation(libs.poi.ooxml)
         }
-        androidMain.dependencies {
-            implementation(libs.androidx.material3)
-        }
     }
 }
 
