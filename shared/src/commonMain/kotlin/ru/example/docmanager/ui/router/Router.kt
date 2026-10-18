@@ -18,7 +18,9 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -290,14 +292,14 @@ private fun RouterFloatingActionButton(
     currentRoute: Route,
     onFabClickAction: (() -> Unit)? = null,
 ) {
-    AnimatedVisibility(
-        visible = currentRoute is Route.Documents
-                && onFabClickAction != null,
-        enter = slideInVertically { it } + fadeIn(),
-        exit = slideOutVertically { it } + fadeOut(),
+    FloatingActionButton(
+        onClick = { onFabClickAction?.invoke() },
+        modifier = Modifier.animateFloatingActionButton(
+            visible = currentRoute is Route.Documents
+                    && onFabClickAction != null,
+            alignment = Alignment.BottomEnd,
+        ),
     ) {
-        FloatingActionButton(onClick = { onFabClickAction?.invoke() }) {
-            Icon(Icons.Rounded.Add, contentDescription = null)
-        }
+        Icon(Icons.Rounded.Add, contentDescription = null)
     }
 }
