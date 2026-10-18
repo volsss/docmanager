@@ -11,13 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
-import ru.example.docmanager.data.reference.ReferenceType
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.data.repositories.references.IndividualsRepository
@@ -27,8 +24,6 @@ import ru.example.docmanager.data.repositories.references.SuppliersRepository
 import ru.example.docmanager.di.DocumentProcessor
 import ru.example.docmanager.di.getDocumentProcessor
 import ru.example.docmanager.ui.screens.document.forms.powerOfAttorney.PowerOfAttorneyFormState
-import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
-import kotlin.time.Clock
 
 class PowerOfAttorneyViewModel(
     val repository: PowerOfAttorneyRepository,

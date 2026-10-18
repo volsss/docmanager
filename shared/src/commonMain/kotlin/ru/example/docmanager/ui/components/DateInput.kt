@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.input_supporting_required
 import org.jetbrains.compose.resources.stringResource
+import ru.example.docmanager.ui.parseRussianOrNull
 import ru.example.docmanager.ui.toEpochMillisUtc
 import ru.example.docmanager.ui.toLocalDateFromUtc
-import ru.example.docmanager.ui.parseRussianOrNull
 import ru.example.docmanager.ui.toRussianString
 
 

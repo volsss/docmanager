@@ -27,9 +27,6 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.reference_new_item_button
 import docmanager.shared.generated.resources.reference_save_button
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.Reference
 import ru.example.docmanager.data.reference.ReferenceType

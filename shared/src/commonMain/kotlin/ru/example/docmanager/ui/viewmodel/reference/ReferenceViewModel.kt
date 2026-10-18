@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.Reference
 import ru.example.docmanager.data.reference.ReferenceType
-import ru.example.docmanager.data.repositories.references.*
+import ru.example.docmanager.data.repositories.references.BaseReferenceRepository
+import ru.example.docmanager.data.repositories.references.ReferenceRepository
 import ru.example.docmanager.ui.router.Route
-import kotlin.collections.mapValues
 
 class ReferenceViewModel(
     private val repositories: Map<ReferenceType, BaseReferenceRepository>,
