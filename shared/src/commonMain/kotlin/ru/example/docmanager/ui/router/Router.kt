@@ -5,7 +5,10 @@
 
 package ru.example.docmanager.ui.router
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,13 +27,9 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.ui.screens.SettingsScreen
-import ru.example.docmanager.ui.screens.StartScreen
-import ru.example.docmanager.ui.screens.DocumentScreen
-import ru.example.docmanager.ui.screens.DocumentTypesScreen
-import ru.example.docmanager.ui.screens.DocumentsScreen
-import ru.example.docmanager.ui.screens.ReferenceScreen
-import ru.example.docmanager.ui.screens.ReferencesScreen
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import ru.example.docmanager.ui.screens.*
 
 @Composable
 fun Router(
@@ -89,7 +88,7 @@ private fun RouterContent(
     onBack: () -> Unit,
     navigateToRoot: (Route) -> Unit,
     showSnackbar: (String) -> Unit,
-    registerFabClickAction: (() -> Unit) -> Unit,
+    registerFabClickAction: ((() -> Unit)?) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     onFabClickAction: (() -> Unit)? = null,
@@ -122,7 +121,7 @@ private fun RouterContent(
         RouterNavDisplay(
             backStack = backStack,
             onBack = onBack,
-            onFabClickAction = registerFabClickAction,
+            registerFabClickAction = registerFabClickAction,
             showSnackbar = showSnackbar,
             modifier = Modifier.padding(paddingValues)
         )
@@ -150,7 +149,7 @@ private fun RouterSnackbarHost(
 private fun RouterNavDisplay(
     backStack: NavBackStack<NavKey>,
     onBack: () -> Unit,
-    onFabClickAction: (() -> Unit) -> Unit,
+    registerFabClickAction: ((() -> Unit)?) -> Unit,
     showSnackbar: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -179,7 +178,10 @@ private fun RouterNavDisplay(
                 DocumentsScreen(
                     destination = it,
                     navigateTo = backStack::add,
-                    onFabActionTriggered = onFabClickAction
+                    registerFabClickAction = registerFabClickAction,
+                    viewModel = koinViewModel(key = it.type.name) {
+                        parametersOf(it)
+                    }
                 )
             }
             entry<Route.Document> {
@@ -289,7 +291,7 @@ private fun RouterFloatingActionButton(
         visible = currentRoute is Route.Documents
                 && onFabClickAction != null,
         enter = slideInVertically { it } + fadeIn(),
-        exit = slideOutVertically { it } + fadeOut()
+        exit = ExitTransition.None
     ) {
         FloatingActionButton(onClick = { onFabClickAction?.invoke() }) {
             Icon(Icons.Rounded.Add, contentDescription = null)

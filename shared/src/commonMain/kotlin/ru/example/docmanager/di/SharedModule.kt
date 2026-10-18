@@ -9,6 +9,8 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ru.example.docmanager.data.database.DatabaseManager
@@ -21,15 +23,15 @@ import ru.example.docmanager.data.repositories.references.IndividualsRepository
 import ru.example.docmanager.data.repositories.references.OrganizationsRepository
 import ru.example.docmanager.data.repositories.references.ProductsRepository
 import ru.example.docmanager.data.repositories.references.SuppliersRepository
-import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
 import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
+import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
 import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
 
 val sharedModule = module {
-    singleOf(::ConnectionViewModel)
-    singleOf(::SettingsViewModel)
+    viewModelOf(::ConnectionViewModel)
+    viewModelOf(::SettingsViewModel)
     single<DatabaseManager> { DefaultDatabaseManager() }
 
     singleOf(::MetadataRepository)
@@ -44,7 +46,12 @@ val sharedModule = module {
         getAll<BaseDocumentRepository>().associateBy { it.type }
     }
 
-    singleOf(::DocumentsViewModel)
+    viewModel { params ->
+        DocumentsViewModel(
+            get(),
+            destination = params.get()
+        )
+    }
 
     // TODO:
     singleOf(::ReferenceViewModel)

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import ru.example.docmanager.ui.components.TextInput
 import ru.example.docmanager.ui.viewmodel.settings.SettingsUiState
 import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
@@ -25,7 +25,7 @@ import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = koinInject()
+    viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
 

@@ -5,9 +5,6 @@
 
 package ru.example.docmanager.ui
 
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.format.char
-
 object Utils {
     const val JVM_H2_JDBC = "jdbc:h2:~/ru.example.docmanager/new_project;MODE=MySQL"
     const val ANDROID_H2_JDBC = "jdbc:h2:/data/data/ru.example.docmanager/new_project;MODE=MySQL"

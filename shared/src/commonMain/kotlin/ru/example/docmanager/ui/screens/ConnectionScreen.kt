@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import ru.example.docmanager.di.Platform
 import ru.example.docmanager.di.getPlatform
 import ru.example.docmanager.ui.Utils
@@ -38,7 +38,7 @@ import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
 fun ConnectionScreen(
     onConnect: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ConnectionViewModel = koinInject()
+    viewModel: ConnectionViewModel = koinViewModel()
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -73,7 +73,7 @@ fun ConnectionScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun LoadingContent() {
+private fun LoadingContent() {
     Box(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background),

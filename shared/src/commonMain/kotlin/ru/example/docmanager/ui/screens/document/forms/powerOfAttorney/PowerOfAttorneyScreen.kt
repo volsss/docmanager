@@ -29,13 +29,8 @@ import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.*
 import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.components.DateInput
-import ru.example.docmanager.ui.components.ModalDatePicker
 import ru.example.docmanager.ui.components.TextInput
-import ru.example.docmanager.ui.toRussianString
 import ru.example.docmanager.ui.screens.document.forms.ReferenceDropdown
-import ru.example.docmanager.ui.toEpochMillisUtc
-import ru.example.docmanager.ui.toLocalDateFromUtc
-import ru.example.docmanager.ui.toLocalDateOrNull
 import ru.example.docmanager.ui.viewmodel.PowerOfAttorneyViewModel
 
 @Composable

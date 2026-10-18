@@ -18,7 +18,6 @@ import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
-import ru.example.docmanager.data.repositories.documents.DocumentRepository
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
 import ru.example.docmanager.di.DocumentProcessor
 import ru.example.docmanager.di.getDocumentProcessor

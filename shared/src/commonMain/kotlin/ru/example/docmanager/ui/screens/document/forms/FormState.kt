@@ -13,7 +13,6 @@ import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.reference.Reference
 import ru.example.docmanager.data.reference.ReferenceType
 import ru.example.docmanager.ui.DATE_FORMAT
-import ru.example.docmanager.ui.Utils
 
 abstract class FormState<D : Document, B : BodyItem>(
     protected val today: LocalDate,

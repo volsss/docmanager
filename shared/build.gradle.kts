@@ -34,6 +34,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            // Compose
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -42,22 +43,32 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.compose.materialIconsExtended)
             implementation(libs.compose.uiToolingPreview)
+
+            // Lifecycle and navigation
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation3.ui)
-            implementation(libs.kotlinx.serializationJson)
-            implementation(libs.koin.compose)
 
+            // Koin and Serialization
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.kotlinx.serializationJson)
+
+            // Exposed
             implementation(libs.exposed.core)
             implementation(libs.exposed.dao)
             implementation(libs.exposed.jdbc)
             implementation(libs.exposed.javatime)
             implementation(libs.exposed.migration.core)
             implementation(libs.exposed.migration.jdbc)
-            implementation(libs.poi.ooxml)
-            implementation(libs.koin.core)
+
+            // Databases
             implementation(libs.h2)
             implementation(libs.postgresql)
+
+            // Document processor
+            implementation(libs.poi.ooxml)
         }
     }
 }

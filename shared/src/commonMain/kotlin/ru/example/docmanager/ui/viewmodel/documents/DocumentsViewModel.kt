@@ -7,26 +7,39 @@ package ru.example.docmanager.ui.viewmodel.documents
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.repositories.documents.BaseDocumentRepository
 import ru.example.docmanager.data.repositories.documents.DocumentRepository
+import ru.example.docmanager.ui.router.Route
+import kotlin.time.Duration.Companion.milliseconds
 
 class DocumentsViewModel(
     private val repositories: Map<DocumentType, BaseDocumentRepository>,
+    private val destination: Route.Documents
 ) : ViewModel() {
-    private val _documents = MutableStateFlow<List<Document>>(emptyList())
-    val documents: StateFlow<List<Document>> = _documents
+    val documents: StateFlow<List<Document>?>
+        field = MutableStateFlow<List<Document>?>(null)
 
-    fun loadDocuments(type: DocumentType) {
+    fun reloadDocumentList() {
         viewModelScope.launch {
-            runCatching {
-                (repositories[type] as? DocumentRepository<*>)?.getAllDocuments()
-            }.onSuccess { docs ->
-                _documents.value = docs?.sortedBy { it.header.number } ?: emptyList()
+            delay(280.milliseconds)
+
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    (repositories[destination.type] as? DocumentRepository<*>)
+                        ?.getAllDocuments()
+                }.onSuccess { docs ->
+                    val sortedDocs = docs?.sortedBy { it.header.number } ?: emptyList()
+
+                    documents.value = sortedDocs
+                }
             }
         }
     }
