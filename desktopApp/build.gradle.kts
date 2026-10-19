@@ -42,7 +42,7 @@ compose.desktop {
             packageVersion = "1.1.0"
             description = "A scalable document manager"
             copyright = "Copyright (c) 2026 Andrew Z."
-            licenseFile.set(project.file("LICENSE"))
+            licenseFile.set(project.parent!!.file("LICENSE"))
 
             modules(
                 "java.instrument",
