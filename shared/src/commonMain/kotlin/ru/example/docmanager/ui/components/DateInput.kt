@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_input_required
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.ui.parseRussianOrNull
-import ru.example.docmanager.ui.toEpochMillisUtc
-import ru.example.docmanager.ui.toLocalDateFromUtc
-import ru.example.docmanager.ui.toRussianString
+import ru.example.docmanager.ui.utils.parseRussianOrNull
+import ru.example.docmanager.ui.utils.toEpochMillisUtc
+import ru.example.docmanager.ui.utils.toLocalDateFromUtc
+import ru.example.docmanager.ui.utils.toRussianString
 
 
 @Composable

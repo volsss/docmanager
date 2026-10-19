@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui
+package ru.example.docmanager.ui.utils
 
 object Utils {
     const val JVM_H2_JDBC = "jdbc:h2:~/ru.example.docmanager/new_project;MODE=MySQL"
@@ -12,6 +12,4 @@ object Utils {
 
     const val H2_DRIVER = "org.h2.Driver"
     const val POSTGRES_DRIVER = "org.postgresql.Driver"
-
-    const val WIDE_BREAKPOINT = 840
 }

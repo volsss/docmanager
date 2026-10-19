@@ -15,13 +15,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.ui.Utils
+import ru.example.docmanager.ui.utils.applyAdaptive
 
 @Composable
 fun ReferenceInput(
@@ -30,9 +29,6 @@ fun ReferenceInput(
     onFieldChange: (itemId: Int, headerFieldType: ru.example.docmanager.data.document.header.HeaderFieldType, newValue: String) -> Unit,
     onRemove: () -> Unit
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
-    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -43,7 +39,10 @@ fun ReferenceInput(
         item.toMap().forEach { (type, value) ->
             OutlinedTextField(
                 label = { Text(stringResource(type.stringResource)) },
-                modifier = if (isWide) Modifier.weight(1f) else Modifier.widthIn(min = 300.dp),
+                modifier = Modifier.applyAdaptive(
+                    whenWide = Modifier.weight(1f),
+                    whenNotWide = Modifier.widthIn(min = 300.dp)
+                ),
                 value = currentValues[type] ?: value,
                 onValueChange = { newValue ->
                     onFieldChange(

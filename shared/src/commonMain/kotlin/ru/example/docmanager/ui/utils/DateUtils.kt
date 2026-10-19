@@ -3,7 +3,7 @@
  * docmanager — a scalable document management system.
  */
 
-package ru.example.docmanager.ui
+package ru.example.docmanager.ui.utils
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone

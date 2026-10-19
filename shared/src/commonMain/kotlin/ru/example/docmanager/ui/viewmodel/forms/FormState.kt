@@ -10,7 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
 import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.ui.toRussianString
+import ru.example.docmanager.ui.utils.toRussianString
 
 abstract class FormState<D : Document, B : BodyItem>(
     open val today: LocalDate,

@@ -14,7 +14,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,9 +29,9 @@ import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.Reference
 import ru.example.docmanager.data.reference.ReferenceType
-import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.components.ReferenceInput
 import ru.example.docmanager.ui.router.Route
+import ru.example.docmanager.ui.utils.applyAdaptive
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceUiState
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
 
@@ -134,14 +133,11 @@ fun ReferenceItems(
     onDelete: (Reference) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
-    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
-
     LazyColumn(
-        modifier = modifier.fillMaxSize().then(
-            if (isWide) Modifier
-            else Modifier.horizontalScroll(rememberScrollState())
-        ),
+        modifier = modifier.fillMaxSize()
+            .applyAdaptive(
+                whenNotWide = Modifier.horizontalScroll(rememberScrollState())
+            ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(
@@ -162,8 +158,8 @@ fun ReferenceItems(
 fun ReferenceActions(
     onSave: () -> Unit,
     onNew: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),

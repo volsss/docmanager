@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,10 +30,10 @@ import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
-import ru.example.docmanager.ui.Utils
 import ru.example.docmanager.ui.components.DateInput
 import ru.example.docmanager.ui.components.ReferenceDropdown
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.utils.applyAdaptive
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyBodyItemState
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyUiState
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyViewModel
@@ -210,9 +209,6 @@ private fun PowerOfAttorneyBodySection(
     products: List<Product>,
     modifier: Modifier = Modifier
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
-    val isWide = windowSizeClass.isWidthAtLeastBreakpoint(Utils.WIDE_BREAKPOINT)
-
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -224,8 +220,8 @@ private fun PowerOfAttorneyBodySection(
         )
 
         Column(
-            Modifier.fillMaxSize().then(
-                if (isWide) Modifier else Modifier.horizontalScroll(rememberScrollState())
+            Modifier.fillMaxSize().applyAdaptive(
+                whenWide = Modifier.horizontalScroll(rememberScrollState())
             )
         ) {
             formState.bodyItems.forEachIndexed { index, item ->
@@ -234,8 +230,7 @@ private fun PowerOfAttorneyBodySection(
                     item = item,
                     products = products,
                     onItemChange = { updated -> formState.updateBodyItem(index, updated) },
-                    onDelete = { formState.removeBodyItem(index) },
-                    isWide = isWide
+                    onDelete = { formState.removeBodyItem(index) }
                 )
             }
         }
@@ -257,8 +252,7 @@ private fun BodyItemRow(
     item: PowerOfAttorneyBodyItemState,
     products: List<Product>,
     onItemChange: (PowerOfAttorneyBodyItemState) -> Unit,
-    onDelete: () -> Unit,
-    isWide: Boolean
+    onDelete: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -277,7 +271,10 @@ private fun BodyItemRow(
             itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
             onValueChange = { onItemChange(item.copy(product = it)) },
             label = stringResource(Res.string.input_product),
-            modifier = if (isWide) Modifier.weight(2f) else Modifier.widthIn(min = 300.dp)
+            modifier = Modifier.applyAdaptive(
+                whenWide = Modifier.weight(2f),
+                whenNotWide = Modifier.widthIn(min = 300.dp)
+            )
         )
 
         OutlinedTextField(
@@ -285,7 +282,10 @@ private fun BodyItemRow(
             onValueChange = { onItemChange(item.copy(unit = it)) },
             label = { Text(stringResource(Res.string.body_field_unit)) },
             singleLine = true,
-            modifier = if (isWide) Modifier.weight(1f) else Modifier.widthIn(min = 150.dp)
+            modifier = Modifier.applyAdaptive(
+                whenWide = Modifier.weight(1f),
+                whenNotWide = Modifier.widthIn(min = 150.dp)
+            )
         )
 
         OutlinedTextField(
@@ -293,7 +293,10 @@ private fun BodyItemRow(
             onValueChange = { onItemChange(item.copy(count = it)) },
             label = { Text(stringResource(Res.string.body_field_count)) },
             singleLine = true,
-            modifier = if (isWide) Modifier.weight(1.5f) else Modifier.widthIn(min = 300.dp)
+            modifier = Modifier.applyAdaptive(
+                whenWide = Modifier.weight(1.5f),
+                whenNotWide = Modifier.widthIn(min = 300.dp)
+            )
         )
 
         IconButton(onClick = onDelete) {

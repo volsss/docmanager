@@ -11,7 +11,7 @@ import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Supplier
-import ru.example.docmanager.ui.toRussianString
+import ru.example.docmanager.ui.utils.toRussianString
 
 data class PowerOfAttorneyHeader(
     override val id: Int,

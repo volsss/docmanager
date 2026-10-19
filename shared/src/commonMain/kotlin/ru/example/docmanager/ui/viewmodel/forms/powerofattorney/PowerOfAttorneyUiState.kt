@@ -18,8 +18,8 @@ import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
-import ru.example.docmanager.ui.DATE_FORMAT
-import ru.example.docmanager.ui.toRussianString
+import ru.example.docmanager.ui.utils.DATE_FORMAT
+import ru.example.docmanager.ui.utils.toRussianString
 import ru.example.docmanager.ui.viewmodel.forms.FormState
 import kotlin.time.Clock
 

@@ -28,7 +28,7 @@ import docmanager.shared.generated.resources.documents_empty_new_button
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
-import ru.example.docmanager.ui.DATE_FORMAT
+import ru.example.docmanager.ui.utils.DATE_FORMAT
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 
