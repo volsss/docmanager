@@ -11,8 +11,6 @@
 
 package ru.example.docmanager.data.repositories.documents
 
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toKotlinLocalDate
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.*
@@ -41,8 +39,8 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
             val headerId = PowerOfAttorneyHeadersTable.insertAndGetId {
                 it[organizationId] = document.header.organization.id
                 it[number] = document.header.number
-                it[dischargeDate] = document.header.dischargeDate.toJavaLocalDate()
-                it[endDate] = document.header.endDate.toJavaLocalDate()
+                it[dischargeDate] = document.header.dischargeDate
+                it[endDate] = document.header.endDate
                 it[individualId] = document.header.individual.id
                 it[supplierId] = document.header.supplier.id
                 it[supplierAgreement] = document.header.supplierAgreement
@@ -64,8 +62,8 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
             }) {
                 it[organizationId] = document.header.organization.id
                 it[number] = document.header.number
-                it[dischargeDate] = document.header.dischargeDate.toJavaLocalDate()
-                it[endDate] = document.header.endDate.toJavaLocalDate()
+                it[dischargeDate] = document.header.dischargeDate
+                it[endDate] = document.header.endDate
                 it[individualId] = document.header.individual.id
                 it[supplierId] = document.header.supplier.id
                 it[supplierAgreement] = document.header.supplierAgreement
@@ -117,7 +115,7 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
                 series = it[IndividualsTable.series],
                 number = it[IndividualsTable.number],
                 issued = it[IndividualsTable.issued],
-                date = it[IndividualsTable.date].toKotlinLocalDate()
+                date = it[IndividualsTable.date]
             )
         }
         val supMap = SuppliersTable.selectAll().associate {
@@ -141,10 +139,8 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
                     organization = orgMap[headerRow[PowerOfAttorneyHeadersTable.organizationId]]
                         ?: Organization(),
                     number = headerRow[PowerOfAttorneyHeadersTable.number],
-                    dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate]
-                        .toKotlinLocalDate(),
-                    endDate = headerRow[PowerOfAttorneyHeadersTable.endDate]
-                        .toKotlinLocalDate(),
+                    dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate],
+                    endDate = headerRow[PowerOfAttorneyHeadersTable.endDate],
                     individual = indMap[headerRow[PowerOfAttorneyHeadersTable.individualId]]
                         ?: Individual(),
                     supplier = supMap[headerRow[PowerOfAttorneyHeadersTable.supplierId]]
@@ -218,7 +214,7 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
                     series = it[IndividualsTable.series],
                     number = it[IndividualsTable.number],
                     issued = it[IndividualsTable.issued],
-                    date = it[IndividualsTable.date].toKotlinLocalDate()
+                    date = it[IndividualsTable.date]
                 )
             } ?: Individual()
 
@@ -234,8 +230,8 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
                     id = id,
                     organization = organization,
                     number = headerRow[PowerOfAttorneyHeadersTable.number],
-                    dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate].toKotlinLocalDate(),
-                    endDate = headerRow[PowerOfAttorneyHeadersTable.endDate].toKotlinLocalDate(),
+                    dischargeDate = headerRow[PowerOfAttorneyHeadersTable.dischargeDate],
+                    endDate = headerRow[PowerOfAttorneyHeadersTable.endDate],
                     individual = individual,
                     supplier = supplier,
                     supplierAgreement = headerRow[PowerOfAttorneyHeadersTable.supplierAgreement]

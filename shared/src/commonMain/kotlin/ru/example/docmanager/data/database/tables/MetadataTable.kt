@@ -12,7 +12,7 @@
 package ru.example.docmanager.data.database.tables
 
 import org.jetbrains.exposed.v1.core.Table
-import org.jetbrains.exposed.v1.javatime.date
+import org.jetbrains.exposed.v1.datetime.date
 
 object MetadataTable : Table("metadata") {
     val id = integer("id").autoIncrement()

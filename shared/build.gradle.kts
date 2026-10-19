@@ -65,7 +65,7 @@ kotlin {
             implementation(libs.exposed.core)
             implementation(libs.exposed.dao)
             implementation(libs.exposed.jdbc)
-            implementation(libs.exposed.javatime)
+            implementation(libs.exposed.kotlin.datetime)
             implementation(libs.exposed.migration.core)
             implementation(libs.exposed.migration.jdbc)
 

@@ -12,7 +12,6 @@
 package ru.example.docmanager.data.database
 
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.todayIn
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
@@ -61,9 +60,7 @@ class DefaultDatabaseManager : DatabaseManager {
                 MetadataTable.insert {
                     it[name] = "Новый проект"
                     it[version] = "1.0"
-                    it[creationDate] = Clock.System.todayIn(
-                        TimeZone.currentSystemDefault()
-                    ).toJavaLocalDate()
+                    it[creationDate] = Clock.System.todayIn(TimeZone.currentSystemDefault())
                     it[author] = "Пользователь"
                 }
             }

@@ -11,8 +11,6 @@
 
 package ru.example.docmanager.data.repositories.references
 
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toKotlinLocalDate
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
@@ -34,7 +32,7 @@ class IndividualsRepository : ReferenceRepository<Individual>("individuals") {
         series = this[IndividualsTable.series],
         number = this[IndividualsTable.number],
         issued = this[IndividualsTable.issued],
-        date = this[IndividualsTable.date].toKotlinLocalDate()
+        date = this[IndividualsTable.date]
     )
 
     override suspend fun getItem(id: Int): Individual = dbQuery {
@@ -55,7 +53,7 @@ class IndividualsRepository : ReferenceRepository<Individual>("individuals") {
                 it[series] = item.series
                 it[number] = item.number
                 it[issued] = item.issued
-                it[date] = item.date.toJavaLocalDate()
+                it[date] = item.date
             }.value
             item.id = newId
             item
@@ -68,7 +66,7 @@ class IndividualsRepository : ReferenceRepository<Individual>("individuals") {
             it[series] = item.series
             it[number] = item.number
             it[issued] = item.issued
-            it[date] = item.date.toJavaLocalDate()
+            it[date] = item.date
         }
     }
 
