@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -216,7 +217,11 @@ private fun RouterTopBar(
 ) {
     TopAppBar(
         navigationIcon = {
-            if (canGoBack) {
+            AnimatedVisibility (
+                visible = canGoBack,
+                enter = expandHorizontally(),
+                exit = shrinkHorizontally()
+            ) {
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
@@ -226,7 +231,21 @@ private fun RouterTopBar(
             }
         },
         title = {
-            Text(text = stringResource(currentRoute.stringResource))
+            Text(
+                text = when (currentRoute) {
+                    is Route.Reference -> {
+                        stringResource(currentRoute.type.stringResource)
+                    }
+                    is Route.Documents -> {
+                        stringResource(currentRoute.type.stringResource)
+                    }
+                    is Route.Form -> {
+                        stringResource(currentRoute.type.stringResource)
+                    }
+                    else -> stringResource(currentRoute.stringResource)
+                },
+                fontWeight = FontWeight.Medium
+            )
         }
     )
 }

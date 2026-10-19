@@ -49,6 +49,8 @@
     <string name="reference_products">Материальные ценности</string>
     <string name="reference_suppliers">Поставщики</string>
 
+    <string name="form_of">Форма %1$s</string>
+
     <string name="header">Шапка документа</string>
     <string name="body">Тело документа</string>
 
