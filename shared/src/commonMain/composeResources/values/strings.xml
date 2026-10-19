@@ -1,6 +1,12 @@
 <!--
   ~ Copyright (c) 2026 Andrew Z.
   ~ docmanager — a scalable document management system.
+  ~
+  ~ This program is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License v3.0.
+  ~
+  ~ Distributed WITHOUT ANY WARRANTY. See the GNU General Public License
+  ~ for more details: <https://gnu.org>
   -->
 
 <resources>
@@ -48,8 +54,6 @@
     <string name="reference_organizations">Организации</string>
     <string name="reference_products">Материальные ценности</string>
     <string name="reference_suppliers">Поставщики</string>
-
-    <string name="form_of">Форма %1$s</string>
 
     <string name="header">Шапка документа</string>
     <string name="body">Тело документа</string>
