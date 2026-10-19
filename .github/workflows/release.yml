@@ -162,7 +162,7 @@ jobs:
           archive: false
           if-no-files-found: error
 
-  linux:
+  linux-deb:
     runs-on: ubuntu-latest
     needs: init
     steps:
@@ -206,6 +206,53 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           path: desktopApp/build/compose/binaries/main/deb/${{ needs.init.outputs.prefix }}-linux-x64.deb
+          archive: false
+          if-no-files-found: error
+
+  linux-rpm:
+    runs-on: ubuntu-latest
+    needs: init
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: latest
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Kotlin Native Compiler
+        uses: actions/cache@v6
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-
+            ${{ runner.os }}-konan-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build RPM Package
+        run: ./gradlew :desktopApp:packageRpm
+
+      - name: Name RPM Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rpm="$(find desktopApp/build/compose/binaries/main/rpm -maxdepth 1 -type f -name '*.rpm' | head -n 1)"
+          test -n "$rpm" || { echo "No RPM found"; exit 1; }
+          mv "$rpm" "desktopApp/build/compose/binaries/main/rpm/${{ needs.init.outputs.prefix }}-linux-x64.rpm"
+
+      - name: Upload RPM Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: desktopApp/build/compose/binaries/main/rpm/${{ needs.init.outputs.prefix }}-linux-x64.rpm
           archive: false
           if-no-files-found: error
 

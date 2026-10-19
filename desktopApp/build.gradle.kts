@@ -29,6 +29,7 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "ru.example.docmanager.MainKt"
+        jvmArgs += listOf("-Xmx2G")
 
         buildTypes.release.proguard {
             configurationFiles.from(project.file("proguard-rules.pro"))
@@ -37,18 +38,26 @@ compose.desktop {
         }
 
         nativeDistributions {
-            modules("java.sql", "java.naming")
+            packageName = "docmanager"
+            packageVersion = "1.1.0"
+            description = "A scalable document manager"
+            copyright = "Copyright (c) 2026 Andrew Z."
+            licenseFile.set(project.file("LICENSE"))
+
+            modules(
+                "java.instrument",
+                "java.security.jgss",
+                "java.sql",
+                "java.xml.crypto",
+                "jdk.unsupported"
+            )
 
             targetFormats (
                 TargetFormat.Dmg,
                 TargetFormat.Msi,
-                TargetFormat.Exe,
+                TargetFormat.Rpm,
                 TargetFormat.Deb
             )
-            packageName = "docmanager"
-            packageVersion = "1.1.0"
-
-            description = "A scalable document manager"
 
             appResourcesRootDir.set(
                 project.layout.projectDirectory.dir("src/main/resources")
