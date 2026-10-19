@@ -14,8 +14,8 @@ package ru.example.docmanager.ui.components
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.component_datepicker_dismiss_button
 import docmanager.shared.generated.resources.component_datepicker_confirm_button
+import docmanager.shared.generated.resources.component_datepicker_dismiss_button
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)

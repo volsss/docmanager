@@ -34,8 +34,9 @@ import docmanager.shared.generated.resources.documents_empty_new_button
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
-import ru.example.docmanager.ui.utils.DATE_FORMAT
 import ru.example.docmanager.ui.router.Route
+import ru.example.docmanager.ui.utils.adaptiveWidth
+import ru.example.docmanager.ui.utils.toRussianString
 import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 
 @Composable
@@ -79,12 +80,17 @@ fun DocumentsScreen(
         }
 
         else -> {
-            DocumentsContent(
-                documentType = destination.type,
-                documents = documents!!,
-                navigateTo = navigateTo,
-                modifier = modifier,
-            )
+            Column(
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DocumentsContent(
+                    documentType = destination.type,
+                    documents = documents!!,
+                    navigateTo = navigateTo,
+                    modifier = modifier.adaptiveWidth(),
+                )
+            }
         }
     }
 }
@@ -98,8 +104,7 @@ private fun DocumentsContent(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
-            .padding(horizontal = 16.dp)
+        modifier = modifier.fillMaxHeight().padding(horizontal = 16.dp)
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
@@ -130,19 +135,19 @@ private fun DocumentsContent(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clip(MaterialShapes.Slanted.toShape())
-                                .background(MaterialTheme.colorScheme.secondary),
+                                .background(MaterialTheme.colorScheme.secondaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = document.header.number.toString().take(3),
-                                color = MaterialTheme.colorScheme.onSecondary
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
                     },
                     supportingContent = {
                         Text(
                             text = "от ${
-                                DATE_FORMAT.format(document.header.dischargeDate)
+                                document.header.dischargeDate.toRussianString()
                             }"
                         )
                     }

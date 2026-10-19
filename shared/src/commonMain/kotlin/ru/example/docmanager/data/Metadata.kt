@@ -11,9 +11,11 @@
 
 package ru.example.docmanager.data
 
+import kotlinx.datetime.LocalDate
+
 data class Metadata(
     val name: String,
     val version: String,
-    val creationDate: String,
+    val creationDate: LocalDate,
     val author: String
 )

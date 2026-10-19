@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,7 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import ru.example.docmanager.ui.components.DateInput
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.viewmodel.settings.SettingsUiState
 import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
 
@@ -36,14 +39,19 @@ fun SettingsScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SettingsContent(
-        state = state,
-        onProjectNameChanged = viewModel::onProjectNameChanged,
-        onVersionChanged = viewModel::onVersionChanged,
-        onAuthorChanged = viewModel::onAuthorChanged,
-        onSave = viewModel::save,
-        modifier = modifier
-    )
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        SettingsContent(
+            state = state,
+            onProjectNameChanged = viewModel::onProjectNameChanged,
+            onVersionChanged = viewModel::onVersionChanged,
+            onAuthorChanged = viewModel::onAuthorChanged,
+            onSave = viewModel::save,
+            modifier = modifier.adaptiveWidth()
+        )
+    }
 }
 
 @Composable
@@ -56,7 +64,8 @@ fun SettingsContent(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(16.dp)
+        modifier = modifier.fillMaxHeight()
+            .padding(16.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -78,7 +87,7 @@ fun SettingsContent(
             label = stringResource(Res.string.settings_field_author),
             modifier = Modifier.fillMaxWidth()
         )
-        TextInput(
+        DateInput(
             value = state.creationDate,
             onValueChange = { },
             label = stringResource(Res.string.settings_field_creation_date),

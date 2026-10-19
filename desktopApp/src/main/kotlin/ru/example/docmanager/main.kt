@@ -34,7 +34,7 @@ fun main() {
             onCloseRequest = ::exitApplication,
             state = rememberWindowState(
                 position = WindowPosition.Aligned(Alignment.Center),
-                width = 1000.dp,
+                width = 1300.dp,
                 height = 800.dp
             ),
             title = "docmanager",

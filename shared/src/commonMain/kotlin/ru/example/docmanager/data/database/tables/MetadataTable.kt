@@ -12,12 +12,13 @@
 package ru.example.docmanager.data.database.tables
 
 import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.javatime.date
 
 object MetadataTable : Table("metadata") {
     val id = integer("id").autoIncrement()
     val name = varchar("name", 255)
     val version = varchar("version", 50)
-    val creationDate = varchar("creation_date", 50)
+    val creationDate = date("creation_date")
     val author = varchar("author", 255)
     override val primaryKey = PrimaryKey(id)
 }

@@ -12,11 +12,7 @@
 package ru.example.docmanager.ui.utils
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+
+@Composable
+fun Modifier.adaptiveWidth(): Modifier {
+    return this.widthIn(max = 891.dp).fillMaxWidth()
+}
 
 @Composable
 fun Modifier.applyAdaptive(
@@ -44,20 +45,17 @@ fun Modifier.applyAdaptive(
 @PreviewScreenSizes
 @Composable
 fun TestAdaptive() {
-    Column (
+    Column(
         modifier = Modifier.fillMaxSize().background(Color.Red),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxHeight()
+                .adaptiveWidth()
                 .applyAdaptive(
-                    whenWide = Modifier
-                        .widthIn(445.dp)
-                        .background(Color.Blue),
-                    whenNotWide = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Cyan)
+                    whenWide = Modifier.background(Color.Blue),
+                    whenNotWide = Modifier.background(Color.Cyan)
                 )
         ) { }
     }

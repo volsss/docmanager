@@ -39,6 +39,7 @@ import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.ui.components.DateInput
 import ru.example.docmanager.ui.components.ReferenceDropdown
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.utils.applyAdaptive
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyBodyItemState
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyUiState
@@ -70,7 +71,7 @@ fun PowerOfAttorneyScreen(
     }
 
     Column(
-        modifier = Modifier.widthIn(max = 800.dp).fillMaxWidth(),
+        modifier = Modifier.adaptiveWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

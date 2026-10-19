@@ -15,7 +15,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.fastFilteredMap
-import kotlinx.datetime.*
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBody
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBodyItem
@@ -24,8 +27,6 @@ import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
-import ru.example.docmanager.ui.utils.DATE_FORMAT
-import ru.example.docmanager.ui.utils.toRussianString
 import ru.example.docmanager.ui.viewmodel.forms.FormState
 import kotlin.time.Clock
 
@@ -38,7 +39,7 @@ data class PowerOfAttorneyUiState(
     Clock.System.todayIn(TimeZone.currentSystemDefault())
 ) {
     val defaultEndDate = today.plus(DatePeriod(days = 30))
-    var endDate by mutableStateOf(defaultEndDate.toRussianString())
+    var endDate by mutableStateOf(defaultEndDate)
     var selectedOrganization by mutableStateOf<Organization?>(null)
     var selectedIndividual by mutableStateOf<Individual?>(null)
     var selectedSupplier by mutableStateOf<Supplier?>(null)
@@ -56,8 +57,8 @@ data class PowerOfAttorneyUiState(
             (existingDocuments.maxOfOrNull { it.header.number } ?: 0) + 1
         } else 1
         number = nextNumber.toString()
-        dischargeDate = today.toRussianString()
-        endDate = defaultEndDate.toRussianString()
+        dischargeDate = today
+        endDate = defaultEndDate
         selectedOrganization = organizations.firstOrNull()
         selectedIndividual = individuals.firstOrNull()
         selectedSupplier = suppliers.firstOrNull()
@@ -71,8 +72,8 @@ data class PowerOfAttorneyUiState(
     ) {
         selectedDocumentId = document.header.id
         number = document.header.number.toString()
-        dischargeDate = document.header.dischargeDate.toRussianString()
-        endDate = document.header.endDate.toRussianString()
+        dischargeDate = document.header.dischargeDate
+        endDate = document.header.endDate
         selectedOrganization =
             organizations.firstOrNull {
                 it.id == document.header.organization.id
@@ -107,28 +108,12 @@ data class PowerOfAttorneyUiState(
         val ind = selectedIndividual ?: return null
         val sup = selectedSupplier ?: return null
 
-        val dis = runCatching {
-            DATE_FORMAT.parse(dischargeDate)
-        }.getOrElse {
-            runCatching {
-                LocalDate.parse(dischargeDate)
-            }.getOrElse { today }
-        }
-
-        val end = runCatching {
-            DATE_FORMAT.parse(endDate)
-        }.getOrElse {
-            runCatching {
-                LocalDate.parse(endDate)
-            }.getOrElse { defaultEndDate }
-        }
-
         val header = PowerOfAttorneyHeader(
             id = selectedDocumentId ?: 0,
             organization = org,
             number = number.toIntOrNull() ?: 0,
-            dischargeDate = dis,
-            endDate = end,
+            dischargeDate = dischargeDate,
+            endDate = endDate,
             individual = ind,
             supplier = sup,
             supplierAgreement = supplierAgreement

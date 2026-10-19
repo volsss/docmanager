@@ -16,14 +16,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
 import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.ui.utils.toRussianString
 
 abstract class FormState<D : Document, B : BodyItem>(
     open val today: LocalDate,
 ) {
     var existingDocuments by mutableStateOf<List<D>>(emptyList())
     var selectedDocumentId by mutableStateOf<Int?>(null)
-    var numberDropdownExpanded by mutableStateOf(false)
 
     val isEditing: Boolean
         get() = selectedDocumentId != null
@@ -31,7 +29,7 @@ abstract class FormState<D : Document, B : BodyItem>(
     var statusMessage by mutableStateOf<String?>(null)
 
     var number by mutableStateOf("1")
-    var dischargeDate by mutableStateOf(today.toRussianString())
+    var dischargeDate by mutableStateOf(today)
 
     var bodyItems: List<B> by mutableStateOf(emptyList())
 

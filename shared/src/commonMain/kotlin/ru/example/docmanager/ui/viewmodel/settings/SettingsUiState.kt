@@ -11,9 +11,11 @@
 
 package ru.example.docmanager.ui.viewmodel.settings
 
+import kotlinx.datetime.LocalDate
+
 data class SettingsUiState(
     val projectName: String = "",
     val version: String = "",
     val author: String = "",
-    val creationDate: String = ""
+    val creationDate: LocalDate = LocalDate(1970, 1, 1)
 )

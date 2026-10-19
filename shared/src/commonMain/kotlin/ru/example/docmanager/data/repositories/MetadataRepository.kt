@@ -11,6 +11,8 @@
 
 package ru.example.docmanager.data.repositories
 
+import kotlinx.datetime.toJavaLocalDate
+import kotlinx.datetime.toKotlinLocalDate
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.data.Metadata
@@ -23,7 +25,7 @@ class MetadataRepository {
         Metadata(
             name = row[MetadataTable.name],
             version = row[MetadataTable.version],
-            creationDate = row[MetadataTable.creationDate],
+            creationDate = row[MetadataTable.creationDate].toKotlinLocalDate(),
             author = row[MetadataTable.author]
         )
     }
@@ -32,7 +34,7 @@ class MetadataRepository {
         MetadataTable.update {
             it[name] = metadata.name
             it[version] = metadata.version
-            it[creationDate] = metadata.creationDate
+            it[creationDate] = metadata.creationDate.toJavaLocalDate()
             it[author] = metadata.author
         }
     }

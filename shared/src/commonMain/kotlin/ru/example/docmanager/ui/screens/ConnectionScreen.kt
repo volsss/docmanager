@@ -35,10 +35,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import ru.example.docmanager.di.Platform
 import ru.example.docmanager.di.getPlatform
-import ru.example.docmanager.ui.utils.Utils
 import ru.example.docmanager.ui.components.Dropdown
 import ru.example.docmanager.ui.components.DropdownMode
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.utils.Utils
 import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
 
 @Composable
