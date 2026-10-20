@@ -34,8 +34,8 @@
   - [⚠️ Практическое задание ](lab6/practice.md)
 ---
 - [Лабораторная работа 7](lab7/)
-  - [⚠️ Теория Android I](lab7/android-1.md)
-  - [⚠️ Теория Android II](lab7/android-2.md)
+  - [Multiplatform I](lab7/multiplatform-1.md)
+  - [Multiplatform II](lab7/multiplatform-2.md)
   - [⚠️ Практическое задание ](lab6/practice.md)
 ---
 - [Лабораторная работа 8](lab8/)
