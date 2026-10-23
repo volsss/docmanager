@@ -34,13 +34,14 @@
   - [⚠️ Практическое задание ](lab6/practice.md)
 ---
 - [Лабораторная работа 7](lab7/)
-  - [Multiplatform I](lab7/multiplatform-1.md)
-  - [Multiplatform II](lab7/multiplatform-2.md)
-  - [⚠️ Практическое задание ](lab6/practice.md)
+  - [⚠️ Теория Compose I](lab7/compose-1.md)
+  - [⚠️ Теория Compose II](lab7/compose-2.md)
+  - [⚠️ Практическое задание ](lab7/practice.md)
 ---
 - [Лабораторная работа 8](lab8/)
-  - [⚠️ Теория Compose I](lab8/compose-1.md)
-  - [⚠️ Теория Compose II](lab8/compose-2.md)
-  - [⚠️ Практическое задание ](lab8/practice.md)
+  - [Знакомство KMP](lab8/multiplatform-1.md)
+  - [CMP и Jetpack Compose](lab8/multiplatform-and-jetpack.md)
+  - [Создание приложения](lab8/multiplatform-2.md)
+  - [⚠️ Практическое задание ](lab6/practice.md)
 ---
 * [GitHub](https://github.com/volsss/docmanager)
