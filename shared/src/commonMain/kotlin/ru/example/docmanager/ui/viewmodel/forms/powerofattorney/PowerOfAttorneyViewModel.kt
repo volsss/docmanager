@@ -39,13 +39,8 @@ class PowerOfAttorneyViewModel(
     val uiState: StateFlow<PowerOfAttorneyUiState>
         field = MutableStateFlow(PowerOfAttorneyUiState())
 
-    private val _documents =
-        MutableStateFlow<List<PowerOfAttorney>>(emptyList())
-    val documents: StateFlow<List<PowerOfAttorney>> =
-        _documents.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    val isLoading: StateFlow<Boolean>
+        field = MutableStateFlow(true)
 
     fun loadInitialData(document: Document? = null) {
         viewModelScope.launch {
@@ -54,14 +49,13 @@ class PowerOfAttorneyViewModel(
     }
 
     suspend fun loadInitialDataSuspend(document: Document? = null) {
+        isLoading.value = true
         uiState.value = uiState.value.copy(
             individuals = individualsRepository.getItems(),
             suppliers = suppliersRepository.getItems(),
             organizations = organizationsRepository.getItems(),
             products = productsRepository.getItems()
         )
-
-        reloadDocumentsSuspend()
 
         if (document != null) {
             if (document is PowerOfAttorney) {
@@ -72,24 +66,7 @@ class PowerOfAttorneyViewModel(
         } else {
             uiState.value.resetForm()
         }
-    }
-
-    fun reloadDocuments() {
-        viewModelScope.launch {
-            reloadDocumentsSuspend()
-        }
-    }
-
-    suspend fun reloadDocumentsSuspend() {
-        _isLoading.value = true
-        runCatching {
-            val list = repository.getAllDocuments()
-            _documents.value = list
-            uiState.value.existingDocuments = list
-        }.onFailure { e ->
-            uiState.value.statusMessage = "Ошибка при загрузке документов: ${e.message}"
-        }
-        _isLoading.value = false
+        isLoading.value = false
     }
 
     fun saveDocument(onDocumentSaved: (() -> Unit)? = null) {
@@ -105,7 +82,7 @@ class PowerOfAttorneyViewModel(
             return
         }
 
-        _isLoading.value = true
+        isLoading.value = true
         runCatching {
             if (uiState.value.isEditing) {
                 repository.updateDocument(document)
@@ -114,12 +91,11 @@ class PowerOfAttorneyViewModel(
                 repository.createDocument(document)
                 uiState.value.statusMessage = "Документ № ${document.header.number} успешно сохранен в базу данных"
             }
-            reloadDocumentsSuspend()
             onDocumentSaved?.invoke()
         }.onFailure { e ->
             uiState.value.statusMessage = "Ошибка при сохранении: ${e.message}"
         }
-        _isLoading.value = false
+        isLoading.value = false
     }
 
     fun saveAsNewDocument(onDocumentSaved: (() -> Unit)? = null) {
@@ -135,17 +111,16 @@ class PowerOfAttorneyViewModel(
             return
         }
 
-        _isLoading.value = true
+        isLoading.value = true
         runCatching {
             repository.createDocument(document)
             uiState.value.statusMessage = "Документ № ${document.header.number} сохранен как новый"
             uiState.value.selectedDocumentId = null
-            reloadDocumentsSuspend()
             onDocumentSaved?.invoke()
         }.onFailure { e ->
             uiState.value.statusMessage = "Ошибка при сохранении: ${e.message}"
         }
-        _isLoading.value = false
+        isLoading.value = false
     }
 
     fun deleteCurrentDocument(onDocumentDeleted: (() -> Unit)? = null) {
@@ -156,17 +131,16 @@ class PowerOfAttorneyViewModel(
 
     suspend fun deleteCurrentDocumentSuspend(onDocumentDeleted: (() -> Unit)? = null) {
         val docId = uiState.value.selectedDocumentId ?: return
-        _isLoading.value = true
+        isLoading.value = true
         runCatching {
             repository.deleteDocument(docId)
             uiState.value.statusMessage = "Документ удален из базы данных"
             resetForm()
-            reloadDocumentsSuspend()
             onDocumentDeleted?.invoke()
         }.onFailure { e ->
             uiState.value.statusMessage = "Ошибка при удалении: ${e.message}"
         }
-        _isLoading.value = false
+        isLoading.value = false
     }
 
     fun exportToFile() {

@@ -22,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -101,7 +102,7 @@ private fun RouterContent(
     onFabClickAction: (() -> Unit)? = null,
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = {
             RouterTopBar(
                 currentRoute = currentRoute,
@@ -119,10 +120,23 @@ private fun RouterContent(
             )
         },
         floatingActionButton = {
-            RouterFloatingActionButton(
-                currentRoute = currentRoute,
-                onFabClickAction = onFabClickAction
-            )
+            when (currentRoute) {
+                is Route.Documents -> {
+                    RouterFloatingActionButton(
+                        onFabClickAction = onFabClickAction,
+                        label = "Новый документ"
+                    )
+                }
+
+                is Route.Form -> {
+                    RouterFloatingActionButton(
+                        onFabClickAction = onFabClickAction,
+                        label = "Новый элемент"
+                    )
+                }
+
+                else -> {}
+            }
         }
     ) { paddingValues ->
         RouterNavDisplay(
@@ -193,7 +207,10 @@ private fun RouterNavDisplay(
             }
             entry<Route.Form> {
                 FormScreen(
-                    destination = it
+                    destination = it,
+                    onStatusMessage = showSnackbar,
+                    navigateTo = backStack::add,
+                    registerFabClickAction = registerFabClickAction
                 )
             }
             entry<Route.References> {
@@ -328,17 +345,37 @@ private fun RowScope.RouterBarItem(
 
 @Composable
 private fun RouterFloatingActionButton(
-    currentRoute: Route,
+    visible: Boolean = true,
     onFabClickAction: (() -> Unit)? = null,
+    icon: ImageVector = Icons.Rounded.Add,
+    label: String? = null,
 ) {
-    FloatingActionButton(
-        onClick = { onFabClickAction?.invoke() },
-        modifier = Modifier.animateFloatingActionButton(
-            visible = currentRoute is Route.Documents
-                    && onFabClickAction != null,
-            alignment = Alignment.BottomEnd,
-        ),
-    ) {
-        Icon(Icons.Rounded.Add, contentDescription = null)
+    val localVisible = visible && onFabClickAction != null
+    if (label != null) {
+        ExtendedFloatingActionButton(
+            icon = {
+                Icon(icon, contentDescription = label)
+            },
+            text = {
+                Text(label)
+            },
+            onClick = { onFabClickAction?.invoke() },
+            modifier = Modifier.animateContentSize()
+                .animateFloatingActionButton(
+                    visible = localVisible,
+                    alignment = Alignment.BottomEnd
+                )
+        )
+    } else {
+        FloatingActionButton(
+            onClick = { onFabClickAction?.invoke() },
+            modifier = Modifier.animateContentSize()
+                .animateFloatingActionButton(
+                    visible = localVisible,
+                    alignment = Alignment.BottomEnd
+                )
+        ) {
+            Icon(icon, contentDescription = label)
+        }
     }
 }

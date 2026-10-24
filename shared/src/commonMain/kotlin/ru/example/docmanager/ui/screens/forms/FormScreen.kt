@@ -31,17 +31,30 @@ import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScr
 @Composable
 fun FormScreen(
     destination: Route.Form,
+    onStatusMessage: (String) -> Unit,
+    navigateTo: (Route) -> Unit,
+    registerFabClickAction: ((() -> Unit)?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val type = destination.type
     val document = destination.document
+    val scrollState = rememberScrollState()
+
     Column(
-        modifier = modifier.fillMaxSize().padding(16.dp)
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier.fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (type) {
-            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(document)
+            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(
+                document = document,
+                onStatusMessage = onStatusMessage,
+                navigateTo = navigateTo,
+                registerFabClickAction = registerFabClickAction,
+                scrollState = scrollState
+            )
+
             DocumentType.TEST -> {
                 Text(stringResource(Res.string.document_test))
             }

@@ -12,22 +12,32 @@
 package ru.example.docmanager.ui.screens.forms.powerofattorney
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import ru.example.docmanager.data.document.Document
@@ -39,17 +49,25 @@ import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.ui.components.DateInput
 import ru.example.docmanager.ui.components.ReferenceDropdown
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.utils.applyAdaptive
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyBodyItemState
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyUiState
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun PowerOfAttorneyScreen(
     document: Document?,
+    onStatusMessage: (String) -> Unit,
+    navigateTo: (Route) -> Unit,
+    registerFabClickAction: ((() -> Unit)?) -> Unit,
+    scrollState: ScrollState,
     viewModel: PowerOfAttorneyViewModel = koinInject()
 ) {
+    val scope = rememberCoroutineScope()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val formState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val organizations = remember(formState) {
@@ -70,14 +88,51 @@ fun PowerOfAttorneyScreen(
         viewModel.autoPopulateDefaults()
     }
 
+    if (isLoading) {
+        LoadingContent()
+        return
+    }
+
+    LaunchedEffect(scope, registerFabClickAction, formState) {
+        registerFabClickAction {
+            formState.addBodyItem()
+            scope.launch {
+                delay(280.milliseconds)
+                scrollState.animateScrollTo(
+                    value = scrollState.maxValue
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(formState.statusMessage) {
+        formState.statusMessage?.let(onStatusMessage)
+    }
+
     Column(
         modifier = Modifier.adaptiveWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        PowerOfAttorneyBanner(
+        PowerOfAttorneyActions(
             formState = formState,
-            onResetForm = viewModel::resetForm
+            onSaveDocument = {
+                viewModel.saveDocument()
+            },
+            onSaveAsNewDocument = {
+                viewModel.saveAsNewDocument()
+            },
+            onDeleteDocument = {
+                viewModel.deleteCurrentDocument {
+                    navigateTo(Route.Documents(formState.type))
+                }
+            },
+            onExportDocument = {
+                viewModel.exportToFile()
+            },
+            onPrintDocument = {
+                viewModel.printDocument()
+            }
         )
 
         PowerOfAttorneyHeaderSection(
@@ -87,51 +142,13 @@ fun PowerOfAttorneyScreen(
             suppliers = suppliers
         )
 
-        PowerOfAttorneyBodySection(formState = formState, products = products)
-
-        PowerOfAttorneyActions(
-            viewModel = viewModel,
-            formState = formState
+        PowerOfAttorneyBodySection(
+            formState = formState,
+            products = products
         )
     }
-}
 
-@Composable
-private fun PowerOfAttorneyBanner(
-    formState: PowerOfAttorneyUiState,
-    onResetForm: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        AnimatedVisibility(visible = formState.statusMessage != null) {
-            Text(
-                text = formState.statusMessage ?: "",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        if (formState.isEditing) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Редактируется документ № ${formState.number} (ID: ${formState.selectedDocumentId})",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                OutlinedButton(
-                    onClick = onResetForm,
-                    modifier = Modifier.height(32.dp)
-                ) {
-                    Text("Создать новый", style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-    }
+    Spacer(Modifier.height(64.dp))
 }
 
 @Composable
@@ -142,71 +159,100 @@ private fun PowerOfAttorneyHeaderSection(
     suppliers: List<Supplier>,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    val isExpanded = remember { mutableStateOf(true) }
+
+    Card (
+        modifier = modifier.fillMaxWidth().animateContentSize(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
     ) {
-        Text(
-            text = stringResource(Res.string.header),
-            modifier = Modifier.fillMaxWidth(),
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        TextInput(
-            value = formState.number,
-            onValueChange = { formState.number = it },
-            label = stringResource(HeaderFieldType.NUMBER.stringResource),
+        Row (
             modifier = Modifier.fillMaxWidth()
-        )
+                .clickable { isExpanded.value = !isExpanded.value }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(Res.string.header),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
-        DateInput(
-            value = formState.dischargeDate,
-            onValueChange = { formState.dischargeDate = it },
-            label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
-            modifier = Modifier.fillMaxWidth()
-        )
+            Spacer(modifier = Modifier.weight(1f))
 
-        DateInput(
-            value = formState.endDate,
-            onValueChange = { formState.endDate = it },
-            label = stringResource(HeaderFieldType.END_DATE.stringResource),
-            modifier = Modifier.fillMaxWidth()
-        )
+            Icon(
+                imageVector = if (isExpanded.value)
+                    Icons.Rounded.KeyboardArrowUp
+                else Icons.Rounded.KeyboardArrowDown,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
 
-        ReferenceDropdown(
-            value = formState.selectedOrganization,
-            items = organizations,
-            itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
-            onValueChange = { formState.selectedOrganization = it },
-            label = stringResource(Res.string.input_organization),
-            modifier = Modifier.fillMaxWidth()
-        )
+        if (isExpanded.value) {
+            Column(
+                modifier = modifier.fillMaxWidth().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TextInput(
+                    value = formState.number,
+                    onValueChange = { formState.number = it },
+                    label = stringResource(HeaderFieldType.NUMBER.stringResource),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        ReferenceDropdown(
-            value = formState.selectedIndividual,
-            items = individuals,
-            itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
-            itemSupportingText = { it?.job ?: "Unknown job" },
-            onValueChange = { formState.selectedIndividual = it },
-            label = stringResource(Res.string.input_individual),
-            modifier = Modifier.fillMaxWidth()
-        )
+                DateInput(
+                    value = formState.dischargeDate,
+                    onValueChange = { formState.dischargeDate = it },
+                    label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        ReferenceDropdown(
-            value = formState.selectedSupplier,
-            items = suppliers,
-            itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
-            onValueChange = { formState.selectedSupplier = it },
-            label = stringResource(Res.string.input_supplier),
-            modifier = Modifier.fillMaxWidth()
-        )
+                DateInput(
+                    value = formState.endDate,
+                    onValueChange = { formState.endDate = it },
+                    label = stringResource(HeaderFieldType.END_DATE.stringResource),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        TextInput(
-            value = formState.supplierAgreement,
-            onValueChange = { formState.supplierAgreement = it },
-            label = stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource),
-            modifier = Modifier.fillMaxWidth()
-        )
+                ReferenceDropdown(
+                    value = formState.selectedOrganization,
+                    items = organizations,
+                    itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+                    onValueChange = { formState.selectedOrganization = it },
+                    label = stringResource(Res.string.input_organization),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                ReferenceDropdown(
+                    value = formState.selectedIndividual,
+                    items = individuals,
+                    itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+                    itemSupportingText = { it?.job ?: "Unknown job" },
+                    onValueChange = { formState.selectedIndividual = it },
+                    label = stringResource(Res.string.input_individual),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                ReferenceDropdown(
+                    value = formState.selectedSupplier,
+                    items = suppliers,
+                    itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+                    onValueChange = { formState.selectedSupplier = it },
+                    label = stringResource(Res.string.input_supplier),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                TextInput(
+                    value = formState.supplierAgreement,
+                    onValueChange = { formState.supplierAgreement = it },
+                    label = stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
     }
 }
 
@@ -216,43 +262,74 @@ private fun PowerOfAttorneyBodySection(
     products: List<Product>,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = stringResource(Res.string.body),
-            modifier = Modifier.fillMaxWidth(),
-            style = MaterialTheme.typography.titleMedium
-        )
+    val isExpanded = remember { mutableStateOf(true) }
+    val bodyItems = formState.bodyItems
 
-        Column(
-            Modifier.fillMaxSize().applyAdaptive(
-                whenWide = Modifier.horizontalScroll(rememberScrollState())
+    AnimatedVisibility(
+        visible = bodyItems.isNotEmpty(),
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Card (
+            modifier = modifier.fillMaxWidth().animateContentSize(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
         ) {
-            formState.bodyItems.forEachIndexed { index, item ->
-                BodyItemRow(
-                    index = index,
-                    item = item,
-                    products = products,
-                    onItemChange = { updated -> formState.updateBodyItem(index, updated) },
-                    onDelete = { formState.removeBodyItem(index) }
+            Row (
+                modifier = Modifier.fillMaxWidth()
+                    .clickable { isExpanded.value = !isExpanded.value }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(Res.string.body),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Icon(
+                    imageVector = if (isExpanded.value)
+                        Icons.Rounded.KeyboardArrowUp
+                    else Icons.Rounded.KeyboardArrowDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-        }
 
-        OutlinedButton(
-            onClick = { formState.addBodyItem() },
-            modifier = Modifier.align(Alignment.Start)
-        ) {
-            Icon(Icons.Default.Add, contentDescription = null)
-            Spacer(Modifier.width(4.dp))
-            Text("Добавить строку")
+            if (isExpanded.value) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                        .applyAdaptive(
+                            whenNotWide = Modifier.horizontalScroll(
+                                rememberScrollState()
+                            )
+                        )
+                        .padding(16.dp)
+                        .animateContentSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    bodyItems.forEachIndexed { index, item ->
+                        BodyItemRow(
+                            index = index,
+                            item = item,
+                            products = products,
+                            onItemChange = { updated ->
+                                formState.updateBodyItem(index, updated)
+                            },
+                            onDelete = { formState.removeBodyItem(index) }
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BodyItemRow(
     index: Int,
@@ -266,11 +343,20 @@ private fun BodyItemRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "${index + 1}",
-            modifier = Modifier.width(24.dp),
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .clip(MaterialShapes.Slanted.toShape())
+                .background(MaterialTheme.colorScheme.secondary),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "${index + 1}",
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
 
         ReferenceDropdown(
             value = item.product,
@@ -280,14 +366,14 @@ private fun BodyItemRow(
             label = stringResource(Res.string.input_product),
             modifier = Modifier.applyAdaptive(
                 whenWide = Modifier.weight(2f),
-                whenNotWide = Modifier.widthIn(min = 300.dp)
+                whenNotWide = Modifier.requiredWidth(300.dp)
             )
         )
 
-        OutlinedTextField(
+        TextInput(
             value = item.unit,
             onValueChange = { onItemChange(item.copy(unit = it)) },
-            label = { Text(stringResource(Res.string.body_field_unit)) },
+            label = stringResource(Res.string.body_field_unit),
             singleLine = true,
             modifier = Modifier.applyAdaptive(
                 whenWide = Modifier.weight(1f),
@@ -295,10 +381,10 @@ private fun BodyItemRow(
             )
         )
 
-        OutlinedTextField(
+        TextInput(
             value = item.count,
             onValueChange = { onItemChange(item.copy(count = it)) },
-            label = { Text(stringResource(Res.string.body_field_count)) },
+            label = stringResource(Res.string.body_field_count),
             singleLine = true,
             modifier = Modifier.applyAdaptive(
                 whenWide = Modifier.weight(1.5f),
@@ -306,54 +392,65 @@ private fun BodyItemRow(
             )
         )
 
-        IconButton(onClick = onDelete) {
-            Icon(Icons.Default.Delete, contentDescription = "Удалить строку")
+        FilledTonalIconButton(
+            onClick = onDelete
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Delete,
+                contentDescription = "Удалить строку"
+            )
         }
     }
 }
 
 @Composable
 private fun PowerOfAttorneyActions(
-    viewModel: PowerOfAttorneyViewModel,
     formState: PowerOfAttorneyUiState,
-    modifier: Modifier = Modifier
+    onSaveDocument: () -> Unit,
+    onSaveAsNewDocument: () -> Unit,
+    onDeleteDocument: () -> Unit,
+    onExportDocument: () -> Unit,
+    onPrintDocument: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     FlowRow(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().animateContentSize(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         itemVerticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
-            onClick = { viewModel.saveDocument() }
-        ) {
-            Text(if (formState.isEditing) "Сохранить (обновить)" else "Сохранить")
+        Button(onClick = onSaveDocument) {
+            Text("Сохранить")
         }
 
         if (formState.isEditing) {
-            OutlinedButton(
-                onClick = { viewModel.saveAsNewDocument() }
-            ) {
+            OutlinedButton(onClick = onSaveAsNewDocument) {
                 Text("Сохранить как новый")
             }
 
-            OutlinedButton(
-                onClick = { viewModel.deleteCurrentDocument() }
-            ) {
+            OutlinedButton(onClick = onDeleteDocument) {
                 Text("Удалить")
             }
         }
 
-        Button(
-            onClick = { viewModel.exportToFile() }
-        ) {
-            Text("Сохранить в файл")
+        Button(onClick = onExportDocument) {
+            Text("Экспорт в файл")
         }
 
-        Button(
-            onClick = { viewModel.printDocument() }
-        ) {
+        Button(onClick = onPrintDocument) {
             Text("Печать")
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun LoadingContent() {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        ContainedLoadingIndicator(modifier = Modifier.size(128.dp))
     }
 }

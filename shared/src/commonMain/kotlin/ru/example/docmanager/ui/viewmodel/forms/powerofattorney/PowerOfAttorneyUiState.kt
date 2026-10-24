@@ -19,6 +19,7 @@ import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
+import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBody
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBodyItem
@@ -36,7 +37,8 @@ data class PowerOfAttorneyUiState(
     val products: List<Product> = emptyList(),
     val suppliers: List<Supplier> = emptyList(),
 ) : FormState<PowerOfAttorney, PowerOfAttorneyBodyItemState>(
-    Clock.System.todayIn(TimeZone.currentSystemDefault())
+    type = DocumentType.POWER_OF_ATTORNEY,
+    today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 ) {
     val defaultEndDate = today.plus(DatePeriod(days = 30))
     var endDate by mutableStateOf(defaultEndDate)
@@ -53,10 +55,7 @@ data class PowerOfAttorneyUiState(
 
     override fun resetForm() {
         selectedDocumentId = null
-        val nextNumber = if (existingDocuments.isNotEmpty()) {
-            (existingDocuments.maxOfOrNull { it.header.number } ?: 0) + 1
-        } else 1
-        number = nextNumber.toString()
+        number = "0"
         dischargeDate = today
         endDate = defaultEndDate
         selectedOrganization = organizations.firstOrNull()

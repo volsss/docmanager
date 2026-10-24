@@ -16,11 +16,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
 import ru.example.docmanager.data.document.Document
+import ru.example.docmanager.data.document.DocumentType
 
 abstract class FormState<D : Document, B : BodyItem>(
+    val type: DocumentType,
     open val today: LocalDate,
 ) {
-    var existingDocuments by mutableStateOf<List<D>>(emptyList())
     var selectedDocumentId by mutableStateOf<Int?>(null)
 
     val isEditing: Boolean

@@ -39,10 +39,9 @@ fun TextInput(
         enabled = enabled,
         onValueChange = onValueChange,
         label = { Text(label) },
-        supportingText = {
-            if (required)
-                Text(stringResource(Res.string.component_input_required))
-        },
+        supportingText = if (required) {
+            { Text(stringResource(Res.string.component_input_required)) }
+        } else null,
         singleLine = singleLine,
         shape = RoundedCornerShape(16.dp),
         trailingIcon = trailingIcon,

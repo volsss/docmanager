@@ -32,7 +32,6 @@ import ru.example.docmanager.ui.utils.toEpochMillisUtc
 import ru.example.docmanager.ui.utils.toLocalDateFromUtc
 import ru.example.docmanager.ui.utils.toRussianString
 
-
 @Composable
 fun DateInput(
     value: LocalDate,
@@ -72,10 +71,9 @@ fun DateInput(
                 }
         },
         label = { Text(label) },
-        supportingText = {
-            if (required)
-                Text(stringResource(Res.string.component_input_required))
-        },
+        supportingText = if (required) {
+            { Text(stringResource(Res.string.component_input_required)) }
+        } else null,
         singleLine = true,
         shape = RoundedCornerShape(16.dp),
         trailingIcon = {

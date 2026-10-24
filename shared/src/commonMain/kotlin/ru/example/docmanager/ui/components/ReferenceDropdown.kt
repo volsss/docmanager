@@ -181,10 +181,8 @@ fun <T : Reference> ReferenceDropdown(
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                             ),
                             onClick = { selectItem(item) },
-                            supportingContent = {
-                                itemSupportingText?.let {
-                                    Text(it.invoke(item))
-                                }
+                            supportingContent = itemSupportingText?.let {
+                                { Text(it.invoke(item)) }
                             },
                             trailingContent = {
                                 AnimatedVisibility(
