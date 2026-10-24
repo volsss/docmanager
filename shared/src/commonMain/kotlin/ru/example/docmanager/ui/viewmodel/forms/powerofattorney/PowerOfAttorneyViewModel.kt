@@ -27,12 +27,33 @@ import ru.example.docmanager.di.DocumentProcessor
 import ru.example.docmanager.di.getDocumentProcessor
 
 class PowerOfAttorneyViewModel(
-    val repository: PowerOfAttorneyRepository,
-    val individualsRepository: IndividualsRepository,
-    val organizationsRepository: OrganizationsRepository,
-    val productsRepository: ProductsRepository,
-    val suppliersRepository: SuppliersRepository
+    private val repository: PowerOfAttorneyRepository,
+    private val individualsRepository: IndividualsRepository,
+    private val organizationsRepository: OrganizationsRepository,
+    private val productsRepository: ProductsRepository,
+    private val suppliersRepository: SuppliersRepository
 ) : ViewModel() {
+    companion object {
+        const val DOCUMENT_NAME = "Доверенность"
+        const val DOCUMENT_FILE = "Доверенность.docx"
+
+        const val FAILED_INITIAL_LOADING = "Ошибка при загрузке документа"
+
+        const val FAILED_SAVING = "Ошибка при сохранении"
+        const val SAVED = "Документ № %d сохранен"
+        const val SAVED_AS_NEW = "Документ № %d сохранен как новый"
+
+        const val FAILED_SAVING_FILE = "Ошибка при сохранении файла"
+        const val SAVED_FILE = "Документ сохранен в файл"
+
+        const val FAILED_DELETING = "Ошибка при удалении"
+        const val DELETED = "Документ удален из базы данных"
+
+
+        const val FAILED_PRINTING = "Ошибка при печати"
+        const val PRINTED = "Документ распечатан"
+    }
+
     private val documentProcessor: DocumentProcessor = getDocumentProcessor()
 
     val uiState: StateFlow<PowerOfAttorneyUiState>
@@ -56,11 +77,13 @@ class PowerOfAttorneyViewModel(
             products = productsRepository.getItems()
         )
 
-        if (document != null) {
-            if (document is PowerOfAttorney) {
+        when (document) {
+            null -> Unit
+            is PowerOfAttorney -> {
                 uiState.value.populateFromDocument(document)
-            } else {
-                uiState.value.statusMessage = "Ошибка при загрузке документа"
+            }
+            else -> {
+                setStatus(FAILED_INITIAL_LOADING)
             }
         }
         isLoading.value = false
@@ -73,111 +96,117 @@ class PowerOfAttorneyViewModel(
     }
 
     suspend fun saveDocumentSuspend(onDocumentSaved: (() -> Unit)? = null) {
-        val document = uiState.value.toDocument()
-        if (document == null) {
-            uiState.value.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
-            return
-        }
-
         isLoading.value = true
+        val document = uiState.value.toDocument() ?: return
+
         runCatching {
             if (uiState.value.isEditing) {
                 repository.updateDocument(document)
-                uiState.value.statusMessage = "Документ № ${document.header.number} успешно обновлен"
             } else {
                 uiState.value.selectedDocumentId = repository.createDocument(document)
-                uiState.value.statusMessage = "Документ № ${document.header.number} успешно сохранен в базу данных"
             }
+            setStatus(SAVED.format(document.header.number))
             onDocumentSaved?.invoke()
         }.onFailure { e ->
-            uiState.value.statusMessage = "Ошибка при сохранении: ${e.message}"
+            setStatus(FAILED_SAVING)
+            e.printStackTrace()
         }
         isLoading.value = false
     }
 
-    fun onSaveAsNewDocument(onDocumentSaved: (() -> Unit)? = null) {
+    fun onSaveAsNewDocument(
+        onDocumentSaved: (() -> Unit)? = null
+    ) {
         viewModelScope.launch {
             saveAsNewDocumentSuspend(onDocumentSaved)
         }
     }
 
-    suspend fun saveAsNewDocumentSuspend(onDocumentSaved: (() -> Unit)? = null) {
-        val document = uiState.value.toDocument()
-        if (document == null) {
-            uiState.value.statusMessage = "Пожалуйста, выберите организацию, физ. лицо и поставщика"
-            return
-        }
-
+    suspend fun saveAsNewDocumentSuspend(
+        onDocumentSaved: (() -> Unit)? = null
+    ) {
         isLoading.value = true
+        val document = uiState.value.toDocument() ?: return
+
         runCatching {
+            println("Saving document: ${uiState.value.selectedDocumentId}")
             uiState.value.selectedDocumentId = repository.createDocument(document)
-            uiState.value.statusMessage = "Документ № ${document.header.number} сохранен как новый"
-            uiState.value.selectedDocumentId = null
+            println("Now at: ${uiState.value.selectedDocumentId}")
+            setStatus(SAVED_AS_NEW.format(document.header.number))
             onDocumentSaved?.invoke()
         }.onFailure { e ->
-            uiState.value.statusMessage = "Ошибка при сохранении: ${e.message}"
+            setStatus(FAILED_SAVING)
+            e.printStackTrace()
         }
         isLoading.value = false
     }
 
-    fun onDeleteCurrentDocument(onDocumentDeleted: (() -> Unit)? = null) {
+    fun onDeleteCurrentDocument(
+        onDocumentDeleted: (() -> Unit)? = null
+    ) {
         viewModelScope.launch {
             deleteCurrentDocumentSuspend(onDocumentDeleted)
         }
     }
 
-    suspend fun deleteCurrentDocumentSuspend(onDocumentDeleted: (() -> Unit)? = null) {
-        val docId = uiState.value.selectedDocumentId ?: return
-        isLoading.value = true
-        runCatching {
-            repository.deleteDocument(docId)
-            uiState.value.statusMessage = "Документ удален из базы данных"
-            onDocumentDeleted?.invoke()
-        }.onFailure { e ->
-            uiState.value.statusMessage = "Ошибка при удалении: ${e.message}"
-        }
-        isLoading.value = false
-    }
-
     fun onExportToFile() {
-        val document = uiState.value.toDocument()
-        if (document == null) {
-            uiState.value.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
-            return
-        }
+        isLoading.value = true
+        val document = uiState.value.toDocument() ?: return
 
         viewModelScope.launch {
             runCatching {
                 documentProcessor.processSave(
-                    documentName = "Доверенность",
-                    documentResourceFile = "Доверенность.docx",
+                    documentName = DOCUMENT_NAME,
+                    documentResourceFile = DOCUMENT_FILE,
                     document = document
                 )
-                uiState.value.statusMessage = "Документ сохранен в файл"
+                setStatus(SAVED_FILE)
             }.onFailure { e ->
-                uiState.value.statusMessage = "Ошибка при сохранении в файл: ${e.message}"
+                setStatus(FAILED_SAVING_FILE)
+                e.printStackTrace()
             }
+            isLoading.value = false
         }
     }
 
-    fun onPrintDocument() {
-        val document = uiState.value.toDocument()
-        if (document == null) {
-            uiState.value.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
-            return
+    suspend fun deleteCurrentDocumentSuspend(
+        onDocumentDeleted: (() -> Unit)? = null
+    ) {
+        isLoading.value = true
+        val docId = uiState.value.selectedDocumentId ?: return
+        runCatching {
+            uiState.value.selectedDocumentId = null
+            repository.deleteDocument(docId)
+            setStatus(DELETED)
+            onDocumentDeleted?.invoke()
+        }.onFailure { e ->
+            setStatus(FAILED_DELETING)
+            e.printStackTrace()
         }
+        isLoading.value = false
+    }
+
+    fun onPrintDocument() {
+        isLoading.value = true
+        val document = uiState.value.toDocument() ?: return
 
         viewModelScope.launch {
             runCatching {
                 documentProcessor.processPrint(
-                    documentName = "Доверенность",
-                    documentResourceFile = "Доверенность.docx",
+                    documentName = DOCUMENT_NAME,
+                    documentResourceFile = DOCUMENT_FILE,
                     document = document
                 )
-                uiState.value.statusMessage = "Запрос на печать документа отправлен"
+                setStatus(PRINTED)
             }.onFailure { e ->
-                uiState.value.statusMessage = "Ошибка при формировании документа для печати: ${e.message}"
+                setStatus(FAILED_PRINTING)
+                e.printStackTrace()
             }
+            isLoading.value = false
         }
+    }
+
+    private fun setStatus(message: String) {
+        uiState.value.statusMessage = message
     }
 }

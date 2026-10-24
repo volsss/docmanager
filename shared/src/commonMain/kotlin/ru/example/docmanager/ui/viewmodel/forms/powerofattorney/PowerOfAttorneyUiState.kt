@@ -40,6 +40,12 @@ data class PowerOfAttorneyUiState(
     type = DocumentType.POWER_OF_ATTORNEY,
     today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 ) {
+    companion object {
+        const val EMPTY_ORGANIZATION = "Выберите организацию"
+        const val EMPTY_INDIVIDUAL = "Выберите физическое лицо"
+        const val EMPTY_SUPPLIER = "Выберите поставщика"
+    }
+
     val defaultEndDate = today.plus(DatePeriod(days = 30))
     var endDate by mutableStateOf(defaultEndDate)
     var selectedOrganization by mutableStateOf<Organization?>(null)
@@ -90,9 +96,21 @@ data class PowerOfAttorneyUiState(
     }
 
     override fun toDocument(): PowerOfAttorney? {
-        val org = selectedOrganization ?: return null
-        val ind = selectedIndividual ?: return null
-        val sup = selectedSupplier ?: return null
+        if (selectedOrganization == null) {
+            statusMessage = EMPTY_ORGANIZATION
+            return null
+        }
+        if (selectedIndividual == null) {
+            statusMessage = EMPTY_INDIVIDUAL
+            return null
+        }
+        if (selectedSupplier == null) {
+            statusMessage = EMPTY_SUPPLIER
+            return null
+        }
+        val org = selectedOrganization!!
+        val ind = selectedIndividual!!
+        val sup = selectedSupplier!!
 
         val header = PowerOfAttorneyHeader(
             id = selectedDocumentId ?: 0,
