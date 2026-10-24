@@ -53,19 +53,6 @@ data class PowerOfAttorneyUiState(
         )
     }
 
-    override fun resetForm() {
-        selectedDocumentId = null
-        number = "0"
-        dischargeDate = today
-        endDate = defaultEndDate
-        selectedOrganization = organizations.firstOrNull()
-        selectedIndividual = individuals.firstOrNull()
-        selectedSupplier = suppliers.firstOrNull()
-        supplierAgreement = ""
-        bodyItems = listOf()
-        statusMessage = null
-    }
-
     override fun populateFromDocument(
         document: PowerOfAttorney
     ) {

@@ -49,7 +49,6 @@ abstract class FormState<D : Document, B : BodyItem>(
     }
 
     abstract fun addBodyItem()
-    abstract fun resetForm()
     abstract fun populateFromDocument(document: D)
 
     abstract fun toDocument(): D?

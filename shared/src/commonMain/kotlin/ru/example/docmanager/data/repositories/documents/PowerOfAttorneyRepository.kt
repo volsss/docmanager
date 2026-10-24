@@ -34,26 +34,28 @@ import ru.example.docmanager.data.reference.Supplier
 class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
     override val type = DocumentType.POWER_OF_ATTORNEY
 
-    override suspend fun createDocument(document: PowerOfAttorney): Unit =
-        dbQuery {
-            val headerId = PowerOfAttorneyHeadersTable.insertAndGetId {
-                it[organizationId] = document.header.organization.id
-                it[number] = document.header.number
-                it[dischargeDate] = document.header.dischargeDate
-                it[endDate] = document.header.endDate
-                it[individualId] = document.header.individual.id
-                it[supplierId] = document.header.supplier.id
-                it[supplierAgreement] = document.header.supplierAgreement
-            }.value
-            document.body.items.forEach { body ->
-                PowerOfAttorneyBodiesTable.insert {
-                    it[count] = body.count
-                    it[unit] = body.unit
-                    it[PowerOfAttorneyBodiesTable.headerId] = headerId
-                    it[productId] = body.product.id
-                }
+    override suspend fun createDocument(
+        document: PowerOfAttorney
+    ) = dbQuery {
+        val headerId = PowerOfAttorneyHeadersTable.insertAndGetId {
+            it[organizationId] = document.header.organization.id
+            it[number] = document.header.number
+            it[dischargeDate] = document.header.dischargeDate
+            it[endDate] = document.header.endDate
+            it[individualId] = document.header.individual.id
+            it[supplierId] = document.header.supplier.id
+            it[supplierAgreement] = document.header.supplierAgreement
+        }.value
+        document.body.items.forEach { body ->
+            PowerOfAttorneyBodiesTable.insert {
+                it[count] = body.count
+                it[unit] = body.unit
+                it[PowerOfAttorneyBodiesTable.headerId] = headerId
+                it[productId] = body.product.id
             }
         }
+        headerId
+    }
 
     override suspend fun updateDocument(document: PowerOfAttorney): Unit =
         dbQuery {

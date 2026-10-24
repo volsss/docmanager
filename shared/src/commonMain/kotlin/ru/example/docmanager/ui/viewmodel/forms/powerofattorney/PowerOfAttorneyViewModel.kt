@@ -62,13 +62,11 @@ class PowerOfAttorneyViewModel(
             } else {
                 uiState.value.statusMessage = "Ошибка при загрузке документа"
             }
-        } else {
-            uiState.value.resetForm()
         }
         isLoading.value = false
     }
 
-    fun saveDocument(onDocumentSaved: (() -> Unit)? = null) {
+    fun onSaveDocument(onDocumentSaved: (() -> Unit)? = null) {
         viewModelScope.launch {
             saveDocumentSuspend(onDocumentSaved)
         }
@@ -87,7 +85,7 @@ class PowerOfAttorneyViewModel(
                 repository.updateDocument(document)
                 uiState.value.statusMessage = "Документ № ${document.header.number} успешно обновлен"
             } else {
-                repository.createDocument(document)
+                uiState.value.selectedDocumentId = repository.createDocument(document)
                 uiState.value.statusMessage = "Документ № ${document.header.number} успешно сохранен в базу данных"
             }
             onDocumentSaved?.invoke()
@@ -97,7 +95,7 @@ class PowerOfAttorneyViewModel(
         isLoading.value = false
     }
 
-    fun saveAsNewDocument(onDocumentSaved: (() -> Unit)? = null) {
+    fun onSaveAsNewDocument(onDocumentSaved: (() -> Unit)? = null) {
         viewModelScope.launch {
             saveAsNewDocumentSuspend(onDocumentSaved)
         }
@@ -112,7 +110,7 @@ class PowerOfAttorneyViewModel(
 
         isLoading.value = true
         runCatching {
-            repository.createDocument(document)
+            uiState.value.selectedDocumentId = repository.createDocument(document)
             uiState.value.statusMessage = "Документ № ${document.header.number} сохранен как новый"
             uiState.value.selectedDocumentId = null
             onDocumentSaved?.invoke()
@@ -122,7 +120,7 @@ class PowerOfAttorneyViewModel(
         isLoading.value = false
     }
 
-    fun deleteCurrentDocument(onDocumentDeleted: (() -> Unit)? = null) {
+    fun onDeleteCurrentDocument(onDocumentDeleted: (() -> Unit)? = null) {
         viewModelScope.launch {
             deleteCurrentDocumentSuspend(onDocumentDeleted)
         }
@@ -134,7 +132,6 @@ class PowerOfAttorneyViewModel(
         runCatching {
             repository.deleteDocument(docId)
             uiState.value.statusMessage = "Документ удален из базы данных"
-            resetForm()
             onDocumentDeleted?.invoke()
         }.onFailure { e ->
             uiState.value.statusMessage = "Ошибка при удалении: ${e.message}"
@@ -142,7 +139,7 @@ class PowerOfAttorneyViewModel(
         isLoading.value = false
     }
 
-    fun exportToFile() {
+    fun onExportToFile() {
         val document = uiState.value.toDocument()
         if (document == null) {
             uiState.value.statusMessage = "Ошибка при сохранении в файл: Документ не может быть сохранен"
@@ -163,7 +160,7 @@ class PowerOfAttorneyViewModel(
         }
     }
 
-    fun printDocument() {
+    fun onPrintDocument() {
         val document = uiState.value.toDocument()
         if (document == null) {
             uiState.value.statusMessage = "Ошибка при сохранении в файл: Документ не может быть распечатан"
@@ -180,28 +177,6 @@ class PowerOfAttorneyViewModel(
                 uiState.value.statusMessage = "Запрос на печать документа отправлен"
             }.onFailure { e ->
                 uiState.value.statusMessage = "Ошибка при формировании документа для печати: ${e.message}"
-            }
-        }
-    }
-
-    fun resetForm() {
-        uiState.value.resetForm()
-    }
-
-    fun autoPopulateDefaults() {
-        if (uiState.value.isEditing) return
-        if (uiState.value.selectedOrganization == null && uiState.value.organizations.isNotEmpty()) {
-            uiState.value.selectedOrganization = uiState.value.organizations.first()
-        }
-        if (uiState.value.selectedIndividual == null && uiState.value.individuals.isNotEmpty()) {
-            uiState.value.selectedIndividual = uiState.value.individuals.first()
-        }
-        if (uiState.value.selectedSupplier == null && uiState.value.suppliers.isNotEmpty()) {
-            uiState.value.selectedSupplier = uiState.value.suppliers.first()
-        }
-        if (uiState.value.products.isNotEmpty()) {
-            uiState.value.bodyItems = uiState.value.bodyItems.map { item ->
-                if (item.product == null) item.copy(product = uiState.value.products.first()) else item
             }
         }
     }

@@ -24,6 +24,9 @@
 
     <string name="documents_empty_content">Заполненных документов нет</string>
     <string name="documents_empty_new_button">Новый документ</string>
+    <string name="documents_fab">Новый документ</string>
+
+    <string name="form_fab">Новый элемент</string>
 
     <string name="reference_save_button">Сохранить</string>
     <string name="reference_new_item_button">Новое поле</string>

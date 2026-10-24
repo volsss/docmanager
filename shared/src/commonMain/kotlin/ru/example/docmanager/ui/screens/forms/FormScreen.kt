@@ -32,7 +32,7 @@ import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScr
 fun FormScreen(
     destination: Route.Form,
     onStatusMessage: (String) -> Unit,
-    navigateTo: (Route) -> Unit,
+    navigateTo: (Route, Boolean) -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     modifier: Modifier = Modifier,
 ) {

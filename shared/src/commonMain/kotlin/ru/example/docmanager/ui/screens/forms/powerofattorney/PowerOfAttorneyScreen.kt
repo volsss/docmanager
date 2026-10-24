@@ -55,7 +55,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun PowerOfAttorneyScreen(
     document: Document?,
     onStatusMessage: (String) -> Unit,
-    navigateTo: (Route) -> Unit,
+    navigateTo: (Route, Boolean) -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     scrollState: ScrollState,
     viewModel: PowerOfAttorneyViewModel = koinInject()
@@ -79,7 +79,6 @@ fun PowerOfAttorneyScreen(
 
     LaunchedEffect(document) {
         viewModel.loadInitialData(document)
-        viewModel.autoPopulateDefaults()
     }
 
     if (isLoading) {
@@ -109,24 +108,16 @@ fun PowerOfAttorneyScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         PowerOfAttorneyActions(
-            formState = formState,
-            onSaveDocument = {
-                viewModel.saveDocument()
-            },
-            onSaveAsNewDocument = {
-                viewModel.saveAsNewDocument()
-            },
+            isEditing = formState.isEditing,
+            onSaveDocument = viewModel::onSaveDocument,
+            onSaveAsNewDocument = viewModel::onSaveAsNewDocument,
             onDeleteDocument = {
-                viewModel.deleteCurrentDocument {
-                    navigateTo(Route.Documents(formState.type))
+                viewModel.onDeleteCurrentDocument {
+                    navigateTo(Route.Documents(formState.type), true)
                 }
             },
-            onExportDocument = {
-                viewModel.exportToFile()
-            },
-            onPrintDocument = {
-                viewModel.printDocument()
-            }
+            onExportDocument = viewModel::onExportToFile,
+            onPrintDocument = viewModel::onPrintDocument
         )
 
         PowerOfAttorneyHeaderSection(
@@ -399,7 +390,7 @@ private fun BodyItemRow(
 
 @Composable
 private fun PowerOfAttorneyActions(
-    formState: PowerOfAttorneyUiState,
+    isEditing: Boolean,
     onSaveDocument: () -> Unit,
     onSaveAsNewDocument: () -> Unit,
     onDeleteDocument: () -> Unit,
@@ -417,7 +408,7 @@ private fun PowerOfAttorneyActions(
             Text("Сохранить")
         }
 
-        if (formState.isEditing) {
+        if (isEditing) {
             OutlinedButton(onClick = onSaveAsNewDocument) {
                 Text("Сохранить как новый")
             }
@@ -441,8 +432,7 @@ private fun PowerOfAttorneyActions(
 @Composable
 private fun LoadingContent() {
     Box(
-        modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         ContainedLoadingIndicator(modifier = Modifier.size(128.dp))

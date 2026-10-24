@@ -30,6 +30,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
+import docmanager.shared.generated.resources.documents_fab
+import docmanager.shared.generated.resources.form_fab
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -61,11 +63,9 @@ fun Router(
         }
     }
 
-    fun navigateToRoot(route: Route) {
-        if (backStack.last() != route) {
-            backStack.clear()
-            backStack.add(route)
-        }
+    fun navigateTo(route: Route, asRoot: Boolean = false) {
+        if (asRoot && backStack.last() != route) backStack.clear()
+        backStack.add(route)
     }
 
     fun showSnackbar(message: String) {
@@ -78,7 +78,7 @@ fun Router(
         currentRoute = currentRoute,
         backStack = backStack,
         onBack = ::onBack,
-        navigateToRoot = ::navigateToRoot,
+        navigateTo = ::navigateTo,
         showSnackbar = ::showSnackbar,
         registerFabClickAction = { action ->
             onFabClickAction = action
@@ -94,7 +94,7 @@ private fun RouterContent(
     currentRoute: Route,
     backStack: NavBackStack<NavKey>,
     onBack: () -> Unit,
-    navigateToRoot: (Route) -> Unit,
+    navigateTo: (Route, Boolean) -> Unit,
     showSnackbar: (String) -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -116,7 +116,7 @@ private fun RouterContent(
         bottomBar = {
             RouterBottomBar(
                 currentRoute = currentRoute,
-                navigateToRoot = navigateToRoot
+                navigateTo = navigateTo
             )
         },
         floatingActionButton = {
@@ -124,14 +124,14 @@ private fun RouterContent(
                 is Route.Documents -> {
                     RouterFloatingActionButton(
                         onFabClickAction = onFabClickAction,
-                        label = "Новый документ"
+                        label = stringResource(Res.string.documents_fab)
                     )
                 }
 
                 is Route.Form -> {
                     RouterFloatingActionButton(
                         onFabClickAction = onFabClickAction,
-                        label = "Новый элемент"
+                        label = stringResource(Res.string.form_fab)
                     )
                 }
 
@@ -141,6 +141,7 @@ private fun RouterContent(
     ) { paddingValues ->
         RouterNavDisplay(
             backStack = backStack,
+            navigateTo = navigateTo,
             onBack = onBack,
             registerFabClickAction = registerFabClickAction,
             showSnackbar = showSnackbar,
@@ -169,6 +170,7 @@ private fun RouterSnackbarHost(
 @Composable
 private fun RouterNavDisplay(
     backStack: NavBackStack<NavKey>,
+    navigateTo: (Route, Boolean) -> Unit,
     onBack: () -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     showSnackbar: (String) -> Unit,
@@ -184,7 +186,7 @@ private fun RouterNavDisplay(
         entryProvider = entryProvider {
             entry<Route.Start> {
                 StartScreen(
-                    navigateTo = backStack::add
+                    navigateTo = { route -> navigateTo(route, false) }
                 )
             }
             entry<Route.Settings> {
@@ -192,13 +194,13 @@ private fun RouterNavDisplay(
             }
             entry<Route.DocumentTypes> {
                 DocumentTypesScreen(
-                    navigateTo = backStack::add
+                    navigateTo = { route -> navigateTo(route, false) }
                 )
             }
             entry<Route.Documents> {
                 DocumentsScreen(
                     destination = it,
-                    navigateTo = backStack::add,
+                    navigateTo = { route -> navigateTo(route, false) },
                     registerFabClickAction = registerFabClickAction,
                     viewModel = koinViewModel(key = it.type.name) {
                         parametersOf(it)
@@ -209,13 +211,13 @@ private fun RouterNavDisplay(
                 FormScreen(
                     destination = it,
                     onStatusMessage = showSnackbar,
-                    navigateTo = backStack::add,
+                    navigateTo = navigateTo,
                     registerFabClickAction = registerFabClickAction
                 )
             }
             entry<Route.References> {
                 ReferencesScreen(
-                    navigateTo = backStack::add
+                    navigateTo = { route -> navigateTo(route, false) }
                 )
             }
             entry<Route.Reference> {
@@ -277,7 +279,7 @@ private fun RouterTopBar(
 @Composable
 private fun RouterBottomBar(
     currentRoute: Route,
-    navigateToRoot: (Route) -> Unit
+    navigateTo: (Route, Boolean) -> Unit
 ) {
     AnimatedVisibility(
         visible = currentRoute is Route.Start
@@ -299,22 +301,22 @@ private fun RouterBottomBar(
             RouterBarItem(
                 route = Route.Start,
                 selected = currentRoute is Route.Start,
-                onClick = { navigateToRoot(Route.Start) },
+                onClick = { navigateTo(Route.Start, true) },
             )
             RouterBarItem(
                 route = Route.DocumentTypes,
                 selected = currentRoute is Route.DocumentTypes,
-                onClick = { navigateToRoot(Route.DocumentTypes) },
+                onClick = { navigateTo(Route.DocumentTypes, true) },
             )
             RouterBarItem(
                 route = Route.References,
                 selected = currentRoute is Route.References,
-                onClick = { navigateToRoot(Route.References) },
+                onClick = { navigateTo(Route.References, true) },
             )
             RouterBarItem(
                 route = Route.Settings,
                 selected = currentRoute is Route.Settings,
-                onClick = { navigateToRoot(Route.Settings) },
+                onClick = { navigateTo(Route.Settings, true) },
             )
         }
     }
