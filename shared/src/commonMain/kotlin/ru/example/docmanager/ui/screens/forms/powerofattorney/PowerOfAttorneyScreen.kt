@@ -15,15 +15,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
@@ -161,13 +155,13 @@ private fun PowerOfAttorneyHeaderSection(
 ) {
     val isExpanded = remember { mutableStateOf(true) }
 
-    Card (
+    Card(
         modifier = modifier.fillMaxWidth().animateContentSize(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
     ) {
-        Row (
+        Row(
             modifier = Modifier.fillMaxWidth()
                 .clickable { isExpanded.value = !isExpanded.value }
                 .padding(16.dp),
@@ -270,13 +264,13 @@ private fun PowerOfAttorneyBodySection(
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-        Card (
+        Card(
             modifier = modifier.fillMaxWidth().animateContentSize(),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
         ) {
-            Row (
+            Row(
                 modifier = Modifier.fillMaxWidth()
                     .clickable { isExpanded.value = !isExpanded.value }
                     .padding(16.dp),
