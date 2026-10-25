@@ -15,10 +15,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.fastFilteredMap
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.form_error_empty_required
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
+import org.jetbrains.compose.resources.getString
 import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBody
@@ -28,24 +31,19 @@ import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
-import ru.example.docmanager.ui.viewmodel.forms.FormState
+import ru.example.docmanager.ui.viewmodel.forms.WithBodyFormState
 import kotlin.time.Clock
 
 data class PowerOfAttorneyUiState(
     val individuals: List<Individual> = emptyList(),
     val organizations: List<Organization> = emptyList(),
     val products: List<Product> = emptyList(),
-    val suppliers: List<Supplier> = emptyList(),
-) : FormState<PowerOfAttorney, PowerOfAttorneyBodyItemState>(
+    val suppliers: List<Supplier> = emptyList()
+) : WithBodyFormState<PowerOfAttorney, PowerOfAttorneyBodyItemState>(
     type = DocumentType.POWER_OF_ATTORNEY,
     today = Clock.System.todayIn(TimeZone.currentSystemDefault())
 ) {
-    companion object {
-        const val EMPTY_ORGANIZATION = "Выберите организацию"
-        const val EMPTY_INDIVIDUAL = "Выберите физическое лицо"
-        const val EMPTY_SUPPLIER = "Выберите поставщика"
-    }
-
+    override var isLoading by mutableStateOf(true)
     val defaultEndDate = today.plus(DatePeriod(days = 30))
     var endDate by mutableStateOf(defaultEndDate)
     var selectedOrganization by mutableStateOf<Organization?>(null)
@@ -95,17 +93,14 @@ data class PowerOfAttorneyUiState(
         }
     }
 
-    override fun toDocument(): PowerOfAttorney? {
-        if (selectedOrganization == null) {
-            statusMessage = EMPTY_ORGANIZATION
-            return null
-        }
-        if (selectedIndividual == null) {
-            statusMessage = EMPTY_INDIVIDUAL
-            return null
-        }
-        if (selectedSupplier == null) {
-            statusMessage = EMPTY_SUPPLIER
+    override suspend fun toDocument(
+        onError: ((String) -> Unit)?
+    ): PowerOfAttorney? {
+        if (selectedOrganization == null
+            || selectedIndividual == null
+            || selectedSupplier == null
+        ) {
+            onError?.invoke(getString(Res.string.form_error_empty_required))
             return null
         }
         val org = selectedOrganization!!

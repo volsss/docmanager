@@ -11,11 +11,12 @@
 
 package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import docmanager.shared.generated.resources.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
@@ -23,8 +24,8 @@ import ru.example.docmanager.data.repositories.references.IndividualsRepository
 import ru.example.docmanager.data.repositories.references.OrganizationsRepository
 import ru.example.docmanager.data.repositories.references.ProductsRepository
 import ru.example.docmanager.data.repositories.references.SuppliersRepository
-import ru.example.docmanager.di.DocumentProcessor
-import ru.example.docmanager.di.getDocumentProcessor
+import ru.example.docmanager.ui.viewmodel.forms.FormViewModel
+
 
 class PowerOfAttorneyViewModel(
     private val repository: PowerOfAttorneyRepository,
@@ -32,181 +33,161 @@ class PowerOfAttorneyViewModel(
     private val organizationsRepository: OrganizationsRepository,
     private val productsRepository: ProductsRepository,
     private val suppliersRepository: SuppliersRepository
-) : ViewModel() {
+) : FormViewModel<PowerOfAttorney, PowerOfAttorneyUiState>() {
     companion object {
-        const val DOCUMENT_NAME = "Доверенность"
-        const val DOCUMENT_FILE = "Доверенность.docx"
-
-        const val FAILED_INITIAL_LOADING = "Ошибка при загрузке документа"
-
-        const val FAILED_SAVING = "Ошибка при сохранении"
-        const val SAVED = "Документ № %d сохранен"
-        const val SAVED_AS_NEW = "Документ № %d сохранен как новый"
-
-        const val FAILED_SAVING_FILE = "Ошибка при сохранении файла"
-        const val SAVED_FILE = "Документ сохранен в файл"
-
-        const val FAILED_DELETING = "Ошибка при удалении"
-        const val DELETED = "Документ удален из базы данных"
-
-
-        const val FAILED_PRINTING = "Ошибка при печати"
-        const val PRINTED = "Документ распечатан"
+        val DOCUMENT_NAME = Res.string.document_power_of_attorney
+        val DOCUMENT_RESOURCE = Res.string.document_power_of_attorney_resource
     }
 
-    private val documentProcessor: DocumentProcessor = getDocumentProcessor()
-
-    val uiState: StateFlow<PowerOfAttorneyUiState>
+    override val uiState: StateFlow<PowerOfAttorneyUiState>
         field = MutableStateFlow(PowerOfAttorneyUiState())
 
-    val isLoading: StateFlow<Boolean>
-        field = MutableStateFlow(true)
-
-    fun loadInitialData(document: Document? = null) {
-        viewModelScope.launch {
-            loadInitialDataSuspend(document)
-        }
-    }
-
-    suspend fun loadInitialDataSuspend(document: Document? = null) {
-        isLoading.value = true
-        uiState.value = uiState.value.copy(
-            individuals = individualsRepository.getItems(),
-            suppliers = suppliersRepository.getItems(),
-            organizations = organizationsRepository.getItems(),
-            products = productsRepository.getItems()
-        )
-
-        when (document) {
-            null -> Unit
-            is PowerOfAttorney -> {
-                uiState.value.populateFromDocument(document)
-            }
-            else -> {
-                setStatus(FAILED_INITIAL_LOADING)
-            }
-        }
-        isLoading.value = false
-    }
-
-    fun onSaveDocument(onDocumentSaved: (() -> Unit)? = null) {
-        viewModelScope.launch {
-            saveDocumentSuspend(onDocumentSaved)
-        }
-    }
-
-    suspend fun saveDocumentSuspend(onDocumentSaved: (() -> Unit)? = null) {
-        isLoading.value = true
-        val document = uiState.value.toDocument() ?: return
-
-        runCatching {
-            if (uiState.value.isEditing) {
-                repository.updateDocument(document)
-            } else {
-                uiState.value.selectedDocumentId = repository.createDocument(document)
-            }
-            setStatus(SAVED.format(document.header.number))
-            onDocumentSaved?.invoke()
-        }.onFailure { e ->
-            setStatus(FAILED_SAVING)
-            e.printStackTrace()
-        }
-        isLoading.value = false
-    }
-
-    fun onSaveAsNewDocument(
-        onDocumentSaved: (() -> Unit)? = null
+    override fun onInit(
+        onStatusUpdate: (String) -> Unit,
+        document: Document?,
     ) {
         viewModelScope.launch {
-            saveAsNewDocumentSuspend(onDocumentSaved)
+            uiState.value.isLoading = true
+            uiState.value = uiState.value.copy(
+                individuals = individualsRepository.getItems(),
+                suppliers = suppliersRepository.getItems(),
+                organizations = organizationsRepository.getItems(),
+                products = productsRepository.getItems()
+            )
+
+            when (document) {
+                null -> Unit
+                is PowerOfAttorney -> {
+                    uiState.value.populateFromDocument(document)
+                }
+
+                else -> {
+                    onStatusUpdate.invoke(
+                        getString(Res.string.form_error_failed_init)
+                    )
+                }
+            }
+            uiState.value.isLoading = false
         }
     }
 
-    suspend fun saveAsNewDocumentSuspend(
-        onDocumentSaved: (() -> Unit)? = null
-    ) {
-        isLoading.value = true
-        val document = uiState.value.toDocument() ?: return
-
-        runCatching {
-            println("Saving document: ${uiState.value.selectedDocumentId}")
-            uiState.value.selectedDocumentId = repository.createDocument(document)
-            println("Now at: ${uiState.value.selectedDocumentId}")
-            setStatus(SAVED_AS_NEW.format(document.header.number))
-            onDocumentSaved?.invoke()
-        }.onFailure { e ->
-            setStatus(FAILED_SAVING)
-            e.printStackTrace()
-        }
-        isLoading.value = false
-    }
-
-    fun onDeleteCurrentDocument(
-        onDocumentDeleted: (() -> Unit)? = null
+    override fun onSaveDocument(
+        onStatusUpdate: (String) -> Unit,
+        onDocumentUpdated: (() -> Unit)?,
+        onDocumentSaved: ((PowerOfAttorney) -> Unit)?
     ) {
         viewModelScope.launch {
-            deleteCurrentDocumentSuspend(onDocumentDeleted)
+            uiState.value.isLoading = true
+            val document = uiState.value.toDocument(onStatusUpdate)
+                ?: return@launch
+
+            runCatching {
+                if (uiState.value.isEditing) {
+                    repository.updateDocument(document)
+                    onDocumentUpdated?.invoke()
+                } else {
+                    uiState.value.selectedDocumentId = null
+                    onDocumentSaved?.invoke(repository.createDocument(document))
+                }
+                onStatusUpdate.invoke(getString(Res.string.form_saved))
+            }.onFailure { e ->
+                onStatusUpdate.invoke(getString(Res.string.form_error_failed_saving))
+                e.printStackTrace()
+            }
+            uiState.value.isLoading = false
         }
     }
 
-    fun onExportToFile() {
-        isLoading.value = true
-        val document = uiState.value.toDocument() ?: return
-
+    override fun onSaveAsNewDocument(
+        onStatusUpdate: (String) -> Unit,
+        onDocumentSaved: ((PowerOfAttorney) -> Unit)?,
+    ) {
         viewModelScope.launch {
+            uiState.value.isLoading = true
+            val document = uiState.value.toDocument(onStatusUpdate)
+                ?: return@launch
+
+            runCatching {
+                val newDocument = repository.createDocument(document)
+                uiState.value.selectedDocumentId = null
+                onStatusUpdate.invoke(getString(Res.string.form_saved_as_new))
+                onDocumentSaved?.invoke(newDocument)
+            }.onFailure { e ->
+                onStatusUpdate.invoke(getString(Res.string.form_error_failed_saving))
+                e.printStackTrace()
+            }
+            uiState.value.isLoading = false
+        }
+    }
+
+    override fun onDeleteDocument(
+        onStatusUpdate: (String) -> Unit,
+        onDocumentDeleted: (() -> Unit)?,
+    ) {
+        viewModelScope.launch {
+            uiState.value.isLoading = true
+            val docId = uiState.value.selectedDocumentId ?: return@launch
+            runCatching {
+                uiState.value.selectedDocumentId = null
+                repository.deleteDocument(docId)
+                onStatusUpdate.invoke(getString(Res.string.form_deleted))
+                onDocumentDeleted?.invoke()
+            }.onFailure { e ->
+                onStatusUpdate.invoke(getString(Res.string.form_error_failed_deleting))
+                e.printStackTrace()
+            }
+            uiState.value.isLoading = false
+        }
+    }
+
+    override fun onExportToFile(
+        onStatusUpdate: (String) -> Unit,
+        onDocumentExported: (() -> Unit)?,
+    ) {
+        viewModelScope.launch {
+            uiState.value.isLoading = true
+            val document = uiState.value.toDocument(onStatusUpdate)
+                ?: return@launch
+
             runCatching {
                 documentProcessor.processSave(
-                    documentName = DOCUMENT_NAME,
-                    documentResourceFile = DOCUMENT_FILE,
+                    documentName = getString(DOCUMENT_NAME)
+                            + " № " + uiState.value.number,
+                    documentResourceFile = getString(DOCUMENT_RESOURCE),
                     document = document
                 )
-                setStatus(SAVED_FILE)
+                onStatusUpdate.invoke(getString(Res.string.form_exported))
             }.onFailure { e ->
-                setStatus(FAILED_SAVING_FILE)
+                onStatusUpdate.invoke(getString(Res.string.form_error_failed_exporting))
                 e.printStackTrace()
             }
-            isLoading.value = false
+            uiState.value.isLoading = false
         }
     }
 
-    suspend fun deleteCurrentDocumentSuspend(
-        onDocumentDeleted: (() -> Unit)? = null
+    override fun onPrintDocument(
+        onStatusUpdate: (String) -> Unit,
+        onDocumentPrinted: (() -> Unit)?,
     ) {
-        isLoading.value = true
-        val docId = uiState.value.selectedDocumentId ?: return
-        runCatching {
-            uiState.value.selectedDocumentId = null
-            repository.deleteDocument(docId)
-            setStatus(DELETED)
-            onDocumentDeleted?.invoke()
-        }.onFailure { e ->
-            setStatus(FAILED_DELETING)
-            e.printStackTrace()
-        }
-        isLoading.value = false
-    }
-
-    fun onPrintDocument() {
-        isLoading.value = true
-        val document = uiState.value.toDocument() ?: return
-
         viewModelScope.launch {
+            uiState.value.isLoading = true
+            val document = uiState.value.toDocument(onStatusUpdate)
+                ?: return@launch
+
             runCatching {
                 documentProcessor.processPrint(
-                    documentName = DOCUMENT_NAME,
-                    documentResourceFile = DOCUMENT_FILE,
+                    documentName = getString(DOCUMENT_NAME)
+                            + " № " + uiState.value.number,
+                    documentResourceFile = getString(DOCUMENT_RESOURCE),
                     document = document
                 )
-                setStatus(PRINTED)
+                onStatusUpdate.invoke(getString(Res.string.form_printed))
+                onDocumentPrinted?.invoke()
             }.onFailure { e ->
-                setStatus(FAILED_PRINTING)
+                onStatusUpdate.invoke(getString(Res.string.form_error_failed_printing))
                 e.printStackTrace()
             }
-            isLoading.value = false
+            uiState.value.isLoading = false
         }
-    }
-
-    private fun setStatus(message: String) {
-        uiState.value.statusMessage = message
     }
 }

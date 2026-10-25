@@ -9,8 +9,10 @@
  * for more details: <https://gnu.org>
  */
 
-package ru.example.docmanager.ui.viewmodel.forms
+package ru.example.docmanager.ui.router
 
-abstract class BodyItem(
-    open val id: Int
-)
+enum class NavigationType {
+    RESET,
+    REPLACE,
+    PUSH
+}

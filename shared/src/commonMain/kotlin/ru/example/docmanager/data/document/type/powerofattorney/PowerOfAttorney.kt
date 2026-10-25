@@ -15,7 +15,7 @@ import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.document.WithBody
 
-class PowerOfAttorney(
+data class PowerOfAttorney(
     override val header: PowerOfAttorneyHeader,
     override val body: PowerOfAttorneyBody,
     override val type: DocumentType = DocumentType.POWER_OF_ATTORNEY

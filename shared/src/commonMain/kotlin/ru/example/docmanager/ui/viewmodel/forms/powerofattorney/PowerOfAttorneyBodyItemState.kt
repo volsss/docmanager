@@ -12,11 +12,11 @@
 package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
 
 import ru.example.docmanager.data.reference.Product
-import ru.example.docmanager.ui.viewmodel.forms.BodyItem
+import ru.example.docmanager.ui.viewmodel.forms.BodyItemState
 
 data class PowerOfAttorneyBodyItemState(
     override val id: Int,
     val product: Product? = null,
     val unit: String = "шт",
     val count: String = "Один"
-) : BodyItem(id)
+) : BodyItemState(id)

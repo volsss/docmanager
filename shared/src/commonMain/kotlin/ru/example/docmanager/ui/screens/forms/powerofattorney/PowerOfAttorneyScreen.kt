@@ -43,6 +43,7 @@ import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.ui.components.DateInput
 import ru.example.docmanager.ui.components.ReferenceDropdown
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.utils.applyAdaptive
@@ -55,13 +56,12 @@ import kotlin.time.Duration.Companion.milliseconds
 fun PowerOfAttorneyScreen(
     document: Document?,
     onStatusMessage: (String) -> Unit,
-    navigateTo: (Route, Boolean) -> Unit,
+    navigateTo: (Route, NavigationType) -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     scrollState: ScrollState,
     viewModel: PowerOfAttorneyViewModel = koinInject()
 ) {
     val scope = rememberCoroutineScope()
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val formState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val organizations = remember(formState) {
@@ -78,10 +78,15 @@ fun PowerOfAttorneyScreen(
     }
 
     LaunchedEffect(document) {
-        viewModel.loadInitialData(document)
+        viewModel.onInit(
+            onStatusUpdate = { message ->
+                onStatusMessage(message)
+            },
+            document = document
+        )
     }
 
-    if (isLoading) {
+    if (formState.isLoading) {
         LoadingContent()
         return
     }
@@ -98,10 +103,6 @@ fun PowerOfAttorneyScreen(
         }
     }
 
-    LaunchedEffect(formState.statusMessage) {
-        formState.statusMessage?.let(onStatusMessage)
-    }
-
     Column(
         modifier = Modifier.adaptiveWidth(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -109,15 +110,49 @@ fun PowerOfAttorneyScreen(
     ) {
         PowerOfAttorneyActions(
             isEditing = formState.isEditing,
-            onSaveDocument = viewModel::onSaveDocument,
-            onSaveAsNewDocument = viewModel::onSaveAsNewDocument,
-            onDeleteDocument = {
-                viewModel.onDeleteCurrentDocument {
-                    navigateTo(Route.Documents(formState.type), true)
-                }
+            onSaveDocument = {
+                viewModel.onSaveDocument(
+                    onStatusUpdate = onStatusMessage,
+                    onDocumentSaved = { newDocument ->
+                        navigateTo(
+                            Route.Form(formState.type, newDocument),
+                            NavigationType.REPLACE
+                        )
+                    }
+                )
             },
-            onExportDocument = viewModel::onExportToFile,
-            onPrintDocument = viewModel::onPrintDocument
+            onSaveAsNewDocument = {
+                viewModel.onSaveAsNewDocument(
+                    onStatusUpdate = onStatusMessage,
+                    onDocumentSaved = { newDocument ->
+                        navigateTo(
+                            Route.Form(formState.type, newDocument),
+                            NavigationType.REPLACE
+                        )
+                    }
+                )
+            },
+            onDeleteDocument = {
+                viewModel.onDeleteDocument(
+                    onStatusUpdate = onStatusMessage,
+                    onDocumentDeleted = {
+                        navigateTo(
+                            Route.Documents(formState.type),
+                            NavigationType.REPLACE
+                        )
+                    }
+                )
+            },
+            onExportDocument = {
+                viewModel.onExportToFile(
+                    onStatusUpdate = onStatusMessage
+                )
+            },
+            onPrintDocument = {
+                viewModel.onPrintDocument(
+                    onStatusUpdate = onStatusMessage
+                )
+            }
         )
 
         PowerOfAttorneyHeaderSection(
@@ -159,7 +194,7 @@ private fun PowerOfAttorneyHeaderSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(Res.string.header),
+                text = stringResource(Res.string.form_section_header),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -207,7 +242,7 @@ private fun PowerOfAttorneyHeaderSection(
                     items = organizations,
                     itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
                     onValueChange = { formState.selectedOrganization = it },
-                    label = stringResource(Res.string.input_organization),
+                    label = stringResource(Res.string.form_field_organization),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -217,7 +252,7 @@ private fun PowerOfAttorneyHeaderSection(
                     itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
                     itemSupportingText = { it?.job ?: "Unknown job" },
                     onValueChange = { formState.selectedIndividual = it },
-                    label = stringResource(Res.string.input_individual),
+                    label = stringResource(Res.string.form_field_individual),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -226,7 +261,7 @@ private fun PowerOfAttorneyHeaderSection(
                     items = suppliers,
                     itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
                     onValueChange = { formState.selectedSupplier = it },
-                    label = stringResource(Res.string.input_supplier),
+                    label = stringResource(Res.string.form_field_supplier),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -268,7 +303,7 @@ private fun PowerOfAttorneyBodySection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(Res.string.body),
+                    text = stringResource(Res.string.form_section_body),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -348,7 +383,7 @@ private fun BodyItemRow(
             items = products,
             itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
             onValueChange = { onItemChange(item.copy(product = it)) },
-            label = stringResource(Res.string.input_product),
+            label = stringResource(Res.string.form_field_product),
             modifier = Modifier.applyAdaptive(
                 whenWide = Modifier.weight(2f),
                 whenNotWide = Modifier.requiredWidth(300.dp)

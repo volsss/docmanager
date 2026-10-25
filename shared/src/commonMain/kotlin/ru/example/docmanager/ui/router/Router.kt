@@ -63,8 +63,15 @@ fun Router(
         }
     }
 
-    fun navigateTo(route: Route, asRoot: Boolean = false) {
-        if (asRoot && backStack.last() != route) backStack.clear()
+    fun navigateTo(
+        route: Route,
+        navigationType: NavigationType = NavigationType.PUSH
+    ) {
+        when (navigationType) {
+            NavigationType.PUSH -> Unit
+            NavigationType.RESET -> backStack.clear()
+            NavigationType.REPLACE -> backStack.removeLastOrNull()
+        }
         backStack.add(route)
     }
 
@@ -94,7 +101,7 @@ private fun RouterContent(
     currentRoute: Route,
     backStack: NavBackStack<NavKey>,
     onBack: () -> Unit,
-    navigateTo: (Route, Boolean) -> Unit,
+    navigateTo: (Route, NavigationType) -> Unit,
     showSnackbar: (String) -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -170,7 +177,7 @@ private fun RouterSnackbarHost(
 @Composable
 private fun RouterNavDisplay(
     backStack: NavBackStack<NavKey>,
-    navigateTo: (Route, Boolean) -> Unit,
+    navigateTo: (Route, NavigationType) -> Unit,
     onBack: () -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     showSnackbar: (String) -> Unit,
@@ -186,7 +193,9 @@ private fun RouterNavDisplay(
         entryProvider = entryProvider {
             entry<Route.Start> {
                 StartScreen(
-                    navigateTo = { route -> navigateTo(route, false) }
+                    navigateTo = { route ->
+                        navigateTo(route, NavigationType.PUSH)
+                    }
                 )
             }
             entry<Route.Settings> {
@@ -194,13 +203,17 @@ private fun RouterNavDisplay(
             }
             entry<Route.DocumentTypes> {
                 DocumentTypesScreen(
-                    navigateTo = { route -> navigateTo(route, false) }
+                    navigateTo = { route ->
+                        navigateTo(route, NavigationType.PUSH)
+                    }
                 )
             }
             entry<Route.Documents> {
                 DocumentsScreen(
                     destination = it,
-                    navigateTo = { route -> navigateTo(route, false) },
+                    navigateTo = { route ->
+                        navigateTo(route, NavigationType.PUSH)
+                    },
                     registerFabClickAction = registerFabClickAction,
                     viewModel = koinViewModel(key = it.type.name) {
                         parametersOf(it)
@@ -217,7 +230,9 @@ private fun RouterNavDisplay(
             }
             entry<Route.References> {
                 ReferencesScreen(
-                    navigateTo = { route -> navigateTo(route, false) }
+                    navigateTo = { route ->
+                        navigateTo(route, NavigationType.PUSH)
+                    }
                 )
             }
             entry<Route.Reference> {
@@ -279,7 +294,7 @@ private fun RouterTopBar(
 @Composable
 private fun RouterBottomBar(
     currentRoute: Route,
-    navigateTo: (Route, Boolean) -> Unit
+    navigateTo: (Route, NavigationType) -> Unit
 ) {
     AnimatedVisibility(
         visible = currentRoute is Route.Start
@@ -301,22 +316,22 @@ private fun RouterBottomBar(
             RouterBarItem(
                 route = Route.Start,
                 selected = currentRoute is Route.Start,
-                onClick = { navigateTo(Route.Start, true) },
+                onClick = { navigateTo(Route.Start, NavigationType.RESET) },
             )
             RouterBarItem(
                 route = Route.DocumentTypes,
                 selected = currentRoute is Route.DocumentTypes,
-                onClick = { navigateTo(Route.DocumentTypes, true) },
+                onClick = { navigateTo(Route.DocumentTypes, NavigationType.RESET) },
             )
             RouterBarItem(
                 route = Route.References,
                 selected = currentRoute is Route.References,
-                onClick = { navigateTo(Route.References, true) },
+                onClick = { navigateTo(Route.References, NavigationType.RESET) },
             )
             RouterBarItem(
                 route = Route.Settings,
                 selected = currentRoute is Route.Settings,
-                onClick = { navigateTo(Route.Settings, true) },
+                onClick = { navigateTo(Route.Settings, NavigationType.RESET) },
             )
         }
     }

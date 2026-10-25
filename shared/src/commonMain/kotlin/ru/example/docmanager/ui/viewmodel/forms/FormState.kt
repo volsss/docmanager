@@ -18,38 +18,19 @@ import kotlinx.datetime.LocalDate
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
 
-abstract class FormState<D : Document, B : BodyItem>(
+abstract class FormState<D : Document>(
     val type: DocumentType,
     open val today: LocalDate,
 ) {
     var selectedDocumentId by mutableStateOf<Int?>(null)
-
     val isEditing: Boolean
         get() = selectedDocumentId != null
 
-    var statusMessage by mutableStateOf<String?>(null)
-
+    // TODO make Int
     var number by mutableStateOf("1")
     var dischargeDate by mutableStateOf(today)
 
-    var bodyItems: List<B> by mutableStateOf(emptyList())
-
-    fun updateBodyItem(index: Int, item: B) {
-        bodyItems = bodyItems.toMutableList().also {
-            if (index in it.indices) it[index] = item
-        }
-    }
-
-    fun removeBodyItem(index: Int) {
-        bodyItems = if (bodyItems.size > 1) {
-            bodyItems.filterIndexed { i, _ -> i != index }
-        } else {
-            listOf()
-        }
-    }
-
-    abstract fun addBodyItem()
+    abstract val isLoading: Boolean
     abstract fun populateFromDocument(document: D)
-
-    abstract fun toDocument(): D?
+    abstract suspend fun toDocument(onError: ((String) -> Unit)?): D?
 }

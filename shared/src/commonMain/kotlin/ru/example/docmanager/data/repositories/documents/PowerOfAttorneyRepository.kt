@@ -54,7 +54,9 @@ class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
                 it[productId] = body.product.id
             }
         }
-        headerId
+        document.copy(
+            header = document.header.copy(id = headerId)
+        )
     }
 
     override suspend fun updateDocument(document: PowerOfAttorney): Unit =

@@ -135,7 +135,7 @@ fun ConnectionContent(
         ) {
             TextInput(
                 value = jdbcUrl,
-                label = stringResource(Res.string.input_jdbc_url),
+                label = stringResource(Res.string.start_input_jdbc_url),
                 onValueChange = { onJdbcUrlChanged(it) },
                 required = true,
                 enabled = jdbcUrl != Utils.H2_DRIVER,
@@ -145,7 +145,7 @@ fun ConnectionContent(
             Dropdown(
                 value = driver,
                 items = listOf(Utils.H2_DRIVER, Utils.POSTGRES_DRIVER),
-                label = stringResource(Res.string.input_driver),
+                label = stringResource(Res.string.start_input_driver),
                 supportingText = stringResource(Res.string.component_input_required),
                 onValueChange = {
                     onDriverChanged(it)
@@ -167,7 +167,7 @@ fun ConnectionContent(
                 ) {
                     TextInput(
                         value = username,
-                        label = stringResource(Res.string.input_user),
+                        label = stringResource(Res.string.start_input_user),
                         onValueChange = { onUsernameChanged(it) },
                         required = true,
                         modifier = Modifier.fillMaxWidth()
@@ -175,7 +175,7 @@ fun ConnectionContent(
 
                     TextInput(
                         value = password,
-                        label = stringResource(Res.string.input_password),
+                        label = stringResource(Res.string.start_input_password),
                         onValueChange = { onPasswordChanged(it) },
                         required = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -187,15 +187,15 @@ fun ConnectionContent(
             AnimatedVisibility(errorMessage != null) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    errorMessage ?: stringResource(Res.string.unknown_error),
+                    errorMessage ?: stringResource(Res.string.common_unknown_error),
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Left
                 )
             }
 
             Spacer(Modifier.heightIn(16.dp))
-            val jdbcEmpty = stringResource(Res.string.start_jdbc_empty)
-            val postgresUserAndPasswordEmpty = stringResource(Res.string.start_postgres_user_and_password_empty)
+            val jdbcEmpty = stringResource(Res.string.start_error_jdbc_empty)
+            val postgresUserAndPasswordEmpty = stringResource(Res.string.start_error_postgres_user_and_password_empty)
             Button(
                 onClick = {
                     if (jdbcUrl.isBlank()) {

@@ -10,89 +10,108 @@
   -->
 
 <resources>
-    <string name="start_title">docmanager</string>
-    <string name="start_jdbc_empty">JDBC URL не может быть пустым</string>
-    <string name="start_postgres_user_and_password_empty">
-        Пользователь и пароль не могут быть пустыми для PostgreSQL
-    </string>
-    <string name="start_connect_button">Подключиться</string>
+    <!-- Common & Components -->
+    <string name="common_unknown_error">Неизвестная ошибка</string>
+    <string name="component_back_button">Назад</string>
+    <string name="component_datepicker_confirm_button">Выбрать</string>
+    <string name="component_datepicker_dismiss_button">Отмена</string>
+    <string name="component_dropdown_placeholder">Выберите значение</string>
+    <string name="component_input_required">* Обязательное поле</string>
 
-    <string name="dashboard_project_name_fallback">Неназванный проект</string>
-    <string name="dashboard_tabs_more">Ещё</string>
-    <string name="dashboard_action_settings">Настройки</string>
-    <string name="dashboard_action_disconnect">Отключиться</string>
-
-    <string name="documents_empty_content">Заполненных документов нет</string>
-    <string name="documents_empty_new_button">Новый документ</string>
-    <string name="documents_fab">Новый документ</string>
-
-    <string name="form_fab">Новый элемент</string>
-
-    <string name="reference_save_button">Сохранить</string>
-    <string name="reference_new_item_button">Новое поле</string>
-
-    <string name="settings_field_project_name">Название</string>
-    <string name="settings_field_version">Версия</string>
-    <string name="settings_field_author">Автор</string>
-    <string name="settings_field_creation_date">Дата создания</string>
-    <string name="settings_save_button">Сохранить</string>
-
-    <string name="input_jdbc_url">JDBC URL*</string>
-    <string name="input_driver">Драйвер*</string>
-    <string name="input_user">Пользователь</string>
-    <string name="input_password">Пароль</string>
-
-    <string name="route_home">Главная</string>
-    <string name="route_form">Форма</string>
-    <string name="route_documents">Документы</string>
+    <!-- Navigation & Routes -->
     <string name="route_document_types">Виды документов</string>
+    <string name="route_documents">Документы</string>
+    <string name="route_form">Форма</string>
+    <string name="route_home">Главная</string>
     <string name="route_reference">Справочник</string>
     <string name="route_references">Справочники</string>
     <string name="route_settings">Настройки</string>
 
-    <string name="document_power_of_attorney">Доверенность</string>
-    <string name="document_test">Тестовый документ</string>
+    <!-- Dashboard & Navigation Bar -->
+    <string name="dashboard_action_disconnect">Отключиться</string>
+    <string name="dashboard_action_settings">Настройки</string>
+    <string name="dashboard_project_name_fallback">Неназванный проект</string>
+    <string name="dashboard_tabs_more">Ещё</string>
 
+    <!-- Connection / Start Screen -->
+    <string name="start_connect_button">Подключиться</string>
+    <string name="start_error_jdbc_empty">JDBC URL не может быть пустым</string>
+    <string name="start_error_postgres_user_and_password_empty">
+        Пользователь и пароль не могут быть пустыми для PostgreSQL
+    </string>
+    <string name="start_input_driver">Драйвер*</string>
+    <string name="start_input_jdbc_url">JDBC URL*</string>
+    <string name="start_input_password">Пароль</string>
+    <string name="start_input_user">Пользователь</string>
+    <string name="start_title">docmanager</string>
+
+    <!-- Document Types & Filed -->
+    <string name="document_power_of_attorney">Доверенность</string>
+    <string name="document_power_of_attorney_resource">Доверенность.docx</string>
+    <string name="document_test">Тестовый документ</string>
+    <string name="document_test_resource">Тестовый документ.docx</string>
+
+    <!-- Documents Screen -->
+    <string name="documents_empty_content">Заполненных документов нет</string>
+    <string name="documents_empty_new_button">Новый документ</string>
+    <string name="documents_fab">Новый документ</string>
+
+    <!-- References Screen & Types -->
     <string name="reference_individuals">Физические лица</string>
+    <string name="reference_new_item_button">Новое поле</string>
     <string name="reference_organizations">Организации</string>
     <string name="reference_products">Материальные ценности</string>
+    <string name="reference_save_button">Сохранить</string>
     <string name="reference_suppliers">Поставщики</string>
 
-    <string name="header">Шапка документа</string>
-    <string name="body">Тело документа</string>
+    <!-- Forms & Document Editing -->
+    <string name="form_deleted">Форма удалена</string>
+    <string name="form_error_empty_required">Заполните все обязательные поля</string>
+    <string name="form_error_failed_deleting">Ошибка удаления</string>
+    <string name="form_error_failed_exporting">Ошибка сохранения файла</string>
+    <string name="form_error_failed_init">Ошибка инициализации формы</string>
+    <string name="form_error_failed_printing">Ошибка печати</string>
+    <string name="form_error_failed_saving">Ошибка сохранения формы</string>
+    <string name="form_exported">Форма экспортирована в файл</string>
+    <string name="form_fab">Новый элемент</string>
+    <string name="form_field_individual">Физическое лицо</string>
+    <string name="form_field_organization">Организация</string>
+    <string name="form_field_product">Материальная ценность</string>
+    <string name="form_field_supplier">Поставщик</string>
+    <string name="form_printed">Форма распечатана</string>
+    <string name="form_saved">Форма сохранена</string>
+    <string name="form_saved_as_new">Форма сохранена как новая</string>
+    <string name="form_section_body">Тело документа</string>
+    <string name="form_section_header">Шапка документа</string>
 
-    <string name="header_field_number">Номер документа</string>
+    <!-- Document Header Fields -->
     <string name="header_field_discharge_date">Дата</string>
     <string name="header_field_end_date">Дата окончания</string>
-    <string name="header_field_supplier_agreement">Договор поставки</string>
+    <string name="header_field_individual_date">Дата выдачи</string>
+    <string name="header_field_individual_issued">Выдан</string>
     <string name="header_field_individual_job">Должность</string>
     <string name="header_field_individual_name">ФИО</string>
-    <string name="header_field_individual_series">Серия</string>
     <string name="header_field_individual_number">Номер</string>
-    <string name="header_field_individual_issued">Выдан</string>
-    <string name="header_field_individual_date">Дата выдачи</string>
-    <string name="header_field_organization_name">Наименование организации</string>
-    <string name="header_field_organization_consumer">Потребитель</string>
-    <string name="header_field_organization_payer">Плательщик</string>
+    <string name="header_field_individual_series">Серия</string>
+    <string name="header_field_number">Номер документа</string>
     <string name="header_field_organization_account">Счет</string>
+    <string name="header_field_organization_consumer">Потребитель</string>
+    <string name="header_field_organization_name">Наименование организации</string>
+    <string name="header_field_organization_payer">Плательщик</string>
     <string name="header_field_product_name">Название</string>
+    <string name="header_field_supplier_agreement">Договор поставки</string>
     <string name="header_field_supplier_name">Наименование поставщика</string>
 
+    <!-- Document Body Fields -->
+    <string name="body_field_count">Количество</string>
     <string name="body_field_number_sorted">Номер по порядку</string>
     <string name="body_field_products">Материальные ценности</string>
     <string name="body_field_unit">Единица измерения</string>
-    <string name="body_field_count">Количество</string>
 
-    <string name="input_individual">Физическое лицо</string>
-    <string name="input_organization">Организация</string>
-    <string name="input_supplier">Поставщик</string>
-    <string name="input_product">Материальная ценность</string>
-
-    <string name="component_input_required">* Обязательное поле</string>
-    <string name="component_dropdown_placeholder">Выберите значение</string>
-    <string name="component_back_button">Назад</string>
-    <string name="component_datepicker_dismiss_button">Отмена</string>
-    <string name="component_datepicker_confirm_button">Выбрать</string>
-
-    <string name="unknown_error">Неизвестная ошибка</string>
+    <!-- Settings Screen -->
+    <string name="settings_field_author">Автор</string>
+    <string name="settings_field_creation_date">Дата создания</string>
+    <string name="settings_field_project_name">Название</string>
+    <string name="settings_field_version">Версия</string>
+    <string name="settings_save_button">Сохранить</string>
 </resources>

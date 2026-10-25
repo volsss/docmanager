@@ -25,6 +25,7 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.data.document.DocumentType
+import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScreen
 
@@ -32,7 +33,7 @@ import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScr
 fun FormScreen(
     destination: Route.Form,
     onStatusMessage: (String) -> Unit,
-    navigateTo: (Route, Boolean) -> Unit,
+    navigateTo: (Route, NavigationType) -> Unit,
     registerFabClickAction: ((() -> Unit)?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
