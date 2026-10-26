@@ -19,11 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Modifier.adaptiveWidth(): Modifier {
-    return this.widthIn(max = 891.dp).fillMaxWidth()
+fun Modifier.adaptiveWidth(max: Dp = 891.dp): Modifier {
+    return this.widthIn(max = max).fillMaxWidth()
 }
 
 @Composable

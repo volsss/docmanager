@@ -11,13 +11,22 @@
 
 package ru.example.docmanager.ui.viewmodel.connection
 
+import ru.example.docmanager.data.database.DatabaseDriver
+
+enum class ConnectionType {
+    LOCAL,
+    REMOTE,
+    OTHER
+}
+
 data class ConnectionUiState(
+    val connectionType: ConnectionType = ConnectionType.LOCAL,
+    val ip: String = "localhost",
     val jdbcUrl: String = "",
-    val driver: String = "",
+    val driver: String = DatabaseDriver.H2.driverClassName,
     val username: String = "",
     val password: String = "",
 
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
     val isConnected: Boolean = false
 )

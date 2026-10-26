@@ -36,14 +36,22 @@
     <!-- Connection / Start Screen -->
     <string name="start_connect_button">Подключиться</string>
     <string name="start_error_jdbc_empty">JDBC URL не может быть пустым</string>
-    <string name="start_error_postgres_user_and_password_empty">
-        Пользователь и пароль не могут быть пустыми для PostgreSQL
+    <string name="start_error_ip_empty">IP адрес не может быть пустым</string>
+    <string name="start_error_postgres_user_and_password_empty">Пользователь и пароль не могут быть пустыми для
+        PostgreSQL
     </string>
     <string name="start_input_driver">Драйвер*</string>
+    <string name="start_input_ip">IP адрес*</string>
     <string name="start_input_jdbc_url">JDBC URL*</string>
     <string name="start_input_password">Пароль</string>
     <string name="start_input_user">Пользователь</string>
     <string name="start_title">docmanager</string>
+    <string name="start_option_local">Локально</string>
+    <string name="start_option_local_supporting">Локальная H2 база данных</string>
+    <string name="start_option_remote">Удалённо</string>
+    <string name="start_option_remote_supporting">Локальная или удалённая PostgreSQL</string>
+    <string name="start_option_other">Другой</string>
+    <string name="start_option_other_supporting">Ручная настройка подключения</string>
 
     <!-- Document Types & Filed -->
     <string name="document_power_of_attorney">Доверенность</string>
