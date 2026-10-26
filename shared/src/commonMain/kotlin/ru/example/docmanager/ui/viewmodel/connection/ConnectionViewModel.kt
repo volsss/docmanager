@@ -22,11 +22,30 @@ import ru.example.docmanager.data.database.DatabaseDriver
 import ru.example.docmanager.data.database.DatabaseManager
 import ru.example.docmanager.di.Platform
 import ru.example.docmanager.di.getPlatform
-import ru.example.docmanager.ui.utils.Utils
 
 class ConnectionViewModel(
     private val databaseManager: DatabaseManager
 ) : ViewModel() {
+    companion object {
+        const val JVM_H2_JDBC = "jdbc:h2:~/ru.example.docmanager/new_project;MODE=MySQL"
+        const val ANDROID_H2_JDBC = "jdbc:h2:/data/data/ru.example.docmanager/new_project;MODE=MySQL"
+        const val DEFAULT_POSTGRES_JDBC = "jdbc:postgresql://localhost:5432/new_project"
+
+        fun formatPostgresJdbcUrl(ip: String): String {
+            val trimmed = ip.trim()
+            if (trimmed.isEmpty()) return ""
+            if (trimmed.startsWith("jdbc:postgresql://")) return trimmed
+            return if (trimmed.contains(':') || trimmed.contains('/')) {
+                if (trimmed.contains('/')) {
+                    "jdbc:postgresql://$trimmed"
+                } else {
+                    "jdbc:postgresql://$trimmed/new_project"
+                }
+            } else {
+                "jdbc:postgresql://$trimmed:5432/new_project"
+            }
+        }
+    }
 
     private val platform: Platform = getPlatform()
 
@@ -35,7 +54,7 @@ class ConnectionViewModel(
             ConnectionUiState(
                 connectionType = ConnectionType.LOCAL,
                 driver = DatabaseDriver.H2.driverClassName,
-                jdbcUrl = if (platform == Platform.JVM) Utils.JVM_H2_JDBC else Utils.ANDROID_H2_JDBC
+                jdbcUrl = if (platform == Platform.JVM) JVM_H2_JDBC else ANDROID_H2_JDBC
             )
         )
 
@@ -44,7 +63,7 @@ class ConnectionViewModel(
             ConnectionType.LOCAL -> uiState.value.copy(
                 connectionType = type,
                 driver = DatabaseDriver.H2.driverClassName,
-                jdbcUrl = if (platform == Platform.JVM) Utils.JVM_H2_JDBC else Utils.ANDROID_H2_JDBC
+                jdbcUrl = if (platform == Platform.JVM) JVM_H2_JDBC else ANDROID_H2_JDBC
             )
 
             ConnectionType.REMOTE -> {
@@ -61,9 +80,9 @@ class ConnectionViewModel(
                 val driver = uiState.value.driver.ifBlank { DatabaseDriver.POSTGRESQL.driverClassName }
                 val jdbcUrl = uiState.value.jdbcUrl.ifBlank {
                     if (driver == DatabaseDriver.H2.driverClassName) {
-                        if (platform == Platform.JVM) Utils.JVM_H2_JDBC else Utils.ANDROID_H2_JDBC
+                        if (platform == Platform.JVM) JVM_H2_JDBC else ANDROID_H2_JDBC
                     } else {
-                        Utils.DEFAULT_POSTGRES_JDBC
+                        DEFAULT_POSTGRES_JDBC
                     }
                 }
                 uiState.value.copy(
@@ -93,9 +112,9 @@ class ConnectionViewModel(
     fun onDriverChanged(newValue: String) {
         val updatedUrl = if (uiState.value.connectionType == ConnectionType.OTHER) {
             if (newValue == DatabaseDriver.H2.driverClassName && uiState.value.jdbcUrl.startsWith("jdbc:postgresql:")) {
-                if (platform == Platform.JVM) Utils.JVM_H2_JDBC else Utils.ANDROID_H2_JDBC
+                if (platform == Platform.JVM) JVM_H2_JDBC else ANDROID_H2_JDBC
             } else if (newValue == DatabaseDriver.POSTGRESQL.driverClassName && uiState.value.jdbcUrl.startsWith("jdbc:h2:")) {
-                Utils.DEFAULT_POSTGRES_JDBC
+                DEFAULT_POSTGRES_JDBC
             } else {
                 uiState.value.jdbcUrl
             }
@@ -124,7 +143,7 @@ class ConnectionViewModel(
             runCatching {
                 val state = uiState.value
                 val effectiveJdbcUrl = when (state.connectionType) {
-                    ConnectionType.LOCAL -> if (platform == Platform.JVM) Utils.JVM_H2_JDBC else Utils.ANDROID_H2_JDBC
+                    ConnectionType.LOCAL -> if (platform == Platform.JVM) JVM_H2_JDBC else ANDROID_H2_JDBC
                     ConnectionType.REMOTE -> formatPostgresJdbcUrl(state.ip)
                     ConnectionType.OTHER -> state.jdbcUrl
                 }
@@ -153,23 +172,6 @@ class ConnectionViewModel(
                 onSuccess()
             }.onFailure {
                 onError(it.localizedMessage ?: "Failed to connect")
-            }
-        }
-    }
-
-    companion object {
-        fun formatPostgresJdbcUrl(ip: String): String {
-            val trimmed = ip.trim()
-            if (trimmed.isEmpty()) return ""
-            if (trimmed.startsWith("jdbc:postgresql://")) return trimmed
-            return if (trimmed.contains(':') || trimmed.contains('/')) {
-                if (trimmed.contains('/')) {
-                    "jdbc:postgresql://$trimmed"
-                } else {
-                    "jdbc:postgresql://$trimmed/new_project"
-                }
-            } else {
-                "jdbc:postgresql://$trimmed:5432/new_project"
             }
         }
     }
