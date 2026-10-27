@@ -1,0 +1,47 @@
+name: Docs to Docx
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "docs/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Convert MD to DOCX preserving structure
+        run: |
+          mkdir -p docx_output
+
+          find docs -type f -name "*.md" | while read -r file; do
+            dir_name=$(dirname "$file")
+
+            mkdir -p "docx_output/$dir_name"
+
+            output_file="docx_output/${file%.md}.docx"
+
+            echo "Converting $file -> $output_file"
+            pandoc "$file" -o "$output_file"
+          done
+
+      - name: Archive DOCX files
+        run: |
+          cd docx_output && zip -r ../converted_docs.zip docs/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: docx-documents
+          path: converted_docs.zip
+          if-no-files-found: error
