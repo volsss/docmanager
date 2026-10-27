@@ -80,6 +80,6 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: docx-documents
+          name: docs
           path: docx_output
           if-no-files-found: error
