@@ -18,6 +18,14 @@ jobs:
       - name: Install pandoc
         uses: pandoc/actions/setup@v1
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Mermaid filter
+        run: npm install --global mermaid-filter
+
       - name: Convert MD to DOCX preserving structure
         run: |
           mkdir -p docx_output
@@ -30,7 +38,12 @@ jobs:
             output_file="docx_output/${file%.md}.docx"
 
             echo "Converting $file -> $output_file"
-            pandoc -f gfm "$file" --resource-path=".:$dir_name" -o "$output_file"
+            pandoc \
+              --from=gfm \
+              --filter=mermaid-filter \
+              --resource-path=".:$dir_name" \
+              --output="$output_file" \
+              "$file"
           done
 
       - name: Upload Artifact
