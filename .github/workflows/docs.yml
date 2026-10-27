@@ -65,6 +65,7 @@ jobs:
             echo "Converting $file -> $output_file"
             pandoc \
               --from=gfm \
+              --lua-filter=alerts.lua \
               --filter=mermaid-filter \
               --resource-path=".:$dir_name" \
               --output="$output_file" \
