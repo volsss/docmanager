@@ -26,13 +26,22 @@ jobs:
       - name: Install Mermaid filter
         run: npm install --global mermaid-filter
 
-      - name: Install Mermaid CLI with TreeView support
+      - name: Install Mermaid CLI
+        shell: bash
         run: |
-          npm install --prefix "$RUNNER_TEMP/mermaid-cli" \
-            "@mermaid-js/mermaid-cli@^12.0.0"
+          rm -rf "$RUNNER_TEMP/mermaid-cli"
 
-          echo "MERMAID_FILTER_CMD_MMDC=$RUNNER_TEMP/mermaid-cli/node_modules/.bin/mmdc" \
-            >> "$GITHUB_ENV"
+          npm install \
+            --prefix "$RUNNER_TEMP/mermaid-cli" \
+            --no-audit \
+            --no-fund \
+            @mermaid-js/mermaid-cli@12.0.0
+
+          MMDC="$RUNNER_TEMP/mermaid-cli/node_modules/.bin/mmdc"
+
+          "$MMDC" --version
+
+          echo "MERMAID_FILTER_CMD_MMDC=$MMDC" >> "$GITHUB_ENV"
 
       - name: Convert MD to DOCX preserving structure
         run: |
