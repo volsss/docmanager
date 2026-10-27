@@ -889,8 +889,8 @@ println(users["Alex"])
 
 ```kotlin
 val users = mutableMapOf(
-"Alex" to 25,
-"Maria" to 30
+    "Alex" to 25,
+    "Maria" to 30
 )
 ```
 

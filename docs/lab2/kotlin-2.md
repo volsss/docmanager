@@ -75,7 +75,7 @@ printUser("Alex", 25)
 
 ```kotlin
 fun multiply(a: Int, b: Int): Int {
-return a * b
+    return a * b
 }
 ```
 

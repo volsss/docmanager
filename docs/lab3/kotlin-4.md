@@ -292,7 +292,7 @@ val (name, age) = user
 val (name, age) = user
 ```
 
-упрощённо соответствует:
+соответствует:
 
 ```kotlin
 val name = user.component1()
@@ -918,7 +918,7 @@ printValue(3.14)
 
 `Any` является базовым нетривиальным супертипом всех `non-nullable` типов **Kotlin**.
 
-Упрощённо это можно представить так:
+Это можно представить так:
 
 ```mermaid
 flowchart TD
