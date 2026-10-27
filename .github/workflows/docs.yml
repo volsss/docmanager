@@ -29,17 +29,25 @@ jobs:
       - name: Install Mermaid CLI
         shell: bash
         run: |
-          rm -rf "$RUNNER_TEMP/mermaid-cli"
+          set -euo pipefail
+
+          CLI_DIR="$RUNNER_TEMP/mermaid-cli"
+          rm -rf "$CLI_DIR"
 
           npm install \
-            --prefix "$RUNNER_TEMP/mermaid-cli" \
+            --prefix "$CLI_DIR" \
             --no-audit \
             --no-fund \
-            @mermaid-js/mermaid-cli@12.0.0
+            --save-exact \
+            @mermaid-js/mermaid-cli@11.17.0
 
-          MMDC="$RUNNER_TEMP/mermaid-cli/node_modules/.bin/mmdc"
+          MMDC="$CLI_DIR/node_modules/.bin/mmdc"
 
+          echo "Installed Mermaid CLI version:"
           "$MMDC" --version
+
+          echo "Checking legacy options required by mermaid-filter:"
+          "$MMDC" --help | grep -E -- '-w, --width|-f, --pdfFit'
 
           echo "MERMAID_FILTER_CMD_MMDC=$MMDC" >> "$GITHUB_ENV"
 
