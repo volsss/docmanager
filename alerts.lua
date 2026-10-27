@@ -6,6 +6,14 @@ local supported = {
   CAUTION = true
 }
 
+local labels = {
+  NOTE = "ЗАМЕЧАНИЕ",
+  TIP = "СОВЕТ",
+  IMPORTANT = "ВАЖНО",
+  WARNING = "ПРЕДУПРЕЖДЕНИЕ",
+  CAUTION = "ВНИМАНИЕ"
+}
+
 local function remove_prefix(inlines, prefix)
   local result = pandoc.List()
   local remaining = #prefix
@@ -53,7 +61,7 @@ function BlockQuote(el)
   table.insert(
     first.content,
     1,
-    pandoc.Strong({ pandoc.Str(kind .. ":") })
+    pandoc.Strong({ pandoc.Str((labels[kind] or kind) .. ":") })
   )
 
   return pandoc.Div(
