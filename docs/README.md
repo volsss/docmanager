@@ -1,3 +1,9 @@
+---
+title: "docmanager"
+author: Andrew Z.
+date: 20.06.2026
+---
+
 # docmanager
 
 **`docmanager`** — это учебный проект и практическое руководство по разработке 

@@ -16,6 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Go to docs working directory
+        run: cd docs
+
       - name: Install pandoc
         uses: pandoc/actions/setup@v1
 
@@ -56,7 +59,7 @@ jobs:
         run: |
           mkdir -p docx_output
 
-          find docs -type f -name "*.md" | while read -r file; do
+          find . -type f -name "*.md" | while read -r file; do
             dir_name=$(dirname "$file")
 
             mkdir -p "docx_output/$dir_name"
@@ -64,11 +67,10 @@ jobs:
             output_file="docx_output/${file%.md}.docx"
 
             echo "Converting $file -> $output_file"
-            pandoc \
-              --from=gfm \
+          
+            pandoc --from=gfm \
               --reference-doc=reference.docx \
-              --toc \
-              --toc-depth=2 \
+              --toc --toc-depth=2 \
               --metadata=toc-title="Содержание" \
               --lua-filter=alerts.lua \
               --filter=mermaid-filter \
