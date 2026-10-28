@@ -69,7 +69,7 @@ jobs:
             echo "Converting $file -> $output_file"
           
             pandoc --from=gfm \
-              --reference-doc=reference.docx \
+              --reference-doc=docs/reference.docx \
               --toc --toc-depth=2 \
               --metadata=toc-title="Содержание" \
               --lua-filter=docs/alerts.lua \
