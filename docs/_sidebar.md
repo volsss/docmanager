@@ -34,8 +34,8 @@
   - [⚠️ Практическое задание ](lab6/practice.md)
 ---
 - [Лабораторная работа 7](lab7/)
-  - [⚠️ Теория Compose I](lab7/compose-1.md)
-  - [⚠️ Теория Compose II](lab7/compose-2.md)
+  - [Теория Compose I](lab7/compose-1.md)
+  - [Теория Compose II](lab7/compose-2.md)
   - [⚠️ Практическое задание ](lab7/practice.md)
 ---
 - [Лабораторная работа 8](lab8/)
