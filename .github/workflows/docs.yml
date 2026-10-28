@@ -45,7 +45,7 @@ jobs:
             --save-exact \
             @mermaid-js/mermaid-cli@11.17.0
 
-          MMDC="$CLI_DIR/node_modules/.bin/mmdc --no-sandbox"
+          MMDC="$CLI_DIR/node_modules/.bin/mmdc"
 
           echo "Installed Mermaid CLI version:"
           "$MMDC" --version
