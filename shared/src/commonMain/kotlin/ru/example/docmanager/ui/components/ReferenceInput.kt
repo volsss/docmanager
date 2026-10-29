@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,12 +42,7 @@ fun ReferenceInput(
         Text(item.id.toString())
 
         item.toMap().forEach { (type, value) ->
-            OutlinedTextField(
-                label = { Text(stringResource(type.stringResource)) },
-                modifier = Modifier.applyAdaptive(
-                    whenWide = Modifier.weight(1f),
-                    whenNotWide = Modifier.widthIn(min = 300.dp)
-                ),
+            TextInput(
                 value = currentValues[type] ?: value,
                 onValueChange = { newValue ->
                     onFieldChange(
@@ -57,7 +51,11 @@ fun ReferenceInput(
                         newValue
                     )
                 },
-                singleLine = true
+                label = stringResource(type.stringResource),
+                modifier = Modifier.applyAdaptive(
+                    whenWide = Modifier.weight(1f),
+                    whenNotWide = Modifier.widthIn(min = 300.dp)
+                ),
             )
         }
 
