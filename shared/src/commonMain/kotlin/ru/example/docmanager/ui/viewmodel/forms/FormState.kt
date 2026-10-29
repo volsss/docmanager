@@ -11,26 +11,20 @@
 
 package ru.example.docmanager.ui.viewmodel.forms
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import kotlinx.datetime.LocalDate
 import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.document.DocumentType
 
 abstract class FormState<D : Document>(
-    val type: DocumentType,
-    open val today: LocalDate,
+    val type: DocumentType
 ) {
-    var selectedDocumentId by mutableStateOf<Int?>(null)
-    val isEditing: Boolean
-        get() = selectedDocumentId != null
-
-    // TODO make Int
-    var number by mutableStateOf("1")
-    var dischargeDate by mutableStateOf(today)
+    abstract val documentId: Int?
+    abstract val number: Int
+    abstract val dischargeDate: LocalDate
 
     abstract val isLoading: Boolean
-    abstract fun populateFromDocument(document: D)
+    val isEditing: Boolean
+        get() = documentId != null
+
     abstract suspend fun toDocument(onError: ((String) -> Unit)?): D?
 }

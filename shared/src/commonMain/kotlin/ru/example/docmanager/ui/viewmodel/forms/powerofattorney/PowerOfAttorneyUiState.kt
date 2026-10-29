@@ -11,16 +11,10 @@
 
 package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.fastFilteredMap
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.form_error_empty_required
-import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.plus
-import kotlinx.datetime.todayIn
+import kotlinx.datetime.*
 import org.jetbrains.compose.resources.getString
 import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
@@ -31,90 +25,47 @@ import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
-import ru.example.docmanager.ui.viewmodel.forms.WithBodyFormState
+import ru.example.docmanager.ui.viewmodel.forms.FormState
 import kotlin.time.Clock
 
 data class PowerOfAttorneyUiState(
     val individuals: List<Individual> = emptyList(),
     val organizations: List<Organization> = emptyList(),
     val products: List<Product> = emptyList(),
-    val suppliers: List<Supplier> = emptyList()
-) : WithBodyFormState<PowerOfAttorney, PowerOfAttorneyBodyItemState>(
-    type = DocumentType.POWER_OF_ATTORNEY,
-    today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-) {
-    override var isLoading by mutableStateOf(true)
-    val defaultEndDate = today.plus(DatePeriod(days = 30))
-    var endDate by mutableStateOf(defaultEndDate)
-    var selectedOrganization by mutableStateOf<Organization?>(null)
-    var selectedIndividual by mutableStateOf<Individual?>(null)
-    var selectedSupplier by mutableStateOf<Supplier?>(null)
-    var supplierAgreement by mutableStateOf("")
+    val suppliers: List<Supplier> = emptyList(),
 
-    override fun addBodyItem() {
-        bodyItems = bodyItems + PowerOfAttorneyBodyItemState(
-            id = bodyItems.size
-        )
-    }
+    override val documentId: Int? = null,
+    override val number: Int = 1,
+    override val dischargeDate: LocalDate =
+        Clock.System.todayIn(TimeZone.currentSystemDefault()),
+    val endDate: LocalDate = dischargeDate.plus(DatePeriod(days = 30)),
+    val organization: Organization? = null,
+    val individual: Individual? = null,
+    val supplier: Supplier? = null,
+    val supplierAgreement: String = "",
 
-    override fun populateFromDocument(
-        document: PowerOfAttorney
-    ) {
-        selectedDocumentId = document.header.id
-        number = document.header.number.toString()
-        dischargeDate = document.header.dischargeDate
-        endDate = document.header.endDate
-        selectedOrganization =
-            organizations.firstOrNull {
-                it.id == document.header.organization.id
-            } ?: document.header.organization
-        selectedIndividual =
-            individuals.firstOrNull {
-                it.id == document.header.individual.id
-            } ?: document.header.individual
-        selectedSupplier =
-            suppliers.firstOrNull {
-                it.id == document.header.supplier.id
-            } ?: document.header.supplier
-        supplierAgreement = document.header.supplierAgreement
-        bodyItems = if (document.body.items.isNotEmpty()) {
-            document.body.items.map { body ->
-                PowerOfAttorneyBodyItemState(
-                    id = body.id,
-                    product = products.firstOrNull {
-                        it.id == body.product.id
-                    } ?: body.product,
-                    unit = body.unit,
-                    count = body.count
-                )
-            }
-        } else {
-            listOf()
-        }
-    }
+    var bodyItems: List<PowerOfAttorneyBodyItemState> = emptyList(),
+
+    override val isLoading: Boolean = true
+) : FormState<PowerOfAttorney>(DocumentType.POWER_OF_ATTORNEY) {
 
     override suspend fun toDocument(
         onError: ((String) -> Unit)?
     ): PowerOfAttorney? {
-        if (selectedOrganization == null
-            || selectedIndividual == null
-            || selectedSupplier == null
+        if (organization == null || individual == null || supplier == null
         ) {
             onError?.invoke(getString(Res.string.form_error_empty_required))
             return null
         }
-        val org = selectedOrganization!!
-        val ind = selectedIndividual!!
-        val sup = selectedSupplier!!
 
         val header = PowerOfAttorneyHeader(
-            id = selectedDocumentId ?: 0,
-            organization = org,
-            number = number.toIntOrNull() ?: 0,
+            id = documentId ?: 0,
+            organization = organization,
+            number = number,
             dischargeDate = dischargeDate,
             endDate = endDate,
-            individual = ind,
-            supplier = sup,
+            individual = individual,
+            supplier = supplier,
             supplierAgreement = supplierAgreement
         )
 

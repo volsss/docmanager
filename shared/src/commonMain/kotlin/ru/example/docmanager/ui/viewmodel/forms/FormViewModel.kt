@@ -55,7 +55,6 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
                     repository.updateDocument(document)
                     onDocumentUpdated?.invoke()
                 } else {
-                    uiState.value.selectedDocumentId = null
                     onDocumentSaved?.invoke(repository.createDocument(document))
                 }
                 onStatusUpdate.invoke(getString(Res.string.form_saved))
@@ -78,7 +77,6 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
 
             runCatching {
                 val newDocument = repository.createDocument(document)
-                uiState.value.selectedDocumentId = null
                 onStatusUpdate.invoke(getString(Res.string.form_saved_as_new))
                 onDocumentSaved?.invoke(newDocument)
             }.onFailure { e ->
@@ -95,9 +93,8 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
     ) {
         viewModelScope.launch {
             setLoading(true)
-            val docId = uiState.value.selectedDocumentId ?: return@launch
+            val docId = uiState.value.documentId ?: return@launch
             runCatching {
-                uiState.value.selectedDocumentId = null
                 repository.deleteDocument(docId)
                 onStatusUpdate.invoke(getString(Res.string.form_deleted))
                 onDocumentDeleted?.invoke()

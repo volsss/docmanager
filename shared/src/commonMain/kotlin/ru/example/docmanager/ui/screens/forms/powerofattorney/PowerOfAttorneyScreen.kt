@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import ru.example.docmanager.data.document.Document
@@ -41,6 +42,7 @@ import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.ui.components.DateInput
+import ru.example.docmanager.ui.components.IntInput
 import ru.example.docmanager.ui.components.ReferenceDropdown
 import ru.example.docmanager.ui.components.TextInput
 import ru.example.docmanager.ui.router.NavigationType
@@ -64,15 +66,6 @@ fun PowerOfAttorneyScreen(
     val scope = rememberCoroutineScope()
     val formState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val organizations = remember(formState) {
-        formState.organizations
-    }
-    val individuals = remember(formState) {
-        formState.individuals
-    }
-    val suppliers = remember(formState) {
-        formState.suppliers
-    }
     val products = remember(formState) {
         formState.products
     }
@@ -93,7 +86,7 @@ fun PowerOfAttorneyScreen(
 
     LaunchedEffect(scope, registerFabClickAction, formState) {
         registerFabClickAction {
-            formState.addBodyItem()
+            viewModel.addBodyItem()
             scope.launch {
                 delay(280.milliseconds)
                 scrollState.animateScrollTo(
@@ -157,14 +150,19 @@ fun PowerOfAttorneyScreen(
 
         PowerOfAttorneyHeaderSection(
             formState = formState,
-            organizations = organizations,
-            individuals = individuals,
-            suppliers = suppliers
+            onNumberChanged = viewModel::onNumberChanged,
+            onDischargeDateChanged = viewModel::onDischargeDateChanged,
+            onEndDateChanged = viewModel::onEndDateChanged,
+            onOrganizationChanged = viewModel::onOrganizationChanged,
+            onIndividualChanged = viewModel::onIndividualChanged,
+            onSupplierChanged = viewModel::onSupplierChanged,
+            onSupplierAgreementChanged = viewModel::onSupplierAgreementChanged,
         )
 
         PowerOfAttorneyBodySection(
             formState = formState,
-            products = products
+            onUpdateBodyItem = viewModel::updateBodyItem,
+            onRemoveBodyItem = viewModel::removeBodyItem,
         )
     }
 
@@ -172,15 +170,12 @@ fun PowerOfAttorneyScreen(
 }
 
 @Composable
-private fun PowerOfAttorneyHeaderSection(
-    formState: PowerOfAttorneyUiState,
-    organizations: List<Organization>,
-    individuals: List<Individual>,
-    suppliers: List<Supplier>,
-    modifier: Modifier = Modifier
+private fun PowerOfAttorneySection (
+    label: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
 ) {
     val isExpanded = remember { mutableStateOf(true) }
-
     Card(
         modifier = modifier.fillMaxWidth().animateContentSize(),
         colors = CardDefaults.cardColors(
@@ -194,7 +189,7 @@ private fun PowerOfAttorneyHeaderSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(Res.string.form_section_header),
+                text = label,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -206,72 +201,92 @@ private fun PowerOfAttorneyHeaderSection(
                     Icons.Rounded.KeyboardArrowUp
                 else Icons.Rounded.KeyboardArrowDown,
                 contentDescription = null,
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
         if (isExpanded.value) {
-            Column(
-                modifier = modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                TextInput(
-                    value = formState.number,
-                    onValueChange = { formState.number = it },
-                    label = stringResource(HeaderFieldType.NUMBER.stringResource),
-                    modifier = Modifier.fillMaxWidth()
-                )
+            content()
+        }
+    }
+}
 
-                DateInput(
-                    value = formState.dischargeDate,
-                    onValueChange = { formState.dischargeDate = it },
-                    label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
-                    modifier = Modifier.fillMaxWidth()
-                )
+@Composable
+private fun PowerOfAttorneyHeaderSection(
+    formState: PowerOfAttorneyUiState,
+    onNumberChanged: (Int) -> Unit,
+    onDischargeDateChanged: (LocalDate) -> Unit,
+    onEndDateChanged: (LocalDate) -> Unit,
+    onOrganizationChanged: (Organization?) -> Unit,
+    onIndividualChanged: (Individual?) -> Unit,
+    onSupplierChanged: (Supplier?) -> Unit,
+    onSupplierAgreementChanged: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    PowerOfAttorneySection(
+        label = stringResource(Res.string.form_section_header),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            IntInput(
+                value = formState.number,
+                onValueChange = onNumberChanged,
+                label = stringResource(HeaderFieldType.NUMBER.stringResource),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                DateInput(
-                    value = formState.endDate,
-                    onValueChange = { formState.endDate = it },
-                    label = stringResource(HeaderFieldType.END_DATE.stringResource),
-                    modifier = Modifier.fillMaxWidth()
-                )
+            DateInput(
+                value = formState.dischargeDate,
+                onValueChange = onDischargeDateChanged,
+                label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                ReferenceDropdown(
-                    value = formState.selectedOrganization,
-                    items = organizations,
-                    itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
-                    onValueChange = { formState.selectedOrganization = it },
-                    label = stringResource(Res.string.form_field_organization),
-                    modifier = Modifier.fillMaxWidth()
-                )
+            DateInput(
+                value = formState.endDate,
+                onValueChange = onEndDateChanged,
+                label = stringResource(HeaderFieldType.END_DATE.stringResource),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                ReferenceDropdown(
-                    value = formState.selectedIndividual,
-                    items = individuals,
-                    itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
-                    itemSupportingText = { it?.job ?: "Unknown job" },
-                    onValueChange = { formState.selectedIndividual = it },
-                    label = stringResource(Res.string.form_field_individual),
-                    modifier = Modifier.fillMaxWidth()
-                )
+            ReferenceDropdown(
+                value = formState.organization,
+                items = formState.organizations,
+                itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+                onValueChange = onOrganizationChanged,
+                label = stringResource(Res.string.form_field_organization),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                ReferenceDropdown(
-                    value = formState.selectedSupplier,
-                    items = suppliers,
-                    itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
-                    onValueChange = { formState.selectedSupplier = it },
-                    label = stringResource(Res.string.form_field_supplier),
-                    modifier = Modifier.fillMaxWidth()
-                )
+            ReferenceDropdown(
+                value = formState.individual,
+                items = formState.individuals,
+                itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+                itemSupportingText = { it?.job ?: "Unknown job" },
+                onValueChange = onIndividualChanged,
+                label = stringResource(Res.string.form_field_individual),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                TextInput(
-                    value = formState.supplierAgreement,
-                    onValueChange = { formState.supplierAgreement = it },
-                    label = stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            ReferenceDropdown(
+                value = formState.supplier,
+                items = formState.suppliers,
+                itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
+                onValueChange = onSupplierChanged,
+                label = stringResource(Res.string.form_field_supplier),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            TextInput(
+                value = formState.supplierAgreement,
+                onValueChange = onSupplierAgreementChanged,
+                label = stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource),
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -279,71 +294,37 @@ private fun PowerOfAttorneyHeaderSection(
 @Composable
 private fun PowerOfAttorneyBodySection(
     formState: PowerOfAttorneyUiState,
-    products: List<Product>,
+    onUpdateBodyItem: (index: Int, item: PowerOfAttorneyBodyItemState) -> Unit,
+    onRemoveBodyItem: (index: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isExpanded = remember { mutableStateOf(true) }
     val bodyItems = formState.bodyItems
 
-    AnimatedVisibility(
-        visible = bodyItems.isNotEmpty(),
-        enter = fadeIn(),
-        exit = fadeOut()
+    PowerOfAttorneySection(
+        label = stringResource(Res.string.form_section_body),
+        modifier = modifier
     ) {
-        Card(
-            modifier = modifier.fillMaxWidth().animateContentSize(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .applyAdaptive(
+                    whenNotWide = Modifier.horizontalScroll(
+                        rememberScrollState()
+                    )
+                )
+                .padding(16.dp)
+                .animateContentSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                    .clickable { isExpanded.value = !isExpanded.value }
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(Res.string.form_section_body),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+            bodyItems.forEachIndexed { index, item ->
+                BodyItemRow(
+                    index = index,
+                    item = item,
+                    products = formState.products,
+                    onItemChange = { updated ->
+                        onUpdateBodyItem(index, updated)
+                    },
+                    onDelete = { onRemoveBodyItem(index) }
                 )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Icon(
-                    imageVector = if (isExpanded.value)
-                        Icons.Rounded.KeyboardArrowUp
-                    else Icons.Rounded.KeyboardArrowDown,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            if (isExpanded.value) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                        .applyAdaptive(
-                            whenNotWide = Modifier.horizontalScroll(
-                                rememberScrollState()
-                            )
-                        )
-                        .padding(16.dp)
-                        .animateContentSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    bodyItems.forEachIndexed { index, item ->
-                        BodyItemRow(
-                            index = index,
-                            item = item,
-                            products = products,
-                            onItemChange = { updated ->
-                                formState.updateBodyItem(index, updated)
-                            },
-                            onDelete = { formState.removeBodyItem(index) }
-                        )
-                    }
-                }
             }
         }
     }
