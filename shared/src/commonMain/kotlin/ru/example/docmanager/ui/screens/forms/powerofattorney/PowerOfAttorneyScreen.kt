@@ -11,10 +11,7 @@
 
 package ru.example.docmanager.ui.screens.forms.powerofattorney
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -65,10 +62,6 @@ fun PowerOfAttorneyScreen(
 ) {
     val scope = rememberCoroutineScope()
     val formState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val products = remember(formState) {
-        formState.products
-    }
 
     LaunchedEffect(document) {
         viewModel.onInit(
@@ -170,7 +163,7 @@ fun PowerOfAttorneyScreen(
 }
 
 @Composable
-private fun PowerOfAttorneySection (
+private fun PowerOfAttorneySection(
     label: String,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit

@@ -15,7 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -36,12 +36,14 @@ fun IntInput(
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
+    var text by remember { mutableStateOf(value.toString()) }
     OutlinedTextField(
-        value = value.toString(),
+        value = text,
         enabled = enabled,
         onValueChange = { value ->
             if (value.isEmpty() || value.all { it.isDigit() }) {
-                onValueChange(value.toIntOrNull() ?: 0)
+                text = value
+                value.toIntOrNull()?.let { onValueChange(it) }
             }
         },
         label = { Text(label) },
