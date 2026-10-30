@@ -22,35 +22,17 @@ data class ReferenceUiState(
     val isLoading: Boolean = false,
     val statusMessage: String? = null
 ) {
-    val currentItems: List<Reference>
-        get() = itemsByType[referenceType].orEmpty()
-
-    fun setItems(referenceType: ReferenceType, items: List<Reference>) {
-        itemsByType = itemsByType + (referenceType to items)
-        if (this.referenceType == referenceType) {
-            syncFieldValues()
-        }
-    }
-
-    fun setAllItems(items: Map<ReferenceType, List<Reference>>) {
-        itemsByType = items
-        syncFieldValues()
-    }
-
-    fun syncFieldValues() {
-        TODO("Not yet implemented")
-    }
-
-    fun getFieldValues(type: ReferenceType, item: Reference): Map<HeaderFieldType, String> {
+    fun getFieldValues(
+        type: ReferenceType,
+        item: Reference
+    ): Map<HeaderFieldType, String> {
         val edits = fieldValues[type]?.get(item.id)
         return edits ?: item.toMap()
     }
 
-    fun getCurrentFieldValues(item: Reference): Map<HeaderFieldType, String> {
-        return getFieldValues(referenceType, item)
-    }
-
-    fun buildUpdatedItems(type: ReferenceType = referenceType): List<Reference> {
+    fun buildUpdatedItems(
+        type: ReferenceType = referenceType
+    ): List<Reference> {
         val items = itemsByType[type].orEmpty()
         val typeFieldEdits = fieldValues[type].orEmpty()
         return items.map { item ->

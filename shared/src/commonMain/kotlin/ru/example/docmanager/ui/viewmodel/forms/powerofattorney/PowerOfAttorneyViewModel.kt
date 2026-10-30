@@ -34,7 +34,6 @@ import ru.example.docmanager.data.repositories.references.OrganizationsRepositor
 import ru.example.docmanager.data.repositories.references.ProductsRepository
 import ru.example.docmanager.data.repositories.references.SuppliersRepository
 import ru.example.docmanager.ui.viewmodel.forms.FormViewModel
-import kotlin.system.measureTimeMillis
 
 class PowerOfAttorneyViewModel(
     powerOfAttorneyRepository: PowerOfAttorneyRepository,
@@ -183,6 +182,7 @@ class PowerOfAttorneyViewModel(
                             )
                         }
                     }
+
                     else -> {
                         onStatusUpdate.invoke(
                             getString(Res.string.form_error_failed_init)

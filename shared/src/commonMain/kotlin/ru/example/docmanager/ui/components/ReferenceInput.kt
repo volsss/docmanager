@@ -25,13 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import ru.example.docmanager.data.document.header.HeaderFieldType
+import ru.example.docmanager.data.reference.Reference
 import ru.example.docmanager.ui.utils.applyAdaptive
 
 @Composable
 fun ReferenceInput(
-    item: ru.example.docmanager.data.reference.Reference,
-    currentValues: Map<ru.example.docmanager.data.document.header.HeaderFieldType, String>,
-    onFieldChange: (itemId: Int, headerFieldType: ru.example.docmanager.data.document.header.HeaderFieldType, newValue: String) -> Unit,
+    item: Reference,
+    currentValues: Map<HeaderFieldType, String>,
+    onFieldChange: (itemId: Int, headerFieldType: HeaderFieldType, newValue: String) -> Unit,
     onRemove: () -> Unit
 ) {
     Row(
