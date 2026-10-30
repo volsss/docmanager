@@ -16,8 +16,10 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.document_power_of_attorney
 import docmanager.shared.generated.resources.document_power_of_attorney_resource
 import docmanager.shared.generated.resources.form_error_failed_init
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.getString
@@ -32,6 +34,7 @@ import ru.example.docmanager.data.repositories.references.OrganizationsRepositor
 import ru.example.docmanager.data.repositories.references.ProductsRepository
 import ru.example.docmanager.data.repositories.references.SuppliersRepository
 import ru.example.docmanager.ui.viewmodel.forms.FormViewModel
+import kotlin.system.measureTimeMillis
 
 class PowerOfAttorneyViewModel(
     powerOfAttorneyRepository: PowerOfAttorneyRepository,
@@ -48,57 +51,63 @@ class PowerOfAttorneyViewModel(
         field = MutableStateFlow(PowerOfAttorneyUiState())
 
     fun onNumberChanged(number: Int) {
-        uiState.value = uiState.value.copy(number = number)
+        uiState.update { it.copy(number = number) }
     }
 
     fun onDischargeDateChanged(dischargeDate: LocalDate) {
-        uiState.value = uiState.value.copy(dischargeDate = dischargeDate)
+        uiState.update { it.copy(dischargeDate = dischargeDate) }
     }
 
     fun onEndDateChanged(endDate: LocalDate) {
-        uiState.value = uiState.value.copy(endDate = endDate)
+        uiState.update { it.copy(endDate = endDate) }
     }
 
     fun onOrganizationChanged(organization: Organization?) {
-        uiState.value = uiState.value.copy(organization = organization)
+        uiState.update { it.copy(organization = organization) }
     }
 
     fun onIndividualChanged(individual: Individual?) {
-        uiState.value = uiState.value.copy(individual = individual)
+        uiState.update { it.copy(individual = individual) }
     }
 
     fun onSupplierChanged(supplier: Supplier?) {
-        uiState.value = uiState.value.copy(supplier = supplier)
+        uiState.update { it.copy(supplier = supplier) }
     }
 
     fun onSupplierAgreementChanged(supplierAgreement: String) {
-        uiState.value = uiState.value.copy(supplierAgreement = supplierAgreement)
+        uiState.update { it.copy(supplierAgreement = supplierAgreement) }
     }
 
     fun addBodyItem() {
-        uiState.value = uiState.value.copy(
-            bodyItems = uiState.value.bodyItems + PowerOfAttorneyBodyItemState(
-                id = uiState.value.bodyItems.size
+        uiState.update {
+            it.copy(
+                bodyItems = it.bodyItems + PowerOfAttorneyBodyItemState(
+                    id = it.bodyItems.size
+                )
             )
-        )
+        }
     }
 
     fun updateBodyItem(index: Int, item: PowerOfAttorneyBodyItemState) {
-        uiState.value = uiState.value.copy(
-            bodyItems = uiState.value.bodyItems.toMutableList().also {
-                if (index in it.indices) it[index] = item
-            }
-        )
+        uiState.update { old ->
+            old.copy(
+                bodyItems = old.bodyItems.toMutableList().also {
+                    if (index in it.indices) it[index] = item
+                }
+            )
+        }
     }
 
     fun removeBodyItem(index: Int) {
-        uiState.value = uiState.value.copy(
-            bodyItems = if (uiState.value.bodyItems.size > 1) {
-                uiState.value.bodyItems.filterIndexed { i, _ -> i != index }
-            } else {
-                listOf()
-            }
-        )
+        uiState.update {
+            it.copy(
+                bodyItems = if (it.bodyItems.size > 1) {
+                    it.bodyItems.filterIndexed { i, _ -> i != index }
+                } else {
+                    listOf()
+                }
+            )
+        }
     }
 
     override fun onInit(
@@ -108,66 +117,85 @@ class PowerOfAttorneyViewModel(
         viewModelScope.launch {
             setLoading(true)
 
-            val individuals = individualsRepository.getItems()
-            val suppliers = suppliersRepository.getItems()
-            val organizations = organizationsRepository.getItems()
-            val products = productsRepository.getItems()
+            try {
+                val individualsDeferred = async {
+                    individualsRepository.getItems()
+                }
+                val suppliersDeferred = async {
+                    suppliersRepository.getItems()
+                }
+                val organizationsDeferred = async {
+                    organizationsRepository.getItems()
+                }
+                val productsDeferred = async {
+                    productsRepository.getItems()
+                }
 
-            uiState.value = uiState.value.copy(
-                individuals = individuals,
-                suppliers = suppliers,
-                organizations = organizations,
-                products = products
-            )
+                val individuals = individualsDeferred.await()
+                val suppliers = suppliersDeferred.await()
+                val organizations = organizationsDeferred.await()
+                val products = productsDeferred.await()
 
-            when (document) {
-                null -> Unit
-                is PowerOfAttorney -> {
-                    uiState.value = uiState.value.copy(
-                        documentId = document.header.id,
+                uiState.update {
+                    it.copy(
+                        individuals = individuals,
+                        suppliers = suppliers,
+                        organizations = organizations,
+                        products = products
+                    )
+                }
 
-                        number = document.header.number,
-                        dischargeDate = document.header.dischargeDate,
-                        endDate = document.header.endDate,
-                        organization = organizations.firstOrNull {
-                            it.id == document.header.organization.id
-                        } ?: document.header.organization,
-                        individual = individuals.firstOrNull {
-                            it.id == document.header.individual.id
-                        } ?: document.header.individual,
-                        supplier = suppliers.firstOrNull {
-                            it.id == document.header.supplier.id
-                        } ?: document.header.supplier,
-                        supplierAgreement = document.header.supplierAgreement,
+                when (document) {
+                    null -> Unit
+                    is PowerOfAttorney -> {
+                        uiState.update { old ->
+                            old.copy(
+                                documentId = document.header.id,
 
-                        bodyItems = if (document.body.items.isNotEmpty()) {
-                            document.body.items.map { body ->
-                                PowerOfAttorneyBodyItemState(
-                                    id = body.id,
-                                    product = products.firstOrNull {
-                                        it.id == body.product.id
-                                    } ?: body.product,
-                                    unit = body.unit,
-                                    count = body.count
-                                )
-                            }
-                        } else {
-                            listOf()
+                                number = document.header.number,
+                                dischargeDate = document.header.dischargeDate,
+                                endDate = document.header.endDate,
+                                organization = organizations.firstOrNull {
+                                    it.id == document.header.organization.id
+                                } ?: document.header.organization,
+                                individual = individuals.firstOrNull {
+                                    it.id == document.header.individual.id
+                                } ?: document.header.individual,
+                                supplier = suppliers.firstOrNull {
+                                    it.id == document.header.supplier.id
+                                } ?: document.header.supplier,
+                                supplierAgreement = document.header.supplierAgreement,
+
+                                bodyItems = if (document.body.items.isNotEmpty()) {
+                                    document.body.items.map { body ->
+                                        PowerOfAttorneyBodyItemState(
+                                            id = body.id,
+                                            product = products.firstOrNull {
+                                                it.id == body.product.id
+                                            } ?: body.product,
+                                            unit = body.unit,
+                                            count = body.count
+                                        )
+                                    }
+                                } else {
+                                    listOf()
+                                }
+                            )
                         }
-                    )
+                    }
+                    else -> {
+                        onStatusUpdate.invoke(
+                            getString(Res.string.form_error_failed_init)
+                        )
+                    }
                 }
-
-                else -> {
-                    onStatusUpdate.invoke(
-                        getString(Res.string.form_error_failed_init)
-                    )
-                }
+            } finally {
+                setLoading(false)
             }
-            setLoading(false)
         }
     }
 
     override fun setLoading(loading: Boolean) {
-        uiState.value = uiState.value.copy(isLoading = loading)
+        uiState.update { it.copy(isLoading = loading) }
     }
 }
