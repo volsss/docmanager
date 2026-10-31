@@ -23,9 +23,9 @@ import docmanager.shared.generated.resources.*
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.StringResource
-import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.document.DocumentType
-import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentType
+import ru.example.docmanager.domain.reference.ReferenceType
 
 @Serializable
 sealed interface Route : NavKey {

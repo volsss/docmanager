@@ -20,7 +20,7 @@ import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.data.database.dbQuery
 import ru.example.docmanager.data.database.tables.references.IndividualsTable
 import ru.example.docmanager.data.reference.Individual
-import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.domain.reference.ReferenceType
 
 class IndividualsRepository : ReferenceRepository<Individual>("individuals") {
     override val type = ReferenceType.INDIVIDUAL

@@ -19,10 +19,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.document.DocumentType
 import ru.example.docmanager.data.repositories.documents.BaseDocumentRepository
 import ru.example.docmanager.data.repositories.documents.DocumentRepository
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.ui.router.Route
 import kotlin.time.Duration.Companion.milliseconds
 

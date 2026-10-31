@@ -21,9 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.data.reference.ReferenceType
-import ru.example.docmanager.ui.AppTheme
+import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.router.Route
+import ru.example.docmanager.ui.theme.AppTheme
 import ru.example.docmanager.ui.utils.adaptiveWidth
 
 @Composable

@@ -20,7 +20,7 @@ import org.jetbrains.exposed.v1.jdbc.update
 import ru.example.docmanager.data.database.dbQuery
 import ru.example.docmanager.data.database.tables.references.OrganizationsTable
 import ru.example.docmanager.data.reference.Organization
-import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.domain.reference.ReferenceType
 
 class OrganizationsRepository : ReferenceRepository<Organization>("organizations") {
     override val type = ReferenceType.ORGANIZATION

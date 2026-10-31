@@ -18,18 +18,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
-import ru.example.docmanager.data.document.Document
 import ru.example.docmanager.data.repositories.documents.DocumentRepository
-import ru.example.docmanager.di.DocumentProcessor
-import ru.example.docmanager.di.getDocumentProcessor
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentProcessor
 
 
 abstract class FormViewModel<T : Document, S : FormState<T>>(
     val repository: DocumentRepository<T>,
     val documentName: StringResource,
     val documentResource: StringResource,
+    val documentProcessor: DocumentProcessor,
 ) : ViewModel() {
-    protected val documentProcessor: DocumentProcessor = getDocumentProcessor()
 
     abstract val uiState: StateFlow<S>
 

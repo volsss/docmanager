@@ -14,7 +14,9 @@ package ru.example.docmanager.data.reference
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import ru.example.docmanager.data.document.header.HeaderFieldType
+import ru.example.docmanager.domain.document.header.HeaderFieldType
+import ru.example.docmanager.domain.reference.Reference
+import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.utils.parseRussianOrNull
 import ru.example.docmanager.ui.utils.toRussianString
 import kotlin.time.Clock

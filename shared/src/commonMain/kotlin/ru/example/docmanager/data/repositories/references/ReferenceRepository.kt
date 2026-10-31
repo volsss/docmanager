@@ -11,7 +11,7 @@
 
 package ru.example.docmanager.data.repositories.references
 
-import ru.example.docmanager.data.reference.Reference
+import ru.example.docmanager.domain.reference.Reference
 
 abstract class ReferenceRepository<T : Reference>(
     val name: String

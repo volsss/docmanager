@@ -32,9 +32,9 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.reference_new_item_button
 import docmanager.shared.generated.resources.reference_save_button
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.data.document.header.HeaderFieldType
-import ru.example.docmanager.data.reference.Reference
-import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.domain.document.header.HeaderFieldType
+import ru.example.docmanager.domain.reference.Reference
+import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.components.ReferenceInput
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.applyAdaptive

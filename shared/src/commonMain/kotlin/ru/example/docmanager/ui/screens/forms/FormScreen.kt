@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.stringResource
-import ru.example.docmanager.data.document.DocumentType
+import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScreen

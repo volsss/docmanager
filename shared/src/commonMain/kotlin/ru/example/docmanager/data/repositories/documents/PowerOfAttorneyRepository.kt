@@ -21,15 +21,15 @@ import ru.example.docmanager.data.database.tables.references.IndividualsTable
 import ru.example.docmanager.data.database.tables.references.OrganizationsTable
 import ru.example.docmanager.data.database.tables.references.ProductsTable
 import ru.example.docmanager.data.database.tables.references.SuppliersTable
-import ru.example.docmanager.data.document.DocumentType
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBody
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBodyItem
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyHeader
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorney
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorneyBody
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorneyBodyItem
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorneyHeader
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
+import ru.example.docmanager.domain.document.DocumentType
 
 class PowerOfAttorneyRepository : DocumentRepository<PowerOfAttorney> {
     override val type = DocumentType.POWER_OF_ATTORNEY

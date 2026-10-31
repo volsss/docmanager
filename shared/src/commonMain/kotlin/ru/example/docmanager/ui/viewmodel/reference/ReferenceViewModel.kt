@@ -17,11 +17,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.example.docmanager.data.document.header.HeaderFieldType
-import ru.example.docmanager.data.reference.Reference
-import ru.example.docmanager.data.reference.ReferenceType
 import ru.example.docmanager.data.repositories.references.BaseReferenceRepository
 import ru.example.docmanager.data.repositories.references.ReferenceRepository
+import ru.example.docmanager.domain.document.header.HeaderFieldType
+import ru.example.docmanager.domain.reference.Reference
+import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.router.Route
 
 class ReferenceViewModel(

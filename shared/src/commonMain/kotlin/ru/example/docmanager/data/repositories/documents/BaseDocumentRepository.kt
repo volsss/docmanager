@@ -11,7 +11,7 @@
 
 package ru.example.docmanager.data.repositories.documents
 
-import ru.example.docmanager.data.document.DocumentType
+import ru.example.docmanager.domain.document.DocumentType
 
 interface BaseDocumentRepository {
     val type: DocumentType

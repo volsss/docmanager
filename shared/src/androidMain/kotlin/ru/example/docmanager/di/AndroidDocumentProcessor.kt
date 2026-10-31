@@ -19,20 +19,21 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.widget.Toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.apache.poi.xwpf.usermodel.XWPFParagraph
 import org.jetbrains.compose.resources.getString
-import org.koin.core.context.GlobalContext
-import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.document.WithBody
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentProcessor
+import ru.example.docmanager.domain.document.WithBody
 import java.io.*
 
-class AndroidDocumentProcessor : DocumentProcessor {
-
-    private fun getContext(): Context? = runCatching { GlobalContext.getOrNull()?.get<Context>() }.getOrNull()
+class AndroidDocumentProcessor(
+    private val context: Context
+) : DocumentProcessor {
 
     private fun showToast(message: String) {
-        val context = getContext() ?: return
         Handler(Looper.getMainLooper()).post {
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
@@ -47,7 +48,6 @@ class AndroidDocumentProcessor : DocumentProcessor {
             if (documentName.endsWith(".docx", ignoreCase = true))
                 documentName
             else "$documentName.docx"
-        val context = getContext()
         val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
         val bodyParts =
             if (document is WithBody<*>) document.body.toMapByColumns().mapKeys {
@@ -61,7 +61,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
             return
         }
 
-        if (context != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
                 put(
@@ -96,8 +96,8 @@ class AndroidDocumentProcessor : DocumentProcessor {
         }
 
         val documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-            ?: context?.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-            ?: context?.filesDir
+            ?: context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+            ?: context.filesDir
             ?: File(".")
 
         if (!documentsDir.exists()) documentsDir.mkdirs()
@@ -105,11 +105,13 @@ class AndroidDocumentProcessor : DocumentProcessor {
         val destination = File(documentsDir, fileName)
         try {
             destination.parentFile?.mkdirs()
-            FileOutputStream(destination).use { fos ->
-                fos.write(generatedBytes)
-                fos.flush()
+            withContext(Dispatchers.IO) {
+                FileOutputStream(destination).use { fos ->
+                    fos.write(generatedBytes)
+                    fos.flush()
+                }
+                showToast("Документ сохранен: ${destination.absolutePath}")
             }
-            showToast("Документ сохранен: ${destination.absolutePath}")
         } catch (e: Exception) {
             println("Error saving to file: ${e.message}")
             showToast("Ошибка сохранения: ${e.message}")
@@ -157,7 +159,7 @@ class AndroidDocumentProcessor : DocumentProcessor {
         headReplacements: Map<String, String>,
         bodyParts: Map<String, List<String>>?
     ): ByteArray? {
-        val inStream = loadResource(getContext(), documentResourceFile) ?: return null
+        val inStream = loadResource(context, documentResourceFile) ?: return null
         return inStream.use { input ->
             ByteArrayOutputStream().use { baos ->
                 processDocument(input, baos, headReplacements, bodyParts)

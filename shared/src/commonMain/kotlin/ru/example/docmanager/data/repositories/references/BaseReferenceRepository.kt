@@ -11,7 +11,7 @@
 
 package ru.example.docmanager.data.repositories.references
 
-import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.domain.reference.ReferenceType
 
 interface BaseReferenceRepository {
     val type: ReferenceType

@@ -12,8 +12,8 @@
 package ru.example.docmanager.ui.viewmodel.forms
 
 import kotlinx.datetime.LocalDate
-import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.document.DocumentType
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentType
 
 abstract class FormState<D : Document>(
     val type: DocumentType

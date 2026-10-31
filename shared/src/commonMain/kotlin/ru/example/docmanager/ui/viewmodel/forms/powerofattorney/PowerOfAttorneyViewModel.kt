@@ -23,8 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.getString
-import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorney
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Supplier
@@ -33,6 +32,8 @@ import ru.example.docmanager.data.repositories.references.IndividualsRepository
 import ru.example.docmanager.data.repositories.references.OrganizationsRepository
 import ru.example.docmanager.data.repositories.references.ProductsRepository
 import ru.example.docmanager.data.repositories.references.SuppliersRepository
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentProcessor
 import ru.example.docmanager.ui.viewmodel.forms.FormViewModel
 
 class PowerOfAttorneyViewModel(
@@ -40,11 +41,13 @@ class PowerOfAttorneyViewModel(
     private val individualsRepository: IndividualsRepository,
     private val organizationsRepository: OrganizationsRepository,
     private val productsRepository: ProductsRepository,
-    private val suppliersRepository: SuppliersRepository
+    private val suppliersRepository: SuppliersRepository,
+    documentProcessor: DocumentProcessor
 ) : FormViewModel<PowerOfAttorney, PowerOfAttorneyUiState>(
     repository = powerOfAttorneyRepository,
     documentName = Res.string.document_power_of_attorney,
-    documentResource = Res.string.document_power_of_attorney_resource
+    documentResource = Res.string.document_power_of_attorney_resource,
+    documentProcessor
 ) {
     override val uiState: StateFlow<PowerOfAttorneyUiState>
         field = MutableStateFlow(PowerOfAttorneyUiState())

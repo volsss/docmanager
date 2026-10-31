@@ -11,9 +11,9 @@
 
 package ru.example.docmanager.ui.viewmodel.reference
 
-import ru.example.docmanager.data.document.header.HeaderFieldType
-import ru.example.docmanager.data.reference.Reference
-import ru.example.docmanager.data.reference.ReferenceType
+import ru.example.docmanager.domain.document.header.HeaderFieldType
+import ru.example.docmanager.domain.reference.Reference
+import ru.example.docmanager.domain.reference.ReferenceType
 
 data class ReferenceUiState(
     val referenceType: ReferenceType = ReferenceType.INDIVIDUAL,

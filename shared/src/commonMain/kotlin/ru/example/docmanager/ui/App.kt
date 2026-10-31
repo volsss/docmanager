@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import ru.example.docmanager.ui.router.Router
 import ru.example.docmanager.ui.screens.ConnectionScreen
+import ru.example.docmanager.ui.theme.AppTheme
 
 @Composable
 fun App(

@@ -32,12 +32,12 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import ru.example.docmanager.data.document.Document
-import ru.example.docmanager.data.document.header.HeaderFieldType
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.header.HeaderFieldType
 import ru.example.docmanager.ui.components.DateInput
 import ru.example.docmanager.ui.components.IntInput
 import ru.example.docmanager.ui.components.ReferenceDropdown

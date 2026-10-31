@@ -11,7 +11,9 @@
 
 package ru.example.docmanager.data.reference
 
-import ru.example.docmanager.data.document.header.HeaderFieldType
+import ru.example.docmanager.domain.document.header.HeaderFieldType
+import ru.example.docmanager.domain.reference.Reference
+import ru.example.docmanager.domain.reference.ReferenceType
 
 data class Organization(
     override var id: Int = -1,

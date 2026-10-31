@@ -16,15 +16,15 @@ import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.form_error_empty_required
 import kotlinx.datetime.*
 import org.jetbrains.compose.resources.getString
-import ru.example.docmanager.data.document.DocumentType
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorney
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBody
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyBodyItem
-import ru.example.docmanager.data.document.type.powerofattorney.PowerOfAttorneyHeader
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorney
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorneyBody
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorneyBodyItem
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorneyHeader
 import ru.example.docmanager.data.reference.Individual
 import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
+import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.ui.viewmodel.forms.FormState
 import kotlin.time.Clock
 

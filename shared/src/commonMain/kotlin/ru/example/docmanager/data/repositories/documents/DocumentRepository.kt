@@ -11,7 +11,7 @@
 
 package ru.example.docmanager.data.repositories.documents
 
-import ru.example.docmanager.data.document.Document
+import ru.example.docmanager.domain.document.Document
 
 interface DocumentRepository<T : Document> : BaseDocumentRepository {
 
