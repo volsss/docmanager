@@ -13,12 +13,9 @@ package ru.example.docmanager.di
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.apache.poi.xwpf.usermodel.XWPFDocument
-import org.apache.poi.xwpf.usermodel.XWPFParagraph
-import org.jetbrains.compose.resources.getString
 import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentEngine
 import ru.example.docmanager.domain.document.DocumentProcessor
-import ru.example.docmanager.domain.document.WithBody
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.awt.Frame
@@ -123,14 +120,20 @@ class JvmDocumentProcessor : DocumentProcessor {
             throw IOException("Failed to create directories for path: ${parent.absolutePath}")
         }
 
-        val blank = object {}.javaClass.getResourceAsStream("/$documentResourceFile")
-        if (blank == null) {
+        val templateBytes = DocumentEngine.getTemplateBytes(documentResourceFile) { path ->
+            object {}.javaClass.getResourceAsStream("/$path")
+                ?: object {}.javaClass.getResourceAsStream(path)
+                ?: Thread.currentThread().contextClassLoader?.getResourceAsStream("/$path")
+                ?: Thread.currentThread().contextClassLoader?.getResourceAsStream(path)
+        }
+
+        if (templateBytes == null) {
             System.err.println("Form not found: $documentResourceFile")
             return@withContext
         }
 
-        blank.use { input ->
-            FileOutputStream(destination).use { fos ->
+        ByteArrayInputStream(templateBytes).use { input ->
+            BufferedOutputStream(FileOutputStream(destination)).use { fos ->
                 processDocument(input, fos, document)
             }
         }
@@ -141,103 +144,6 @@ class JvmDocumentProcessor : DocumentProcessor {
         output: OutputStream,
         document: Document
     ) {
-        XWPFDocument(input).use { doc ->
-            val headReplacements = document.header.toMap().mapKeys { it.key.placeholder }
-            doc.paragraphs.forEach { it.replacePlaceholders(headReplacements) }
-            doc.tables.forEach { table ->
-                table.rows.forEach { row ->
-                    row.tableCells.forEach { cell ->
-                        cell.paragraphs.forEach { it.replacePlaceholders(headReplacements) }
-                    }
-                }
-            }
-            if (document is WithBody<*>) {
-                val bodyParts = document.body.toMapByColumns().mapKeys { getString(it.key.stringResource) }
-                processBodyParts(doc, bodyParts)
-            }
-            doc.write(output)
-        }
-    }
-
-    private fun XWPFParagraph.replacePlaceholders(replacements: Map<String, String>) {
-        val originalText = paragraphText ?: return
-        var updatedText = originalText
-        var matched = false
-
-        for ((key, value) in replacements) {
-            val placeholder = if (key.startsWith("{{") && key.endsWith("}}")) key else "{{$key}}"
-            if (placeholder in updatedText) {
-                updatedText = updatedText.replace(placeholder, value)
-                matched = true
-            } else if (key in updatedText) {
-                updatedText = updatedText.replace(key, value)
-                matched = true
-            }
-        }
-
-        if (matched) {
-            if (runs.isNotEmpty()) {
-                val firstRun = runs[0]
-                val font = firstRun.fontFamily
-                val size = firstRun.fontSizeAsDouble
-                val bold = firstRun.isBold
-                val italic = firstRun.isItalic
-
-                for (i in runs.lastIndex downTo 1) removeRun(i)
-                firstRun.setText(updatedText, 0)
-                if (font != null) firstRun.fontFamily = font
-                if (size != null && size > 0) firstRun.fontSize = size.toInt()
-                firstRun.isBold = bold
-                firstRun.isItalic = italic
-            } else {
-                createRun().setText(updatedText)
-            }
-        }
-    }
-
-    private fun processBodyParts(document: XWPFDocument, bodyParts: Map<String, List<String>>) {
-        if (bodyParts.isEmpty()) return
-        val maxRows = bodyParts.values.maxOfOrNull { it.size } ?: 0
-        if (maxRows == 0) return
-
-        val table = document.tables.firstOrNull { t ->
-            if (t.rows.isEmpty()) return@firstOrNull false
-            val headerRowText = t.rows[0].tableCells.joinToString(" ") { it.text }
-            bodyParts.keys.any { headerRowText.contains(it, ignoreCase = true) }
-        } ?: document.tables.getOrNull(1) ?: return
-
-        val headerCells = table.rows[0].tableCells
-        val columnData = headerCells.indices.associateWith { colIdx ->
-            val cellText = headerCells[colIdx].text.replace("\r", " ").replace("\n", " ").trim()
-            val matchedEntry = bodyParts.entries.firstOrNull { (key, _) ->
-                val cleanKey = key.trim()
-                cellText.contains(cleanKey, ignoreCase = true) ||
-                        cleanKey.contains(cellText, ignoreCase = true) ||
-                        cellText.replace(" ", "").equals(cleanKey.replace(" ", ""), ignoreCase = true)
-            }
-            matchedEntry?.value ?: bodyParts.values.elementAtOrNull(colIdx) ?: emptyList()
-        }
-
-        val startRowIdx = if (table.rows.size > 2) 2 else table.rows.size
-
-        for (rowIndex in 0 until maxRows) {
-            val row =
-                if (rowIndex == 0 && table.rows.size > startRowIdx) table.getRow(startRowIdx) else table.createRow()
-            for (colIdx in headerCells.indices) {
-                val value = columnData[colIdx]?.getOrNull(rowIndex) ?: ""
-                val cell = if (colIdx < row.tableCells.size) row.tableCells[colIdx] else row.addNewTableCell()
-                val paragraph = if (cell.paragraphs.isNotEmpty()) cell.paragraphs[0] else cell.addParagraph()
-                if (paragraph.runs.isNotEmpty()) {
-                    for (r in paragraph.runs.lastIndex downTo 1) paragraph.removeRun(r)
-                    paragraph.runs[0].setText(value, 0)
-                } else {
-                    paragraph.createRun().apply {
-                        fontFamily = "Arial"
-                        fontSize = 8
-                        setText(value)
-                    }
-                }
-            }
-        }
+        DocumentEngine.processDocument(input, output, document)
     }
 }
