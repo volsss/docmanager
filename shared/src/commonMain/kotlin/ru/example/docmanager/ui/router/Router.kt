@@ -163,13 +163,21 @@ private fun RouterSnackbarHost(
 ) {
     SnackbarHost(
         hostState = snackbarHostState,
-        snackbar = {
-            Snackbar(
-                snackbarData = it,
-                shape = MaterialTheme.shapes.large,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
+        snackbar = { snackbarData ->
+            SwipeToDismissBox(
+                state = rememberSwipeToDismissBoxState(),
+                onDismiss = {
+                    snackbarData.dismiss()
+                },
+                backgroundContent = { }
+            ) {
+                Snackbar(
+                    snackbarData = snackbarData,
+                    shape = MaterialTheme.shapes.large,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            }
         }
     )
 }
