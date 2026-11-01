@@ -80,13 +80,11 @@
     <string name="form_error_failed_init">Ошибка инициализации формы</string>
     <string name="form_error_failed_printing">Ошибка печати</string>
     <string name="form_error_failed_saving">Ошибка сохранения формы</string>
-    <string name="form_exported">Форма экспортирована в файл</string>
     <string name="form_fab">Новый элемент</string>
     <string name="form_field_individual">Физическое лицо</string>
     <string name="form_field_organization">Организация</string>
     <string name="form_field_product">Материальная ценность</string>
     <string name="form_field_supplier">Поставщик</string>
-    <string name="form_printed">Форма распечатана</string>
     <string name="form_saved">Форма сохранена</string>
     <string name="form_saved_as_new">Форма сохранена как новая</string>
     <string name="form_section_body">Тело документа</string>

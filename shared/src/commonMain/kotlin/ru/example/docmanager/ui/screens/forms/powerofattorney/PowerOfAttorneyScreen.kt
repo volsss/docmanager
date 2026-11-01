@@ -63,7 +63,7 @@ fun PowerOfAttorneyScreen(
     val scope = rememberCoroutineScope()
     val formState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(document) {
+    LaunchedEffect(document, onStatusMessage) {
         viewModel.onInit(
             onStatusUpdate = { message ->
                 onStatusMessage(message)
@@ -130,14 +130,10 @@ fun PowerOfAttorneyScreen(
                 )
             },
             onExportDocument = {
-                viewModel.onExportToFile(
-                    onStatusUpdate = onStatusMessage
-                )
+                viewModel.onExportToFile(onStatusUpdate = onStatusMessage)
             },
             onPrintDocument = {
-                viewModel.onPrintDocument(
-                    onStatusUpdate = onStatusMessage
-                )
+                viewModel.onPrintDocument(onStatusUpdate = onStatusMessage)
             }
         )
 

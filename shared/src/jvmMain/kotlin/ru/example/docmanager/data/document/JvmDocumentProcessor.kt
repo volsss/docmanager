@@ -30,16 +30,20 @@ class JvmDocumentProcessor : DocumentProcessor {
     override suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: Document,
+        onFailure: (String) -> Unit,
+        onSuccess: (String) -> Unit
     ) {
         val destination = chooseSaveFile("$documentName.docx") ?: return
-        processSaveToFile(destination, documentResourceFile, document)
+        processSaveToFile(destination, documentResourceFile, document, onFailure, onSuccess)
     }
 
     override suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: Document,
+        onFailure: (String) -> Unit,
+        onSuccess: (String) -> Unit
     ) {
         if (isPrintingAvailable()) {
             try {
@@ -49,21 +53,23 @@ class JvmDocumentProcessor : DocumentProcessor {
                     }
                 }
 
-                processSaveToFile(tempFile, documentResourceFile, document)
+                processSaveToFile(tempFile, documentResourceFile, document, onFailure, onSuccess)
 
                 withContext(Dispatchers.IO) {
                     if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.PRINT)) {
                         Desktop.getDesktop().print(tempFile)
+                        onSuccess("Документ успешно распечатан")
                     } else {
-                        throw UnsupportedOperationException("Print action is not supported on this platform/desktop.")
+                        onFailure("Печать не поддерживается устройством.")
+                        return@withContext
                     }
                 }
                 return
             } catch (e: Exception) {
-                System.err.println("Printing failed: ${e.message}, falling back to saving to file")
+                onFailure("Ошибка печати: ${e.message}, попытка сохранения в файл")
             }
         }
-        processSave(documentName, documentResourceFile, document)
+        processSave(documentName, documentResourceFile, document, onFailure, onSuccess)
     }
 
     fun isPrintingAvailable(): Boolean {
@@ -113,11 +119,14 @@ class JvmDocumentProcessor : DocumentProcessor {
     suspend fun processSaveToFile(
         destination: File,
         documentResourceFile: String,
-        document: Document
+        document: Document,
+        onFailure: (String) -> Unit,
+        onSuccess: (String) -> Unit
     ) = withContext(Dispatchers.IO) {
         val parent = destination.parentFile
         if (parent != null && !parent.exists() && !parent.mkdirs()) {
-            throw IOException("Failed to create directories for path: ${parent.absolutePath}")
+            onFailure("Ошибка создания директорий для: ${parent.absolutePath}")
+            return@withContext
         }
 
         val templateBytes = DocumentEngine.getTemplateBytes(documentResourceFile) { path ->
@@ -128,13 +137,14 @@ class JvmDocumentProcessor : DocumentProcessor {
         }
 
         if (templateBytes == null) {
-            System.err.println("Form not found: $documentResourceFile")
+            onFailure("Форма не найдена: $documentResourceFile")
             return@withContext
         }
 
         ByteArrayInputStream(templateBytes).use { input ->
             BufferedOutputStream(FileOutputStream(destination)).use { fos ->
                 processDocument(input, fos, document)
+                onSuccess("Документ успешно сохранен")
             }
         }
     }

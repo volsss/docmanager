@@ -119,10 +119,13 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
                     documentName = getString(documentName)
                             + " № " + uiState.value.number,
                     documentResourceFile = getString(documentResource),
-                    document = document
+                    document = document,
+                    onFailure = onStatusUpdate,
+                    onSuccess = { s ->
+                        onStatusUpdate(s)
+                        onDocumentExported?.invoke()
+                    }
                 )
-                onStatusUpdate.invoke(getString(Res.string.form_exported))
-                onDocumentExported?.invoke()
             }.onFailure { e ->
                 onStatusUpdate.invoke(getString(Res.string.form_error_failed_exporting))
                 e.printStackTrace()
@@ -145,10 +148,13 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
                     documentName = getString(documentName)
                             + " № " + uiState.value.number,
                     documentResourceFile = getString(documentResource),
-                    document = document
+                    document = document,
+                    onFailure = onStatusUpdate,
+                    onSuccess = { s ->
+                        onStatusUpdate.invoke(s)
+                        onDocumentPrinted?.invoke()
+                    }
                 )
-                onStatusUpdate.invoke(getString(Res.string.form_printed))
-                onDocumentPrinted?.invoke()
             }.onFailure { e ->
                 onStatusUpdate.invoke(getString(Res.string.form_error_failed_printing))
                 e.printStackTrace()

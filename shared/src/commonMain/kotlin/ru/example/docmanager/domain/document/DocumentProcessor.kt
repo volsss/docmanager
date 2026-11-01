@@ -15,12 +15,16 @@ interface DocumentProcessor {
     suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: Document,
+        onFailure: (String) -> Unit,
+        onSuccess: (String) -> Unit
     )
 
     suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: Document,
+        onFailure: (String) -> Unit,
+        onSuccess: (String) -> Unit
     )
 }

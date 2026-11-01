@@ -15,10 +15,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.os.Build
 import android.os.Environment
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
-import android.widget.Toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
@@ -32,16 +29,12 @@ class AndroidDocumentProcessor(
     private val context: Context
 ) : DocumentProcessor {
 
-    private fun showToast(message: String) {
-        Handler(Looper.getMainLooper()).post {
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        }
-    }
-
     override suspend fun processSave(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: Document,
+        onFailure: (String) -> Unit,
+        onSuccess: (String) -> Unit
     ) {
         val fileName =
             if (documentName.endsWith(".docx", ignoreCase = true))
@@ -55,8 +48,7 @@ class AndroidDocumentProcessor(
 
         val generatedBytes = generateDocumentBytes(documentResourceFile, headReplacements, bodyParts)
         if (generatedBytes == null || generatedBytes.isEmpty()) {
-            println("Failed to generate document: empty bytes or template not found")
-            showToast("Ошибка при создании документа: шаблон не найден")
+            onFailure("Ошибка при создании документа: шаблон не найден")
             return
         }
 
@@ -85,10 +77,10 @@ class AndroidDocumentProcessor(
                     contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
                     context.contentResolver.update(uri, contentValues, null, null)
 
-                    showToast("Документ сохранен в папку 'Документы': $fileName")
+                    onSuccess("Документ сохранен в папку 'Документы': $fileName")
                     return
                 } catch (e: Exception) {
-                    println("Error saving via MediaStore: ${e.message}")
+                    onFailure("Ошибка сохранения через MediaStore: ${e.message}")
                     runCatching { context.contentResolver.delete(uri, null, null) }
                 }
             }
@@ -109,20 +101,21 @@ class AndroidDocumentProcessor(
                     fos.write(generatedBytes)
                     fos.flush()
                 }
-                showToast("Документ сохранен: ${destination.absolutePath}")
+                onSuccess("Документ сохранен: ${destination.absolutePath}")
             }
         } catch (e: Exception) {
-            println("Error saving to file: ${e.message}")
-            showToast("Ошибка сохранения: ${e.message}")
+            onFailure("Ошибка сохранения: ${e.message}")
         }
     }
 
     override suspend fun processPrint(
         documentName: String,
         documentResourceFile: String,
-        document: Document
+        document: Document,
+        onFailure: (String) -> Unit,
+        onSuccess: (String) -> Unit
     ) {
-        processSave(documentName, documentResourceFile, document)
+        processSave(documentName, documentResourceFile, document, onFailure, onSuccess)
     }
 
     private fun loadResource(context: Context?, documentResourceFile: String): InputStream? {
