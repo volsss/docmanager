@@ -12,6 +12,7 @@
 package ru.example.docmanager.di
 
 import org.koin.dsl.module
+import ru.example.docmanager.data.document.JvmDocumentProcessor
 import ru.example.docmanager.domain.document.DocumentProcessor
 
 actual val platformModule = module {

@@ -9,7 +9,7 @@
  * for more details: <https://gnu.org>
  */
 
-package ru.example.docmanager.di
+package ru.example.docmanager.data.document
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

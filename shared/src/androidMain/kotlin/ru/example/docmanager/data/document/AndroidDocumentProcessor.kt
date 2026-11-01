@@ -9,7 +9,7 @@
  * for more details: <https://gnu.org>
  */
 
-package ru.example.docmanager.di
+package ru.example.docmanager.data.document
 
 import android.content.ContentValues
 import android.content.Context
