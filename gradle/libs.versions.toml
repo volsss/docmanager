@@ -1,5 +1,5 @@
 [versions]
-agp = "9.3.0"
+agp = "9.3.3"
 androidx-lifecycle = "2.11.0"
 android-compileSdk = "37"
 android-minSdk = "26"
