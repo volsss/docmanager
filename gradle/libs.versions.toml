@@ -45,6 +45,7 @@ exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datet
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi-ooxml" }
+poi-ooxml-full = { module = "org.apache.poi:poi-ooxml-full", version.ref = "poi-ooxml" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

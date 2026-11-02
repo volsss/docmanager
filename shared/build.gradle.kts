@@ -75,8 +75,13 @@ kotlin {
 
             // Document processor
             implementation(libs.poi.ooxml)
+            implementation(libs.poi.ooxml.full)
         }
     }
+}
+
+configurations.configureEach {
+    exclude(group = "org.apache.poi", module = "poi-ooxml-lite")
 }
 
 dependencies {
