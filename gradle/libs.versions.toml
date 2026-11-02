@@ -1,22 +1,22 @@
 [versions]
-agp = "9.1.1"
+agp = "9.3.0"
 androidx-lifecycle = "2.11.0"
 android-compileSdk = "37"
 android-minSdk = "26"
 android-targetSdk = "37"
 androidx-activity = "1.13.0"
-composeMultiplatform = "1.12.1"
+composeMultiplatform = "1.12.2"
 material3 = "1.12.0-alpha03"
 kotlin = "2.4.21"
 materialIconsExtended = "1.7.8"
 koin = "4.2.2"
-exposed = "1.5.1"
+exposed = "1.6.0"
 h2 = "2.5.252"
 postgresql = "42.7.14"
 material3Adaptive = "1.3.0"
-poi-ooxml = "5.5.1"
-multiplatform-nav3-ui = "1.1.2"
-kotlinx-serialization = "1.11.0"
+poi-ooxml = "6.0.0"
+multiplatform-nav3-ui = "1.2.0"
+kotlinx-serialization = "1.12.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
