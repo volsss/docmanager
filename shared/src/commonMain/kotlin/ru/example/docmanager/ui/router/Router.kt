@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
@@ -28,7 +28,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -39,8 +38,6 @@ import ru.example.docmanager.ui.screens.forms.FormScreen
 fun Router(
     modifier: Modifier = Modifier
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val backStack = rememberNavBackStack(
         configuration = routerConfig,
         Route.Start
@@ -66,19 +63,11 @@ fun Router(
         backStack.add(route)
     }
 
-    fun showSnackbar(message: String) {
-        scope.launch {
-            snackbarHostState.showSnackbar(message)
-        }
-    }
-
     RouterContent(
         currentRoute = currentRoute,
         backStack = backStack,
         onBack = ::onBack,
         navigateTo = ::navigateTo,
-        showSnackbar = ::showSnackbar,
-        snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
 }
@@ -89,8 +78,6 @@ private fun RouterContent(
     backStack: NavBackStack<NavKey>,
     onBack: () -> Unit,
     navigateTo: (Route, NavigationType) -> Unit,
-    showSnackbar: (String) -> Unit,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -101,9 +88,6 @@ private fun RouterContent(
                 canGoBack = backStack.size > 1,
                 onBack = onBack
             )
-        },
-        snackbarHost = {
-            RouterSnackbarHost(snackbarHostState)
         },
         bottomBar = {
             RouterBottomBar(
@@ -116,35 +100,9 @@ private fun RouterContent(
             backStack = backStack,
             navigateTo = navigateTo,
             onBack = onBack,
-            showSnackbar = showSnackbar,
             modifier = Modifier.padding(paddingValues)
         )
     }
-}
-
-@Composable
-private fun RouterSnackbarHost(
-    snackbarHostState: SnackbarHostState
-) {
-    SnackbarHost(
-        hostState = snackbarHostState,
-        snackbar = { snackbarData ->
-            SwipeToDismissBox(
-                state = rememberSwipeToDismissBoxState(),
-                onDismiss = {
-                    snackbarData.dismiss()
-                },
-                backgroundContent = { }
-            ) {
-                Snackbar(
-                    snackbarData = snackbarData,
-                    shape = MaterialTheme.shapes.large,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            }
-        }
-    )
 }
 
 @Composable
@@ -152,7 +110,6 @@ private fun RouterNavDisplay(
     backStack: NavBackStack<NavKey>,
     navigateTo: (Route, NavigationType) -> Unit,
     onBack: () -> Unit,
-    showSnackbar: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavDisplay(
@@ -194,7 +151,6 @@ private fun RouterNavDisplay(
             entry<Route.Form> {
                 FormScreen(
                     destination = it,
-                    onStatusMessage = showSnackbar,
                     navigateTo = navigateTo
                 )
             }
@@ -208,7 +164,6 @@ private fun RouterNavDisplay(
             entry<Route.Reference> {
                 ReferenceScreen(
                     destination = it,
-                    onStatusMessage = showSnackbar,
                     viewModel = koinViewModel(key = it.type.name) {
                         parametersOf(it)
                     }

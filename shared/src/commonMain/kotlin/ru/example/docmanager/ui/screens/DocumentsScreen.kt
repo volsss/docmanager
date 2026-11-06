@@ -21,6 +21,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,7 @@ import docmanager.shared.generated.resources.documents_fab
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.Document
 import ru.example.docmanager.domain.document.DocumentType
+import ru.example.docmanager.ui.components.AppSnackbarHost
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.utils.toRussianString
@@ -48,41 +50,17 @@ fun DocumentsScreen(
     modifier: Modifier = Modifier,
 ) {
     val documents by viewModel.documents.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(destination.type) {
         viewModel.reloadDocumentList()
     }
 
-    when {
-        documents == null -> {
-            LoadingContent(modifier = modifier)
-            return
-        }
-
-        documents!!.isEmpty() -> {
-            EmptyContent(
-                onNewDocumentClick = {
-                    navigateTo(Route.Form(destination.type))
-                },
-                modifier = modifier
-            )
-            return
-        }
-
-        else -> {
-            Box(modifier = modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    DocumentsContent(
-                        documentType = destination.type,
-                        documents = documents!!,
-                        navigateTo = navigateTo,
-                        modifier = Modifier.adaptiveWidth(),
-                    )
-                }
-
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = { AppSnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            if (!documents.isNullOrEmpty()) {
                 ExtendedFloatingActionButton(
                     text = { Text(stringResource(Res.string.documents_fab)) },
                     icon = {
@@ -94,14 +72,40 @@ fun DocumentsScreen(
                     onClick = {
                         navigateTo(Route.Form(destination.type))
                     },
-                    modifier = Modifier
-                        .animateFloatingActionButton(
-                            visible = true,
-                            alignment = Alignment.BottomEnd
-                        )
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
+                    modifier = Modifier.animateFloatingActionButton(
+                        visible = true,
+                        alignment = Alignment.BottomEnd
+                    )
                 )
+            }
+        }
+    ) { innerPadding ->
+        when {
+            documents == null -> {
+                LoadingContent(modifier = Modifier.padding(innerPadding))
+            }
+
+            documents!!.isEmpty() -> {
+                EmptyContent(
+                    onNewDocumentClick = {
+                        navigateTo(Route.Form(destination.type))
+                    },
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+
+            else -> {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(innerPadding),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DocumentsContent(
+                        documentType = destination.type,
+                        documents = documents!!,
+                        navigateTo = navigateTo,
+                        modifier = Modifier.adaptiveWidth(),
+                    )
+                }
             }
         }
     }

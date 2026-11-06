@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import ru.example.docmanager.data.database.DatabaseDriver
+import ru.example.docmanager.ui.components.AppSnackbarHost
 import ru.example.docmanager.ui.components.Dropdown
 import ru.example.docmanager.ui.components.DropdownMode
 import ru.example.docmanager.ui.components.TextInput
@@ -122,7 +123,7 @@ fun ConnectionContent(
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { AppSnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize().padding(paddingValues),

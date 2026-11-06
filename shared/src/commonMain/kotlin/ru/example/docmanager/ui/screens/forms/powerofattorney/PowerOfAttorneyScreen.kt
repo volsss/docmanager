@@ -43,6 +43,7 @@ import ru.example.docmanager.ui.components.DateInput
 import ru.example.docmanager.ui.components.IntInput
 import ru.example.docmanager.ui.components.ReferenceDropdown
 import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.components.AppSnackbarHost
 import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth
@@ -55,19 +56,25 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun PowerOfAttorneyScreen(
     document: Document?,
-    onStatusMessage: (String) -> Unit,
     navigateTo: (Route, NavigationType) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PowerOfAttorneyViewModel = koinInject()
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     val formState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(document, onStatusMessage) {
+    fun showSnackbar(message: String) {
+        scope.launch {
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
+    LaunchedEffect(document) {
         viewModel.onInit(
             onStatusUpdate = { message ->
-                onStatusMessage(message)
+                showSnackbar(message)
             },
             document = document
         )
@@ -78,10 +85,34 @@ fun PowerOfAttorneyScreen(
         return
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        snackbarHost = { AppSnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text(stringResource(Res.string.form_fab)) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = stringResource(Res.string.form_fab)
+                    )
+                },
+                onClick = {
+                    viewModel.addBodyItem()
+                    scope.launch {
+                        delay(280.milliseconds)
+                        scrollState.animateScrollTo(
+                            value = scrollState.maxValue
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
                 .verticalScroll(scrollState)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -95,7 +126,7 @@ fun PowerOfAttorneyScreen(
                     isEditing = formState.isEditing,
                     onSaveDocument = {
                         viewModel.onSaveDocument(
-                            onStatusUpdate = onStatusMessage,
+                            onStatusUpdate = ::showSnackbar,
                             onDocumentSaved = { newDocument ->
                                 navigateTo(
                                     Route.Form(formState.type, newDocument),
@@ -106,7 +137,7 @@ fun PowerOfAttorneyScreen(
                     },
                     onSaveAsNewDocument = {
                         viewModel.onSaveAsNewDocument(
-                            onStatusUpdate = onStatusMessage,
+                            onStatusUpdate = ::showSnackbar,
                             onDocumentSaved = { newDocument ->
                                 navigateTo(
                                     Route.Form(formState.type, newDocument),
@@ -117,7 +148,7 @@ fun PowerOfAttorneyScreen(
                     },
                     onDeleteDocument = {
                         viewModel.onDeleteDocument(
-                            onStatusUpdate = onStatusMessage,
+                            onStatusUpdate = ::showSnackbar,
                             onDocumentDeleted = {
                                 navigateTo(
                                     Route.Documents(formState.type),
@@ -127,10 +158,10 @@ fun PowerOfAttorneyScreen(
                         )
                     },
                     onExportDocument = {
-                        viewModel.onExportToFile(onStatusUpdate = onStatusMessage)
+                        viewModel.onExportToFile(onStatusUpdate = ::showSnackbar)
                     },
                     onPrintDocument = {
-                        viewModel.onPrintDocument(onStatusUpdate = onStatusMessage)
+                        viewModel.onPrintDocument(onStatusUpdate = ::showSnackbar)
                     }
                 )
 
@@ -151,35 +182,7 @@ fun PowerOfAttorneyScreen(
                     onRemoveBodyItem = viewModel::removeBodyItem,
                 )
             }
-
-            Spacer(Modifier.height(88.dp))
         }
-
-        ExtendedFloatingActionButton(
-            text = { Text(stringResource(Res.string.form_fab)) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = stringResource(Res.string.form_fab)
-                )
-            },
-            onClick = {
-                viewModel.addBodyItem()
-                scope.launch {
-                    delay(280.milliseconds)
-                    scrollState.animateScrollTo(
-                        value = scrollState.maxValue
-                    )
-                }
-            },
-            modifier = Modifier
-                .animateFloatingActionButton(
-                    visible = true,
-                    alignment = Alignment.BottomEnd
-                )
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        )
     }
 }
 

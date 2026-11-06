@@ -32,7 +32,6 @@ import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScr
 @Composable
 fun FormScreen(
     destination: Route.Form,
-    onStatusMessage: (String) -> Unit,
     navigateTo: (Route, NavigationType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -42,7 +41,6 @@ fun FormScreen(
     when (type) {
         DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(
             document = document,
-            onStatusMessage = onStatusMessage,
             navigateTo = navigateTo,
             modifier = modifier
         )
