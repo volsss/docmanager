@@ -18,7 +18,7 @@
     <string name="component_dropdown_placeholder">Выберите значение</string>
     <string name="component_input_required">* Обязательное поле</string>
 
-    <!-- Navigation & Routes -->
+    <!-- Navigation -->
     <string name="route_document_types">Виды документов</string>
     <string name="route_documents">Документы</string>
     <string name="route_form">Форма</string>
@@ -27,33 +27,44 @@
     <string name="route_references">Справочники</string>
     <string name="route_settings">Настройки</string>
 
-    <!-- Dashboard & Navigation Bar -->
-    <string name="dashboard_action_disconnect">Отключиться</string>
-    <string name="dashboard_action_settings">Настройки</string>
-    <string name="dashboard_project_name_fallback">Неназванный проект</string>
-    <string name="dashboard_tabs_more">Ещё</string>
-
-    <!-- Connection / Start Screen -->
-    <string name="start_connect_button">Подключиться</string>
-    <string name="start_error_jdbc_empty">JDBC URL не может быть пустым</string>
-    <string name="start_error_ip_empty">IP адрес не может быть пустым</string>
-    <string name="start_error_postgres_user_and_password_empty">Пользователь и пароль не могут быть пустыми для
+    <!-- Connection Screen -->
+    <string name="connection_connect_button">Подключиться</string>
+    <string name="connection_error_jdbc_empty">JDBC URL не может быть пустым</string>
+    <string name="connection_error_ip_empty">IP адрес не может быть пустым</string>
+    <string name="connection_error_postgres_user_and_password_empty">Пользователь и пароль не могут быть пустыми для
         PostgreSQL
     </string>
-    <string name="start_input_driver">Драйвер*</string>
-    <string name="start_input_ip">IP адрес*</string>
-    <string name="start_input_jdbc_url">JDBC URL*</string>
-    <string name="start_input_password">Пароль</string>
-    <string name="start_input_user">Пользователь</string>
-    <string name="start_title">docmanager</string>
-    <string name="start_option_local">Локально</string>
-    <string name="start_option_local_supporting">Локальная H2 база данных</string>
-    <string name="start_option_remote">Удалённо</string>
-    <string name="start_option_remote_supporting">Локальная или удалённая PostgreSQL</string>
-    <string name="start_option_other">Другой</string>
-    <string name="start_option_other_supporting">Ручная настройка подключения</string>
+    <string name="connection_input_driver">Драйвер *</string>
+    <string name="connection_input_ip">IP адрес *</string>
+    <string name="connection_input_jdbc_url">JDBC URL *</string>
+    <string name="connection_input_password">Пароль</string>
+    <string name="connection_input_user">Пользователь</string>
+    <string name="connection_title">docmanager</string>
+    <string name="connection_option_local">Локально</string>
+    <string name="connection_option_local_supporting">Локальная H2 база данных</string>
+    <string name="connection_option_remote">Удалённо</string>
+    <string name="connection_option_remote_supporting">Локальная или удалённая PostgreSQL</string>
+    <string name="connection_option_other">Другой</string>
+    <string name="connection_option_other_supporting">Ручная настройка подключения</string>
 
-    <!-- Document Types & Filed -->
+    <!-- Start Screen -->
+    <string name="start_loading_title">Открываем вашу студию</string>
+
+    <string name="start_project_untitled">Проект без названия</string>
+    <string name="start_hero_eyebrow">docmanager</string>
+    <string name="start_hero_tagline">Все документы на своих местах</string>
+    <string name="start_project_version">v%1$s</string>
+    <string name="start_project_created_on">Создано %1$s</string>
+
+    <string name="start_section_overview">Обзор</string>
+
+    <string name="start_stat_total">ВСЕГО</string>
+    <string name="start_stat_document_types">Типов документов</string>
+    <string name="start_stat_documents">Документов</string>
+    <string name="start_stat_reference_types">Справочников</string>
+    <string name="start_stat_references">Полей в справочниках</string>
+
+    <!-- Document Types -->
     <string name="document_power_of_attorney">Доверенность</string>
     <string name="document_power_of_attorney_resource">Доверенность.docx</string>
     <string name="document_test">Тестовый документ</string>
@@ -73,7 +84,7 @@
     <string name="reference_save_button">Сохранить</string>
     <string name="reference_suppliers">Поставщики</string>
 
-    <!-- Forms & Document Editing -->
+    <!-- Forms -->
     <string name="form_deleted">Форма удалена</string>
     <string name="form_error_empty_required">Заполните все обязательные поля</string>
     <string name="form_error_failed_deleting">Ошибка удаления</string>

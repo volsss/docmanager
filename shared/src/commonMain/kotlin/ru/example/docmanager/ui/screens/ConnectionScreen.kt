@@ -117,9 +117,9 @@ fun ConnectionContent(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val jdbcEmpty = stringResource(Res.string.start_error_jdbc_empty)
-    val ipEmpty = stringResource(Res.string.start_error_ip_empty)
-    val postgresUserAndPasswordEmpty = stringResource(Res.string.start_error_postgres_user_and_password_empty)
+    val jdbcEmpty = stringResource(Res.string.connection_error_jdbc_empty)
+    val ipEmpty = stringResource(Res.string.connection_error_ip_empty)
+    val postgresUserAndPasswordEmpty = stringResource(Res.string.connection_error_postgres_user_and_password_empty)
 
     Scaffold(
         modifier = modifier,
@@ -137,7 +137,7 @@ fun ConnectionContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = stringResource(Res.string.start_title),
+                    text = stringResource(Res.string.connection_title),
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace,
@@ -155,8 +155,8 @@ fun ConnectionContent(
                         selected = connectionType == ConnectionType.LOCAL,
                         onClick = { onConnectionTypeChanged(ConnectionType.LOCAL) },
                         iconPolygon = MaterialShapes.Circle,
-                        supportingText = stringResource(Res.string.start_option_local_supporting),
-                        text = stringResource(Res.string.start_option_local)
+                        supportingText = stringResource(Res.string.connection_option_local_supporting),
+                        text = stringResource(Res.string.connection_option_local)
                     )
                     ConnectionOption(
                         index = 1,
@@ -165,8 +165,8 @@ fun ConnectionContent(
                         onClick = { onConnectionTypeChanged(ConnectionType.REMOTE) },
                         iconPolygon = MaterialShapes.Gem,
                         iconColor = MaterialTheme.colorScheme.tertiary,
-                        supportingText = stringResource(Res.string.start_option_remote_supporting),
-                        text = stringResource(Res.string.start_option_remote)
+                        supportingText = stringResource(Res.string.connection_option_remote_supporting),
+                        text = stringResource(Res.string.connection_option_remote)
                     )
                     ConnectionOption(
                         index = 2,
@@ -175,8 +175,8 @@ fun ConnectionContent(
                         onClick = { onConnectionTypeChanged(ConnectionType.OTHER) },
                         iconPolygon = MaterialShapes.Pill,
                         iconColor = MaterialTheme.colorScheme.secondary,
-                        supportingText = stringResource(Res.string.start_option_other_supporting),
-                        text = stringResource(Res.string.start_option_other)
+                        supportingText = stringResource(Res.string.connection_option_other_supporting),
+                        text = stringResource(Res.string.connection_option_other)
                     )
                 }
 
@@ -189,7 +189,7 @@ fun ConnectionContent(
                     ) {
                         TextInput(
                             value = ip,
-                            label = stringResource(Res.string.start_input_ip),
+                            label = stringResource(Res.string.connection_input_ip),
                             onValueChange = { onIpChanged(it) },
                             required = true,
                             modifier = Modifier.fillMaxWidth()
@@ -197,7 +197,7 @@ fun ConnectionContent(
 
                         TextInput(
                             value = username,
-                            label = stringResource(Res.string.start_input_user),
+                            label = stringResource(Res.string.connection_input_user),
                             onValueChange = { onUsernameChanged(it) },
                             required = true,
                             modifier = Modifier.fillMaxWidth()
@@ -205,7 +205,7 @@ fun ConnectionContent(
 
                         TextInput(
                             value = password,
-                            label = stringResource(Res.string.start_input_password),
+                            label = stringResource(Res.string.connection_input_password),
                             onValueChange = { onPasswordChanged(it) },
                             required = true,
                             modifier = Modifier.fillMaxWidth(),
@@ -221,7 +221,7 @@ fun ConnectionContent(
                     ) {
                         TextInput(
                             value = jdbcUrl,
-                            label = stringResource(Res.string.start_input_jdbc_url),
+                            label = stringResource(Res.string.connection_input_jdbc_url),
                             onValueChange = { onJdbcUrlChanged(it) },
                             required = true,
                             modifier = Modifier.fillMaxWidth()
@@ -230,7 +230,7 @@ fun ConnectionContent(
                         Dropdown(
                             value = driver,
                             items = DatabaseDriver.entries.map { it.driverClassName },
-                            label = stringResource(Res.string.start_input_driver),
+                            label = stringResource(Res.string.connection_input_driver),
                             supportingText = stringResource(Res.string.component_input_required),
                             onValueChange = { onDriverChanged(it) },
                             mode = DropdownMode.VALUES_ONLY
@@ -238,14 +238,14 @@ fun ConnectionContent(
 
                         TextInput(
                             value = username,
-                            label = stringResource(Res.string.start_input_user),
+                            label = stringResource(Res.string.connection_input_user),
                             onValueChange = { onUsernameChanged(it) },
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         TextInput(
                             value = password,
-                            label = stringResource(Res.string.start_input_password),
+                            label = stringResource(Res.string.connection_input_password),
                             onValueChange = { onPasswordChanged(it) },
                             modifier = Modifier.fillMaxWidth(),
                             visualTransformation = PasswordVisualTransformation()
@@ -298,7 +298,7 @@ fun ConnectionContent(
                     contentPadding = ButtonDefaults.LargeContentPadding,
                 ) {
                     Text(
-                        stringResource(Res.string.start_connect_button),
+                        stringResource(Res.string.connection_connect_button),
                         style = ButtonDefaults.textStyleFor(ButtonDefaults.LargeContainerHeight)
                     )
                 }

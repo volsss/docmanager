@@ -20,11 +20,21 @@ import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyViewModel
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
 import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
+import ru.example.docmanager.ui.viewmodel.start.StartViewModel
 
 val viewModelModule = module {
     viewModelOf(::ConnectionViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::PowerOfAttorneyViewModel)
+
+    viewModel {
+        StartViewModel(
+            metadataRepository = get(),
+            databaseManager = get(),
+            documentRepositories = get(named("documents")),
+            referenceRepositories = get(named("references"))
+        )
+    }
 
     viewModel { params ->
         ReferenceViewModel(

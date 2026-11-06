@@ -23,6 +23,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
@@ -58,7 +59,11 @@ fun DocumentTypesScreen(
                     }
                 },
                 title = {
-                    Text(stringResource(Res.string.route_document_types))
+                    Text(
+                        text = stringResource(Res.string.route_document_types),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             )
         }

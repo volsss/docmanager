@@ -26,6 +26,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
@@ -90,7 +91,11 @@ fun ReferenceScreen(
                     }
                 },
                 title = {
-                    Text(stringResource(referenceType.stringResource))
+                    Text(
+                        text = stringResource(referenceType.stringResource),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             )
         },
