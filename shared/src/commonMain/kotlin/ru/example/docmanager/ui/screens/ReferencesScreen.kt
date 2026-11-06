@@ -11,15 +11,23 @@
 
 package ru.example.docmanager.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.component_back_button
+import docmanager.shared.generated.resources.route_references
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.router.Route
@@ -29,16 +37,43 @@ import ru.example.docmanager.ui.utils.adaptiveWidth
 @Composable
 fun ReferencesScreen(
     navigateTo: (Route) -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    Scaffold(
         modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ReferencesContent(
-            navigateTo = navigateTo,
-            modifier = modifier.adaptiveWidth()
-        )
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AnimatedVisibility(
+                        visible = canGoBack,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally()
+                    ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(Res.string.component_back_button),
+                            )
+                        }
+                    }
+                },
+                title = {
+                    Text(stringResource(Res.string.route_references))
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ReferencesContent(
+                navigateTo = navigateTo,
+                modifier = modifier.adaptiveWidth()
+            )
+        }
     }
 }
 
@@ -84,7 +119,9 @@ private fun ReferencesContent(
 fun ReferencesScreenPreview() {
     AppTheme(darkTheme = false) {
         ReferencesScreen(
-            navigateTo = { }
+            navigateTo = { },
+            canGoBack = false,
+            onBack = { }
         )
     }
 }
@@ -94,7 +131,9 @@ fun ReferencesScreenPreview() {
 fun ReferencesScreenDarkThemePreview() {
     AppTheme(darkTheme = true) {
         ReferencesScreen(
-            navigateTo = { }
+            navigateTo = { },
+            canGoBack = false,
+            onBack = { }
         )
     }
 }

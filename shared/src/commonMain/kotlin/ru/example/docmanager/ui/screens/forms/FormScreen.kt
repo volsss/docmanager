@@ -11,17 +11,23 @@
 
 package ru.example.docmanager.ui.screens.forms
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.component_back_button
 import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.DocumentType
@@ -33,27 +39,55 @@ import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScr
 fun FormScreen(
     destination: Route.Form,
     navigateTo: (Route, NavigationType) -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val type = destination.type
     val document = destination.document
 
-    when (type) {
-        DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(
-            document = document,
-            navigateTo = navigateTo,
-            modifier = modifier
-        )
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AnimatedVisibility(
+                        visible = canGoBack,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally()
+                    ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(Res.string.component_back_button),
+                            )
+                        }
+                    }
+                },
+                title = {
+                    Text(stringResource(type.stringResource))
+                }
+            )
+        }
+    ) { paddingValues ->
+        when (type) {
+            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(
+                document = document,
+                navigateTo = navigateTo,
+                modifier = modifier.padding(paddingValues)
+            )
 
-        DocumentType.TEST -> {
-            val scrollState = rememberScrollState()
-            Column(
-                modifier = modifier.fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(stringResource(Res.string.document_test))
+            DocumentType.TEST -> {
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = modifier.fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                        .verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(stringResource(Res.string.document_test))
+                }
             }
         }
     }

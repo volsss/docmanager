@@ -39,11 +39,7 @@ import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.domain.document.Document
 import ru.example.docmanager.domain.document.header.HeaderFieldType
-import ru.example.docmanager.ui.components.DateInput
-import ru.example.docmanager.ui.components.IntInput
-import ru.example.docmanager.ui.components.ReferenceDropdown
-import ru.example.docmanager.ui.components.TextInput
-import ru.example.docmanager.ui.components.AppSnackbarHost
+import ru.example.docmanager.ui.components.*
 import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth

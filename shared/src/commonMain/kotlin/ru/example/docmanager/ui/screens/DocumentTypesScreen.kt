@@ -11,14 +11,22 @@
 
 package ru.example.docmanager.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.component_back_button
+import docmanager.shared.generated.resources.route_document_types
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.ui.router.Route
@@ -27,16 +35,43 @@ import ru.example.docmanager.ui.utils.adaptiveWidth
 @Composable
 fun DocumentTypesScreen(
     navigateTo: (Route) -> Unit,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    Scaffold(
         modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        DocumentTypesContent(
-            navigateTo = navigateTo,
-            modifier = modifier.adaptiveWidth()
-        )
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AnimatedVisibility(
+                        visible = canGoBack,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally()
+                    ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(Res.string.component_back_button),
+                            )
+                        }
+                    }
+                },
+                title = {
+                    Text(stringResource(Res.string.route_document_types))
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            DocumentTypesContent(
+                navigateTo = navigateTo,
+                modifier = modifier.adaptiveWidth()
+            )
+        }
     }
 }
 

@@ -12,22 +12,21 @@
 package ru.example.docmanager.ui.router
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.component_back_button
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -80,27 +79,30 @@ private fun RouterContent(
     navigateTo: (Route, NavigationType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            RouterTopBar(
-                currentRoute = currentRoute,
-                canGoBack = backStack.size > 1,
-                onBack = onBack
-            )
-        },
-        bottomBar = {
-            RouterBottomBar(
-                currentRoute = currentRoute,
-                navigateTo = navigateTo
-            )
-        }
-    ) { paddingValues ->
+    val bottomBarRoutes = listOf(
+        Route.Start,
+        Route.DocumentTypes,
+        Route.References
+    )
+    val showBottomBar = bottomBarRoutes.contains(currentRoute)
+
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.surfaceDim)
+            .fillMaxSize(),
+    ) {
         RouterNavDisplay(
             backStack = backStack,
             navigateTo = navigateTo,
             onBack = onBack,
-            modifier = Modifier.padding(paddingValues)
+            modifier = if (showBottomBar) Modifier.fillMaxSize().padding(bottom = 80.dp) else Modifier.fillMaxSize()
+        )
+
+        RouterBottomBar(
+            currentRoute = currentRoute,
+            routes = bottomBarRoutes,
+            navigateTo = navigateTo,
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }
@@ -112,6 +114,7 @@ private fun RouterNavDisplay(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val canGoBack = backStack.size > 1
     NavDisplay(
         backStack = backStack,
         onBack = onBack,
@@ -124,17 +127,27 @@ private fun RouterNavDisplay(
                 StartScreen(
                     navigateTo = { route ->
                         navigateTo(route, NavigationType.PUSH)
-                    }
+                    },
+                    canGoBack = false,
+                    onBack = onBack
                 )
-            }
-            entry<Route.Settings> {
-                SettingsScreen()
             }
             entry<Route.DocumentTypes> {
                 DocumentTypesScreen(
                     navigateTo = { route ->
                         navigateTo(route, NavigationType.PUSH)
-                    }
+                    },
+                    canGoBack = false,
+                    onBack = onBack
+                )
+            }
+            entry<Route.References> {
+                ReferencesScreen(
+                    navigateTo = { route ->
+                        navigateTo(route, NavigationType.PUSH)
+                    },
+                    canGoBack = false,
+                    onBack = onBack
                 )
             }
             entry<Route.Documents> {
@@ -145,20 +158,17 @@ private fun RouterNavDisplay(
                     },
                     viewModel = koinViewModel(key = it.type.name) {
                         parametersOf(it)
-                    }
+                    },
+                    canGoBack = canGoBack,
+                    onBack = onBack
                 )
             }
             entry<Route.Form> {
                 FormScreen(
                     destination = it,
-                    navigateTo = navigateTo
-                )
-            }
-            entry<Route.References> {
-                ReferencesScreen(
-                    navigateTo = { route ->
-                        navigateTo(route, NavigationType.PUSH)
-                    }
+                    navigateTo = navigateTo,
+                    canGoBack = canGoBack,
+                    onBack = onBack
                 )
             }
             entry<Route.Reference> {
@@ -166,66 +176,32 @@ private fun RouterNavDisplay(
                     destination = it,
                     viewModel = koinViewModel(key = it.type.name) {
                         parametersOf(it)
-                    }
+                    },
+                    canGoBack = canGoBack,
+                    onBack = onBack
+                )
+            }
+            entry<Route.Settings> {
+                SettingsScreen(
+                    canGoBack = canGoBack,
+                    onBack = onBack
                 )
             }
         }
     )
 }
 
-@Composable
-private fun RouterTopBar(
-    currentRoute: Route,
-    canGoBack: Boolean,
-    onBack: () -> Unit
-) {
-    TopAppBar(
-        navigationIcon = {
-            AnimatedVisibility(
-                visible = canGoBack,
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally()
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = stringResource(Res.string.component_back_button),
-                    )
-                }
-            }
-        },
-        title = {
-            Text(
-                text = when (currentRoute) {
-                    is Route.Reference -> {
-                        stringResource(currentRoute.type.stringResource)
-                    }
-
-                    is Route.Documents -> {
-                        stringResource(currentRoute.type.stringResource)
-                    }
-
-                    is Route.Form -> {
-                        stringResource(currentRoute.type.stringResource)
-                    }
-
-                    else -> stringResource(currentRoute.stringResource)
-                }
-            )
-        }
-    )
-}
 
 @Composable
 private fun RouterBottomBar(
     currentRoute: Route,
-    navigateTo: (Route, NavigationType) -> Unit
+    routes: List<Route>,
+    navigateTo: (Route, NavigationType) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
-        visible = currentRoute is Route.Start
-                || currentRoute is Route.Settings
-                || currentRoute is Route.DocumentTypes
-                || currentRoute is Route.References,
+        visible = routes.contains(currentRoute),
+        modifier = modifier,
         enter = slideInVertically(
             initialOffsetY = { fullHeight -> fullHeight },
         ) + expandVertically(
@@ -238,26 +214,13 @@ private fun RouterBottomBar(
         ) + fadeOut()
     ) {
         NavigationBar {
-            RouterBarItem(
-                route = Route.Start,
-                selected = currentRoute is Route.Start,
-                onClick = { navigateTo(Route.Start, NavigationType.RESET) },
-            )
-            RouterBarItem(
-                route = Route.DocumentTypes,
-                selected = currentRoute is Route.DocumentTypes,
-                onClick = { navigateTo(Route.DocumentTypes, NavigationType.RESET) },
-            )
-            RouterBarItem(
-                route = Route.References,
-                selected = currentRoute is Route.References,
-                onClick = { navigateTo(Route.References, NavigationType.RESET) },
-            )
-            RouterBarItem(
-                route = Route.Settings,
-                selected = currentRoute is Route.Settings,
-                onClick = { navigateTo(Route.Settings, NavigationType.RESET) },
-            )
+            routes.forEach { route ->
+                RouterBarItem(
+                    route = route,
+                    selected = currentRoute == route,
+                    onClick = { navigateTo(route, NavigationType.RESET) },
+                )
+            }
         }
     }
 }

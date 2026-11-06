@@ -11,11 +11,15 @@
 
 package ru.example.docmanager.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -29,10 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.documents_empty_content
-import docmanager.shared.generated.resources.documents_empty_new_button
-import docmanager.shared.generated.resources.documents_fab
+import docmanager.shared.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.Document
 import ru.example.docmanager.domain.document.DocumentType
@@ -47,6 +48,8 @@ fun DocumentsScreen(
     destination: Route.Documents,
     navigateTo: (Route) -> Unit,
     viewModel: DocumentsViewModel,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val documents by viewModel.documents.collectAsStateWithLifecycle()
@@ -58,6 +61,27 @@ fun DocumentsScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AnimatedVisibility(
+                        visible = canGoBack,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally()
+                    ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(Res.string.component_back_button),
+                            )
+                        }
+                    }
+                },
+                title = {
+                    Text(stringResource(destination.type.stringResource))
+                }
+            )
+        },
         snackbarHost = { AppSnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (!documents.isNullOrEmpty()) {

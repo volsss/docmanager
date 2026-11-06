@@ -11,11 +11,15 @@
 
 package ru.example.docmanager.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,23 +38,50 @@ import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
 
 @Composable
 fun SettingsScreen(
+    canGoBack: Boolean,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(
+    Scaffold(
         modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        SettingsContent(
-            state = state,
-            onProjectNameChanged = viewModel::onProjectNameChanged,
-            onVersionChanged = viewModel::onVersionChanged,
-            onAuthorChanged = viewModel::onAuthorChanged,
-            onSave = viewModel::save,
-            modifier = modifier.adaptiveWidth()
-        )
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AnimatedVisibility(
+                        visible = canGoBack,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally()
+                    ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(Res.string.component_back_button),
+                            )
+                        }
+                    }
+                },
+                title = {
+                    Text(stringResource(Res.string.route_settings))
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            SettingsContent(
+                state = state,
+                onProjectNameChanged = viewModel::onProjectNameChanged,
+                onVersionChanged = viewModel::onVersionChanged,
+                onAuthorChanged = viewModel::onAuthorChanged,
+                onSave = viewModel::save,
+                modifier = modifier.adaptiveWidth()
+            )
+        }
     }
 }
 
