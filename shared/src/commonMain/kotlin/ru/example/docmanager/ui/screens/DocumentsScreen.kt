@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.documents_empty_content
 import docmanager.shared.generated.resources.documents_empty_new_button
+import docmanager.shared.generated.resources.documents_fab
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.Document
 import ru.example.docmanager.domain.document.DocumentType
@@ -43,7 +44,6 @@ import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
 fun DocumentsScreen(
     destination: Route.Documents,
     navigateTo: (Route) -> Unit,
-    registerFabClickAction: ((() -> Unit)?) -> Unit,
     viewModel: DocumentsViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -51,16 +51,6 @@ fun DocumentsScreen(
 
     LaunchedEffect(destination.type) {
         viewModel.reloadDocumentList()
-    }
-
-    LaunchedEffect(registerFabClickAction, documents) {
-        if (documents.isNullOrEmpty()) {
-            registerFabClickAction(null)
-            return@LaunchedEffect
-        }
-        registerFabClickAction {
-            navigateTo(Route.Form(destination.type))
-        }
     }
 
     when {
@@ -80,15 +70,37 @@ fun DocumentsScreen(
         }
 
         else -> {
-            Column(
-                modifier = modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                DocumentsContent(
-                    documentType = destination.type,
-                    documents = documents!!,
-                    navigateTo = navigateTo,
-                    modifier = modifier.adaptiveWidth(),
+            Box(modifier = modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    DocumentsContent(
+                        documentType = destination.type,
+                        documents = documents!!,
+                        navigateTo = navigateTo,
+                        modifier = Modifier.adaptiveWidth(),
+                    )
+                }
+
+                ExtendedFloatingActionButton(
+                    text = { Text(stringResource(Res.string.documents_fab)) },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Add,
+                            contentDescription = stringResource(Res.string.documents_fab)
+                        )
+                    },
+                    onClick = {
+                        navigateTo(Route.Form(destination.type))
+                    },
+                    modifier = Modifier
+                        .animateFloatingActionButton(
+                            visible = true,
+                            alignment = Alignment.BottomEnd
+                        )
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
                 )
             }
         }
@@ -108,7 +120,8 @@ private fun DocumentsContent(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            contentPadding = PaddingValues(bottom = 88.dp)
         ) {
             itemsIndexed(
                 items = documents,

@@ -15,6 +15,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
@@ -56,11 +57,11 @@ fun PowerOfAttorneyScreen(
     document: Document?,
     onStatusMessage: (String) -> Unit,
     navigateTo: (Route, NavigationType) -> Unit,
-    registerFabClickAction: ((() -> Unit)?) -> Unit,
-    scrollState: ScrollState,
+    modifier: Modifier = Modifier,
     viewModel: PowerOfAttorneyViewModel = koinInject()
 ) {
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
     val formState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(document, onStatusMessage) {
@@ -73,89 +74,113 @@ fun PowerOfAttorneyScreen(
     }
 
     if (formState.isLoading) {
-        LoadingContent()
+        LoadingContent(modifier = modifier)
         return
     }
 
-    LaunchedEffect(scope, registerFabClickAction, formState) {
-        registerFabClickAction {
-            viewModel.addBodyItem()
-            scope.launch {
-                delay(280.milliseconds)
-                scrollState.animateScrollTo(
-                    value = scrollState.maxValue
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column(
+                modifier = Modifier.adaptiveWidth(),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PowerOfAttorneyActions(
+                    isEditing = formState.isEditing,
+                    onSaveDocument = {
+                        viewModel.onSaveDocument(
+                            onStatusUpdate = onStatusMessage,
+                            onDocumentSaved = { newDocument ->
+                                navigateTo(
+                                    Route.Form(formState.type, newDocument),
+                                    NavigationType.REPLACE
+                                )
+                            }
+                        )
+                    },
+                    onSaveAsNewDocument = {
+                        viewModel.onSaveAsNewDocument(
+                            onStatusUpdate = onStatusMessage,
+                            onDocumentSaved = { newDocument ->
+                                navigateTo(
+                                    Route.Form(formState.type, newDocument),
+                                    NavigationType.REPLACE
+                                )
+                            }
+                        )
+                    },
+                    onDeleteDocument = {
+                        viewModel.onDeleteDocument(
+                            onStatusUpdate = onStatusMessage,
+                            onDocumentDeleted = {
+                                navigateTo(
+                                    Route.Documents(formState.type),
+                                    NavigationType.REPLACE
+                                )
+                            }
+                        )
+                    },
+                    onExportDocument = {
+                        viewModel.onExportToFile(onStatusUpdate = onStatusMessage)
+                    },
+                    onPrintDocument = {
+                        viewModel.onPrintDocument(onStatusUpdate = onStatusMessage)
+                    }
+                )
+
+                PowerOfAttorneyHeaderSection(
+                    formState = formState,
+                    onNumberChanged = viewModel::onNumberChanged,
+                    onDischargeDateChanged = viewModel::onDischargeDateChanged,
+                    onEndDateChanged = viewModel::onEndDateChanged,
+                    onOrganizationChanged = viewModel::onOrganizationChanged,
+                    onIndividualChanged = viewModel::onIndividualChanged,
+                    onSupplierChanged = viewModel::onSupplierChanged,
+                    onSupplierAgreementChanged = viewModel::onSupplierAgreementChanged,
+                )
+
+                PowerOfAttorneyBodySection(
+                    formState = formState,
+                    onUpdateBodyItem = viewModel::updateBodyItem,
+                    onRemoveBodyItem = viewModel::removeBodyItem,
                 )
             }
+
+            Spacer(Modifier.height(88.dp))
         }
-    }
 
-    Column(
-        modifier = Modifier.adaptiveWidth(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        PowerOfAttorneyActions(
-            isEditing = formState.isEditing,
-            onSaveDocument = {
-                viewModel.onSaveDocument(
-                    onStatusUpdate = onStatusMessage,
-                    onDocumentSaved = { newDocument ->
-                        navigateTo(
-                            Route.Form(formState.type, newDocument),
-                            NavigationType.REPLACE
-                        )
-                    }
+        ExtendedFloatingActionButton(
+            text = { Text(stringResource(Res.string.form_fab)) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = stringResource(Res.string.form_fab)
                 )
             },
-            onSaveAsNewDocument = {
-                viewModel.onSaveAsNewDocument(
-                    onStatusUpdate = onStatusMessage,
-                    onDocumentSaved = { newDocument ->
-                        navigateTo(
-                            Route.Form(formState.type, newDocument),
-                            NavigationType.REPLACE
-                        )
-                    }
+            onClick = {
+                viewModel.addBodyItem()
+                scope.launch {
+                    delay(280.milliseconds)
+                    scrollState.animateScrollTo(
+                        value = scrollState.maxValue
+                    )
+                }
+            },
+            modifier = Modifier
+                .animateFloatingActionButton(
+                    visible = true,
+                    alignment = Alignment.BottomEnd
                 )
-            },
-            onDeleteDocument = {
-                viewModel.onDeleteDocument(
-                    onStatusUpdate = onStatusMessage,
-                    onDocumentDeleted = {
-                        navigateTo(
-                            Route.Documents(formState.type),
-                            NavigationType.REPLACE
-                        )
-                    }
-                )
-            },
-            onExportDocument = {
-                viewModel.onExportToFile(onStatusUpdate = onStatusMessage)
-            },
-            onPrintDocument = {
-                viewModel.onPrintDocument(onStatusUpdate = onStatusMessage)
-            }
-        )
-
-        PowerOfAttorneyHeaderSection(
-            formState = formState,
-            onNumberChanged = viewModel::onNumberChanged,
-            onDischargeDateChanged = viewModel::onDischargeDateChanged,
-            onEndDateChanged = viewModel::onEndDateChanged,
-            onOrganizationChanged = viewModel::onOrganizationChanged,
-            onIndividualChanged = viewModel::onIndividualChanged,
-            onSupplierChanged = viewModel::onSupplierChanged,
-            onSupplierAgreementChanged = viewModel::onSupplierAgreementChanged,
-        )
-
-        PowerOfAttorneyBodySection(
-            formState = formState,
-            onUpdateBodyItem = viewModel::updateBodyItem,
-            onRemoveBodyItem = viewModel::removeBodyItem,
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
         )
     }
-
-    Spacer(Modifier.height(64.dp))
 }
 
 @Composable
@@ -435,9 +460,11 @@ private fun PowerOfAttorneyActions(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun LoadingContent() {
+private fun LoadingContent(
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         ContainedLoadingIndicator(modifier = Modifier.size(128.dp))

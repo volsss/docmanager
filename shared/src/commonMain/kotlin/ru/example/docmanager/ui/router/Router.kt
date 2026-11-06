@@ -17,12 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -30,8 +28,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
-import docmanager.shared.generated.resources.documents_fab
-import docmanager.shared.generated.resources.form_fab
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -43,10 +39,6 @@ import ru.example.docmanager.ui.screens.forms.FormScreen
 fun Router(
     modifier: Modifier = Modifier
 ) {
-    var onFabClickAction by remember {
-        mutableStateOf<(() -> Unit)?>(null)
-    }
-
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val backStack = rememberNavBackStack(
@@ -59,7 +51,6 @@ fun Router(
     fun onBack() {
         if (backStack.size > 1) {
             backStack.removeLastOrNull()
-            onFabClickAction = null
         }
     }
 
@@ -87,12 +78,8 @@ fun Router(
         onBack = ::onBack,
         navigateTo = ::navigateTo,
         showSnackbar = ::showSnackbar,
-        registerFabClickAction = { action ->
-            onFabClickAction = action
-        },
         snackbarHostState = snackbarHostState,
         modifier = modifier,
-        onFabClickAction = onFabClickAction,
     )
 }
 
@@ -103,10 +90,8 @@ private fun RouterContent(
     onBack: () -> Unit,
     navigateTo: (Route, NavigationType) -> Unit,
     showSnackbar: (String) -> Unit,
-    registerFabClickAction: ((() -> Unit)?) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    onFabClickAction: (() -> Unit)? = null,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -125,32 +110,12 @@ private fun RouterContent(
                 currentRoute = currentRoute,
                 navigateTo = navigateTo
             )
-        },
-        floatingActionButton = {
-            when (currentRoute) {
-                is Route.Documents -> {
-                    RouterFloatingActionButton(
-                        onFabClickAction = onFabClickAction,
-                        label = stringResource(Res.string.documents_fab)
-                    )
-                }
-
-                is Route.Form -> {
-                    RouterFloatingActionButton(
-                        onFabClickAction = onFabClickAction,
-                        label = stringResource(Res.string.form_fab)
-                    )
-                }
-
-                else -> {}
-            }
         }
     ) { paddingValues ->
         RouterNavDisplay(
             backStack = backStack,
             navigateTo = navigateTo,
             onBack = onBack,
-            registerFabClickAction = registerFabClickAction,
             showSnackbar = showSnackbar,
             modifier = Modifier.padding(paddingValues)
         )
@@ -187,7 +152,6 @@ private fun RouterNavDisplay(
     backStack: NavBackStack<NavKey>,
     navigateTo: (Route, NavigationType) -> Unit,
     onBack: () -> Unit,
-    registerFabClickAction: ((() -> Unit)?) -> Unit,
     showSnackbar: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -222,7 +186,6 @@ private fun RouterNavDisplay(
                     navigateTo = { route ->
                         navigateTo(route, NavigationType.PUSH)
                     },
-                    registerFabClickAction = registerFabClickAction,
                     viewModel = koinViewModel(key = it.type.name) {
                         parametersOf(it)
                     }
@@ -232,8 +195,7 @@ private fun RouterNavDisplay(
                 FormScreen(
                     destination = it,
                     onStatusMessage = showSnackbar,
-                    navigateTo = navigateTo,
-                    registerFabClickAction = registerFabClickAction
+                    navigateTo = navigateTo
                 )
             }
             entry<Route.References> {
@@ -366,41 +328,4 @@ private fun RowScope.RouterBarItem(
             indicatorColor = MaterialTheme.colorScheme.primaryContainer,
         ),
     )
-}
-
-@Composable
-private fun RouterFloatingActionButton(
-    visible: Boolean = true,
-    onFabClickAction: (() -> Unit)? = null,
-    icon: ImageVector = Icons.Rounded.Add,
-    label: String? = null,
-) {
-    val localVisible = visible && onFabClickAction != null
-    if (label != null) {
-        ExtendedFloatingActionButton(
-            icon = {
-                Icon(icon, contentDescription = label)
-            },
-            text = {
-                Text(label)
-            },
-            onClick = { onFabClickAction?.invoke() },
-            modifier = Modifier.animateContentSize()
-                .animateFloatingActionButton(
-                    visible = localVisible,
-                    alignment = Alignment.BottomEnd
-                )
-        )
-    } else {
-        FloatingActionButton(
-            onClick = { onFabClickAction?.invoke() },
-            modifier = Modifier.animateContentSize()
-                .animateFloatingActionButton(
-                    visible = localVisible,
-                    alignment = Alignment.BottomEnd
-                )
-        ) {
-            Icon(icon, contentDescription = label)
-        }
-    }
 }
