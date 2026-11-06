@@ -36,6 +36,7 @@ import ru.example.docmanager.domain.document.header.HeaderFieldType
 import ru.example.docmanager.domain.reference.Reference
 import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.components.AppSnackbarHost
+import ru.example.docmanager.ui.components.LoadingBox
 import ru.example.docmanager.ui.components.ReferenceInput
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.applyAdaptive
@@ -94,7 +95,7 @@ fun ReferenceScreen(
                     Text(
                         text = stringResource(referenceType.stringResource),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             )
@@ -137,24 +138,24 @@ private fun ReferenceContent(
 ) {
     val references = uiState.itemsByType[referenceType].orEmpty()
 
+    if (uiState.isLoading) {
+        LoadingBox(modifier = modifier)
+        return
+    }
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        if (uiState.isLoading) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        }
-
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ReferenceActions(
                 onSave = onSave,
-                onNew = onNew,
-                enabled = !uiState.isLoading
+                onNew = onNew
             )
 
-            if (references.isEmpty() && !uiState.isLoading) {
+            if (references.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -213,22 +214,19 @@ fun ReferenceActions(
     onSave: () -> Unit,
     onNew: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Button(
-            onClick = onSave,
-            enabled = enabled
+            onClick = onSave
         ) {
             Text(stringResource(Res.string.reference_save_button))
         }
 
         Button(
-            onClick = onNew,
-            enabled = enabled
+            onClick = onNew
         ) {
             Text(stringResource(Res.string.reference_new_item_button))
         }

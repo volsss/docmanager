@@ -77,7 +77,7 @@ fun PowerOfAttorneyScreen(
     }
 
     if (formState.isLoading) {
-        LoadingContent(modifier = modifier)
+        LoadingBox(modifier = modifier)
         return
     }
 
@@ -454,18 +454,5 @@ private fun PowerOfAttorneyActions(
         Button(onClick = onPrintDocument) {
             Text("Печать")
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun LoadingContent(
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        ContainedLoadingIndicator(modifier = Modifier.size(128.dp))
     }
 }

@@ -64,7 +64,7 @@ fun ReferencesScreen(
                     Text(
                         text = stringResource(Res.string.route_references),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             )

@@ -48,8 +48,6 @@
     <string name="connection_option_other_supporting">Ручная настройка подключения</string>
 
     <!-- Start Screen -->
-    <string name="start_loading_title">Открываем вашу студию</string>
-
     <string name="start_project_untitled">Проект без названия</string>
     <string name="start_hero_eyebrow">docmanager</string>
     <string name="start_hero_tagline">Все документы на своих местах</string>

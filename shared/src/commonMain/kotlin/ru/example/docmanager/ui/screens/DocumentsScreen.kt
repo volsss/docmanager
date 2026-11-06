@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.Document
 import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.ui.components.AppSnackbarHost
+import ru.example.docmanager.ui.components.LoadingBox
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.utils.toRussianString
@@ -82,7 +83,7 @@ fun DocumentsScreen(
                     Text(
                         text = stringResource(destination.type.stringResource),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             )
@@ -111,7 +112,7 @@ fun DocumentsScreen(
     ) { innerPadding ->
         when {
             documents == null -> {
-                LoadingContent(modifier = Modifier.padding(innerPadding))
+                LoadingBox(modifier = Modifier.padding(innerPadding))
             }
 
             documents!!.isEmpty() -> {
@@ -248,19 +249,6 @@ private fun EmptyContent(
                 )
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun LoadingContent(
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        ContainedLoadingIndicator(modifier = Modifier.size(128.dp))
     }
 }
 

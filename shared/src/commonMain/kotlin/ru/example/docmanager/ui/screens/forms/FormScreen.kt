@@ -25,6 +25,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
@@ -65,7 +66,11 @@ fun FormScreen(
                     }
                 },
                 title = {
-                    Text(stringResource(type.stringResource))
+                    Text(
+                        text = stringResource(type.stringResource),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             )
         }

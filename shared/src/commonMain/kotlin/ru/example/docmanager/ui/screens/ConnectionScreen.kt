@@ -39,10 +39,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import ru.example.docmanager.data.database.DatabaseDriver
-import ru.example.docmanager.ui.components.AppSnackbarHost
-import ru.example.docmanager.ui.components.Dropdown
-import ru.example.docmanager.ui.components.DropdownMode
-import ru.example.docmanager.ui.components.TextInput
+import ru.example.docmanager.ui.components.*
 import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.viewmodel.connection.ConnectionType
 import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
@@ -56,7 +53,7 @@ fun ConnectionScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (state.isLoading) {
-        LoadingContent()
+        LoadingBox(modifier = modifier)
         return
     }
 
@@ -83,18 +80,6 @@ fun ConnectionScreen(
         username = state.username,
         password = state.password
     )
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun LoadingContent() {
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
-    ) {
-        ContainedLoadingIndicator(modifier = Modifier.size(128.dp))
-    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -350,12 +335,6 @@ fun ConnectionOption(
     ) {
         Text(text)
     }
-}
-
-@Preview
-@Composable
-fun LoadingContentPreview() {
-    LoadingContent()
 }
 
 @Preview

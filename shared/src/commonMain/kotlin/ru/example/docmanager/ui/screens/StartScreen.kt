@@ -39,6 +39,7 @@ import docmanager.shared.generated.resources.*
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import ru.example.docmanager.ui.components.LoadingBox
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.utils.applyAdaptive
@@ -80,7 +81,7 @@ fun StartScreen(
                     Text(
                         text = stringResource(Res.string.route_home),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 },
                 actions = {
@@ -118,7 +119,7 @@ private fun StartContent(
     modifier: Modifier = Modifier
 ) {
     if (state.isLoading) {
-        StartLoadingScreen(modifier)
+        LoadingBox(modifier = modifier)
         return
     }
 
@@ -151,43 +152,6 @@ private fun StartContent(
             item(key = "statistics") {
                 StatsGrid(state = state)
             }
-        }
-    }
-}
-
-@Composable
-private fun StartLoadingScreen(modifier: Modifier = Modifier) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(colorScheme.surface),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Surface(
-                shape = RoundedCornerShape(30.dp),
-                color = colorScheme.primaryContainer,
-                modifier = Modifier.size(88.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(40.dp),
-                        strokeWidth = 3.dp,
-                        color = colorScheme.primary
-                    )
-                }
-            }
-            Text(
-                text = stringResource(Res.string.start_loading_title),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.onSurface
-            )
         }
     }
 }
@@ -330,7 +294,6 @@ private fun ProjectArtwork() {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ProjectMetadata(state: StartUiState) {
     FlowRow(

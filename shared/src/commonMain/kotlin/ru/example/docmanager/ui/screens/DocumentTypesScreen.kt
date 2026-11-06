@@ -62,7 +62,7 @@ fun DocumentTypesScreen(
                     Text(
                         text = stringResource(Res.string.route_document_types),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             )
