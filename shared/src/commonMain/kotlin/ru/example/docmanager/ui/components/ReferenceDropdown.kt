@@ -12,6 +12,7 @@
 package ru.example.docmanager.ui.components
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,12 +21,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -121,8 +124,17 @@ fun <T : Reference> ReferenceDropdown(
             singleLine = true,
             shape = RoundedCornerShape(16.dp),
             trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded
+                val rotationState by animateFloatAsState(
+                    targetValue = if (expanded) 180f else 0f,
+                    label = "DropdownArrowRotation"
+                )
+
+                Icon(
+                    imageVector = Icons.Rounded.KeyboardArrowDown,
+                    contentDescription = if (expanded) "Collapse dropdown" else "Expand dropdown",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .graphicsLayer(rotationZ = rotationState)
                 )
             },
             keyboardOptions = keyboardOptions,
