@@ -8,6 +8,8 @@
 кроссплатформенного приложения на базе **Kotlin Multiplatform (KMP)** для
 управления документооборотом на примере автоматизации работы с доверенностями.
 
+<img src="img.png" width="640px" style="border-radius: 12px">
+
 ### Цель проекта 
 
 Создание многоплатформенного приложения (поддерживающего Android и Desktop JVM), 
@@ -17,13 +19,13 @@
 
 ### Возможности
 
-- [X] Кроссплатформенность: Android + Desktop (Windows, macOS, Linux)
+- [X] Кроссплатформенность: **Android** + **Desktop** (Windows, macOS, Linux)
 - [X] Управление документами типа Доверенность (Форма М-2)
 - [X] Управление справочниками (организации, физические лица, поставщики и т. д.)
-- [X] Создание документов формата Word (`.docx`) из шаблона с использованием Apache POI
-- [X] Поддержка печати на Desktop
-- [X] Поддержка датабаз: H2 (embedded/in-memory) и PostgreSQL
-- [X] Material 3 UI с Compose Multiplatform
+- [X] Создание документов формата **Word** (`.docx`) из шаблона с использованием **Apache POI**
+- [X] Поддержка печати на **Desktop**
+- [X] Поддержка датабаз **H2** (embedded/in-memory) и **PostgreSQL**
+- [X] Material 3 UI с **Compose Multiplatform**
 
 ## Требования
 
