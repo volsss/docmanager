@@ -33,7 +33,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.component_dropdown_empty
 import docmanager.shared.generated.resources.component_dropdown_placeholder
+import docmanager.shared.generated.resources.component_dropdown_selected
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -281,7 +283,7 @@ fun Dropdown(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Rounded.Check,
-                                        contentDescription = "Selected",
+                                        contentDescription = stringResource(Res.string.component_dropdown_selected),
                                         modifier = Modifier
                                             .padding(start = 12.dp)
                                             .size(20.dp),
@@ -303,7 +305,7 @@ fun Dropdown(
                                 .padding(16.dp)
                         ) {
                             Text(
-                                text = "Элементов нет",
+                                text = stringResource(Res.string.component_dropdown_empty),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()

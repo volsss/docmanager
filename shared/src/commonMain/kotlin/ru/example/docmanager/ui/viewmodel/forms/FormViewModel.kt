@@ -117,7 +117,7 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
             runCatching {
                 documentProcessor.processSave(
                     documentName = getString(documentName)
-                            + " № " + uiState.value.number,
+                            + getString(Res.string.form_document_number_separator) + uiState.value.number,
                     documentResourceFile = getString(documentResource),
                     document = document,
                     onFailure = onStatusUpdate,
@@ -146,7 +146,7 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
             runCatching {
                 documentProcessor.processPrint(
                     documentName = getString(documentName)
-                            + " № " + uiState.value.number,
+                            + getString(Res.string.form_document_number_separator) + uiState.value.number,
                     documentResourceFile = getString(documentResource),
                     document = document,
                     onFailure = onStatusUpdate,

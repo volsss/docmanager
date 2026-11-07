@@ -33,10 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.component_back_button
-import docmanager.shared.generated.resources.reference_fab
-import docmanager.shared.generated.resources.reference_save_button
+import docmanager.shared.generated.resources.*
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.header.HeaderFieldType
@@ -185,7 +182,7 @@ private fun ReferenceContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Записи отсутствуют",
+                        text = stringResource(Res.string.component_no_records),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -284,7 +281,7 @@ fun ReferenceItemRow(
         ) {
             Icon(
                 imageVector = Icons.Rounded.Delete,
-                contentDescription = "Удалить строку"
+                contentDescription = stringResource(Res.string.component_delete_row)
             )
         }
     }

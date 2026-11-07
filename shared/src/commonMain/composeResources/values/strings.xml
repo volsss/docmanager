@@ -12,11 +12,20 @@
 <resources>
     <!-- Common & Components -->
     <string name="common_unknown_error">Неизвестная ошибка</string>
+    <string name="common_number_prefix">№</string>
+    <string name="common_date_prefix">от</string>
+    <string name="common_document_with_number">%1$s № %2$s</string>
+    <string name="common_document_date">%1$s %2$s</string>
+
     <string name="component_back_button">Назад</string>
     <string name="component_datepicker_confirm_button">Выбрать</string>
     <string name="component_datepicker_dismiss_button">Отмена</string>
     <string name="component_dropdown_placeholder">Выберите значение</string>
+    <string name="component_dropdown_empty">Элементов нет</string>
+    <string name="component_dropdown_selected">Выбрано</string>
     <string name="component_input_required">* Обязательное поле</string>
+    <string name="component_delete_row">Удалить строку</string>
+    <string name="component_no_records">Записи отсутствуют</string>
 
     <!-- Navigation -->
     <string name="route_document_types">Виды документов</string>
@@ -34,6 +43,8 @@
     <string name="connection_error_postgres_user_and_password_empty">Пользователь и пароль не могут быть пустыми для
         PostgreSQL
     </string>
+    <string name="connection_error_url_driver_empty">URL и драйвер не могут быть пустыми</string>
+    <string name="connection_error_failed">Не удалось подключиться</string>
     <string name="connection_input_driver">Драйвер *</string>
     <string name="connection_input_ip">IP адрес *</string>
     <string name="connection_input_jdbc_url">JDBC URL *</string>
@@ -53,6 +64,7 @@
     <string name="start_hero_tagline">Все документы на своих местах</string>
     <string name="start_project_version">v%1$s</string>
     <string name="start_project_created_on">Создано %1$s</string>
+    <string name="start_error_load_stats">Не удалось загрузить статистику</string>
 
     <string name="start_section_overview">Обзор</string>
 
@@ -99,6 +111,12 @@
     <string name="form_saved_as_new">Форма сохранена как новая</string>
     <string name="form_section_body">Тело документа</string>
     <string name="form_section_header">Шапка документа</string>
+    <string name="form_button_save">Сохранить</string>
+    <string name="form_button_save_as_new">Сохранить как новый</string>
+    <string name="form_button_delete">Удалить</string>
+    <string name="form_button_export">Экспорт в файл</string>
+    <string name="form_button_print">Печать</string>
+    <string name="form_document_number_separator"> № </string>
 
     <!-- Document Header Fields -->
     <string name="header_field_discharge_date">Дата</string>

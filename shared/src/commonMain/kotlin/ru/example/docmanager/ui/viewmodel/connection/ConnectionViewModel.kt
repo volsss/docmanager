@@ -13,11 +13,15 @@ package ru.example.docmanager.ui.viewmodel.connection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.connection_error_failed
+import docmanager.shared.generated.resources.connection_error_url_driver_empty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.getString
 import ru.example.docmanager.data.database.DatabaseDriver
 import ru.example.docmanager.data.database.DatabaseManager
 import ru.example.docmanager.data.database.DefaultConnectionConfig
@@ -147,7 +151,7 @@ class ConnectionViewModel(
                 }
 
                 if (effectiveJdbcUrl.isBlank() || effectiveDriver.isBlank()) {
-                    throw IllegalArgumentException("URL and Driver cannot be empty.")
+                    throw IllegalArgumentException(getString(Res.string.connection_error_url_driver_empty))
                 }
 
                 uiState.value = uiState.value.copy(isLoading = true)
@@ -164,7 +168,7 @@ class ConnectionViewModel(
                 uiState.value = uiState.value.copy(isLoading = false, isConnected = true)
                 onSuccess()
             }.onFailure {
-                onError(it.localizedMessage ?: "Failed to connect")
+                onError(it.localizedMessage ?: getString(Res.string.connection_error_failed))
             }
         }
     }

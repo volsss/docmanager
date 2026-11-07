@@ -411,7 +411,7 @@ private fun BodyItemRow(
         ) {
             Icon(
                 imageVector = Icons.Rounded.Delete,
-                contentDescription = "Удалить строку"
+                contentDescription = stringResource(Res.string.component_delete_row)
             )
         }
     }
@@ -434,25 +434,25 @@ private fun PowerOfAttorneyActions(
         itemVerticalAlignment = Alignment.CenterVertically
     ) {
         Button(onClick = onSaveDocument) {
-            Text("Сохранить")
+            Text(stringResource(Res.string.form_button_save))
         }
 
         if (isEditing) {
             OutlinedButton(onClick = onSaveAsNewDocument) {
-                Text("Сохранить как новый")
+                Text(stringResource(Res.string.form_button_save_as_new))
             }
 
             OutlinedButton(onClick = onDeleteDocument) {
-                Text("Удалить")
+                Text(stringResource(Res.string.form_button_delete))
             }
         }
 
         Button(onClick = onExportDocument) {
-            Text("Экспорт в файл")
+            Text(stringResource(Res.string.form_button_export))
         }
 
         Button(onClick = onPrintDocument) {
-            Text("Печать")
+            Text(stringResource(Res.string.form_button_print))
         }
     }
 }

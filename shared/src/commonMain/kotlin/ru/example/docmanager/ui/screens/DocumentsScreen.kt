@@ -193,16 +193,20 @@ private fun DocumentsContent(
                     },
                     supportingContent = {
                         Text(
-                            text = "от ${
+                            text = stringResource(
+                                Res.string.common_document_date,
+                                stringResource(Res.string.common_date_prefix),
                                 document.header.dischargeDate.toRussianString()
-                            }"
+                            )
                         )
                     }
                 ) {
                     Text(
-                        text = "${
-                            stringResource(documentType.stringResource)
-                        } № ${document.header.number}"
+                        text = stringResource(
+                            Res.string.common_document_with_number,
+                            stringResource(documentType.stringResource),
+                            document.header.number
+                        )
                     )
                 }
             }

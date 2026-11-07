@@ -13,10 +13,13 @@ package ru.example.docmanager.ui.viewmodel.start
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.start_error_load_stats
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import ru.example.docmanager.data.database.DatabaseManager
 import ru.example.docmanager.data.repositories.MetadataRepository
@@ -107,7 +110,7 @@ class StartViewModel(
                     it.copy(
                         isLoading = false,
                         isRefreshing = false,
-                        error = e.localizedMessage ?: "Failed to load stats"
+                        error = e.localizedMessage ?: getString(Res.string.start_error_load_stats)
                     )
                 }
             }
