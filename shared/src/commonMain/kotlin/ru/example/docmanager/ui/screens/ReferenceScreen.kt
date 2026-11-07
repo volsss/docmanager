@@ -14,6 +14,7 @@ package ru.example.docmanager.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,14 +23,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import docmanager.shared.generated.resources.*
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.component_back_button
+import docmanager.shared.generated.resources.reference_fab
+import docmanager.shared.generated.resources.reference_save_button
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.header.HeaderFieldType
@@ -37,7 +44,7 @@ import ru.example.docmanager.domain.reference.Reference
 import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.components.AppSnackbarHost
 import ru.example.docmanager.ui.components.LoadingBox
-import ru.example.docmanager.ui.components.ReferenceInput
+import ru.example.docmanager.ui.components.TextInput
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.applyAdaptive
 import ru.example.docmanager.ui.viewmodel.reference.ReferenceUiState
@@ -56,20 +63,20 @@ fun ReferenceScreen(
     val referenceType = destination.type
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(referenceType) {
-        viewModel.setType(referenceType)
-        if (uiState.itemsByType.isEmpty()) {
-            viewModel.loadReferenceItems()
+    fun showSnackbar(message: String) {
+        scope.launch {
+            snackbarHostState.showSnackbar(message)
         }
     }
 
-    val currentSnackbarHostState by rememberUpdatedState(snackbarHostState)
-    LaunchedEffect(uiState.statusMessage) {
-        uiState.statusMessage?.let { message ->
-            scope.launch {
-                currentSnackbarHostState.showSnackbar(message)
-            }
-            viewModel.clearStatusMessage()
+    LaunchedEffect(referenceType) {
+        viewModel.setType(referenceType)
+        if (uiState.itemsByType.isEmpty()) {
+            viewModel.loadReferenceItems(
+                onError = { message ->
+                    showSnackbar(message)
+                }
+            )
         }
     }
 
@@ -97,6 +104,22 @@ fun ReferenceScreen(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
+                },
+                actions = {
+                    FilledTonalIconButton(
+                        onClick = {
+                            viewModel.saveAll(
+                                onError = { message ->
+                                    showSnackbar(message)
+                                }
+                            )
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Save,
+                            contentDescription = stringResource(Res.string.reference_save_button)
+                        )
+                    }
                 }
             )
         },
@@ -110,16 +133,24 @@ fun ReferenceScreen(
                         contentDescription = stringResource(Res.string.reference_fab)
                     )
                 },
-                onClick = viewModel::createItem
+                onClick = {
+                    viewModel.createItem(
+                        onError = {
+                            showSnackbar(it)
+                        }
+                    )
+                }
             )
         }
     ) { innerPadding ->
         ReferenceContent(
             referenceType = referenceType,
             uiState = uiState,
-            onSave = viewModel::saveAll,
-            onNew = viewModel::createItem,
-            onDelete = viewModel::deleteItem,
+            onDelete = {
+                viewModel.deleteItem(it) {
+                    showSnackbar(it)
+                }
+            },
             onFieldChange = viewModel::updateField,
             modifier = Modifier.padding(innerPadding)
         )
@@ -130,8 +161,6 @@ fun ReferenceScreen(
 private fun ReferenceContent(
     referenceType: ReferenceType,
     uiState: ReferenceUiState,
-    onSave: () -> Unit,
-    onNew: () -> Unit,
     onDelete: (Reference) -> Unit,
     onFieldChange: (itemId: Int, headerFieldType: HeaderFieldType, newValue: String) -> Unit,
     modifier: Modifier = Modifier
@@ -150,11 +179,6 @@ private fun ReferenceContent(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ReferenceActions(
-                onSave = onSave,
-                onNew = onNew
-            )
-
             if (references.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -199,7 +223,7 @@ private fun ReferenceItems(
             items = references,
             key = { item -> item.id }
         ) { item ->
-            ReferenceInput(
+            ReferenceItemRow(
                 item = item,
                 currentValues = uiState.getFieldValues(referenceType, item),
                 onFieldChange = onFieldChange,
@@ -209,26 +233,59 @@ private fun ReferenceItems(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ReferenceActions(
-    onSave: () -> Unit,
-    onNew: () -> Unit,
-    modifier: Modifier = Modifier,
+fun ReferenceItemRow(
+    item: Reference,
+    currentValues: Map<HeaderFieldType, String>,
+    onFieldChange: (itemId: Int, headerFieldType: HeaderFieldType, newValue: String) -> Unit,
+    onRemove: () -> Unit
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
-            onClick = onSave
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .clip(MaterialShapes.Slanted.toShape())
+                .background(MaterialTheme.colorScheme.secondary),
+            contentAlignment = Alignment.Center
         ) {
-            Text(stringResource(Res.string.reference_save_button))
+            Text(
+                text = item.id.toString(),
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
-        Button(
-            onClick = onNew
+        item.toMap().forEach { (type, value) ->
+            TextInput(
+                value = currentValues[type] ?: value,
+                onValueChange = { newValue ->
+                    onFieldChange(
+                        item.id,
+                        type,
+                        newValue
+                    )
+                },
+                label = stringResource(type.stringResource),
+                modifier = Modifier.applyAdaptive(
+                    whenWide = Modifier.weight(1f),
+                    whenNotWide = Modifier.widthIn(min = 300.dp)
+                ),
+            )
+        }
+
+        FilledTonalIconButton(
+            onClick = onRemove
         ) {
-            Text(stringResource(Res.string.reference_new_item_button))
+            Icon(
+                imageVector = Icons.Rounded.Delete,
+                contentDescription = "Удалить строку"
+            )
         }
     }
 }

@@ -19,8 +19,7 @@ data class ReferenceUiState(
     val referenceType: ReferenceType = ReferenceType.INDIVIDUAL,
     var itemsByType: Map<ReferenceType, List<Reference>> = emptyMap(),
     var fieldValues: Map<ReferenceType, Map<Int, Map<HeaderFieldType, String>>> = emptyMap(),
-    val isLoading: Boolean = false,
-    val statusMessage: String? = null
+    val isLoading: Boolean = false
 ) {
     fun getFieldValues(
         type: ReferenceType,

@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import ru.example.docmanager.data.database.DatabaseManager
 import ru.example.docmanager.data.repositories.MetadataRepository
@@ -42,7 +43,7 @@ class StartViewModel(
 
     fun refresh() {
         viewModelScope.launch {
-            uiState.value = uiState.value.copy(isRefreshing = true)
+            uiState.update { it.copy(isRefreshing = true) }
             loadStats()
         }
     }
@@ -102,11 +103,13 @@ class StartViewModel(
                 if (e is CancellationException) {
                     ensureActive()
                 }
-                uiState.value = uiState.value.copy(
-                    isLoading = false,
-                    isRefreshing = false,
-                    error = e.localizedMessage ?: "Failed to load stats"
-                )
+                uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isRefreshing = false,
+                        error = e.localizedMessage ?: "Failed to load stats"
+                    )
+                }
             }
         }
     }

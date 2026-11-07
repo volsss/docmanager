@@ -13,6 +13,9 @@ package ru.example.docmanager.ui.viewmodel.reference
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -31,13 +34,17 @@ class ReferenceViewModel(
     val uiState: StateFlow<ReferenceUiState>
         field = MutableStateFlow(ReferenceUiState())
 
-    fun loadReferenceItems() {
+    fun loadReferenceItems(
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
-            loadReferenceItemsSuspend()
+            loadReferenceItemsSuspend(onError)
         }
     }
 
-    suspend fun loadReferenceItemsSuspend() {
+    suspend fun loadReferenceItemsSuspend(
+        onError: (String) -> Unit
+    ) {
         uiState.update { it.copy(isLoading = true) }
         runCatching {
             repositories.mapValues { (_, repository) ->
@@ -51,17 +58,14 @@ class ReferenceViewModel(
                 )
             }
         }.onFailure { error ->
-            uiState.update { state ->
-                state.copy(
-                    isLoading = false,
-                    statusMessage = "Ошибка при загрузке справочников: ${error.message}"
-                )
+            if (error is CancellationException) {
+                currentCoroutineContext().ensureActive()
             }
+            uiState.update { state ->
+                state.copy(isLoading = false)
+            }
+            onError.invoke("Ошибка при загрузке справочников: ${error.message}")
         }
-    }
-
-    fun clearStatusMessage() {
-        uiState.update { it.copy(statusMessage = null) }
     }
 
     fun setType(referenceType: ReferenceType) {
@@ -87,18 +91,21 @@ class ReferenceViewModel(
         }
     }
 
-    fun createItem() {
+    fun createItem(
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
-            createItemSuspend()
+            createItemSuspend(onError)
         }
     }
 
-    suspend fun createItemSuspend() {
+    suspend fun createItemSuspend(
+        onError: (String) -> Unit
+    ) {
         val referenceType = uiState.value.referenceType
         val repository = (repositories[referenceType] as? ReferenceRepository<out Reference>)
             ?: return
 
-        uiState.update { it.copy(isLoading = true) }
         runCatching {
             repository.createItem()
         }.onSuccess { created ->
@@ -110,33 +117,34 @@ class ReferenceViewModel(
                 val updatedFieldValues = state.fieldValues + (referenceType to updatedTypeEdits)
                 state.copy(
                     itemsByType = updatedItemsByType,
-                    fieldValues = updatedFieldValues,
-                    isLoading = false,
-                    statusMessage = "Запись создана"
+                    fieldValues = updatedFieldValues
                 )
             }
         }.onFailure { error ->
-            uiState.update { state ->
-                state.copy(
-                    isLoading = false,
-                    statusMessage = "Ошибка при создании записи: ${error.message}"
-                )
+            if (error is CancellationException) {
+                currentCoroutineContext().ensureActive()
             }
+            onError("Ошибка при создании записи: ${error.message}")
         }
     }
 
-    fun deleteItem(item: Reference) {
+    fun deleteItem(
+        item: Reference,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
-            deleteItemSuspend(item)
+            deleteItemSuspend(item, onError)
         }
     }
 
-    suspend fun deleteItemSuspend(item: Reference) {
+    suspend fun deleteItemSuspend(
+        item: Reference,
+        onError: (String) -> Unit
+    ) {
         val referenceType = uiState.value.referenceType
         val repository = (repositories[referenceType] as? ReferenceRepository<out Reference>)
             ?: return
 
-        uiState.update { it.copy(isLoading = true) }
         runCatching {
             repository.deleteItem(item.id)
         }.onSuccess {
@@ -147,28 +155,28 @@ class ReferenceViewModel(
                 val updatedFieldValues = state.fieldValues + (referenceType to typeEdits)
                 state.copy(
                     itemsByType = updatedItemsByType,
-                    fieldValues = updatedFieldValues,
-                    isLoading = false,
-                    statusMessage = "Запись удалена"
+                    fieldValues = updatedFieldValues
                 )
             }
         }.onFailure { error ->
-            uiState.update { state ->
-                state.copy(
-                    isLoading = false,
-                    statusMessage = "Ошибка при удалении записи: ${error.message}"
-                )
+            if (error is CancellationException) {
+                currentCoroutineContext().ensureActive()
             }
+            onError("Ошибка при удалении записи: ${error.message}")
         }
     }
 
-    fun saveAll() {
+    fun saveAll(
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
-            saveAllSuspend()
+            saveAllSuspend(onError)
         }
     }
 
-    suspend fun saveAllSuspend() {
+    suspend fun saveAllSuspend(
+        onError: (String) -> Unit
+    ) {
         val referenceType = uiState.value.referenceType
         val repository = (repositories[referenceType] as? ReferenceRepository<out Reference>)
             ?: return
@@ -187,17 +195,19 @@ class ReferenceViewModel(
                 state.copy(
                     itemsByType = updatedItemsByType,
                     fieldValues = updatedFieldValues,
-                    isLoading = false,
-                    statusMessage = "Изменения сохранены"
+                    isLoading = false
                 )
             }
         }.onFailure { error ->
+            if (error is CancellationException) {
+                currentCoroutineContext().ensureActive()
+            }
             uiState.update { state ->
                 state.copy(
-                    isLoading = false,
-                    statusMessage = "Ошибка при сохранении изменений: ${error.message}"
+                    isLoading = false
                 )
             }
+            onError("Ошибка при сохранении изменений: ${error.message}")
         }
     }
 
