@@ -33,11 +33,18 @@ class StartViewModel(
     private val referenceRepositories: Map<ReferenceType, BaseReferenceRepository>
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(StartUiState())
-    val uiState: StateFlow<StartUiState> = _uiState
+    val uiState: StateFlow<StartUiState>
+        field = MutableStateFlow(StartUiState())
 
     init {
         loadStats()
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            uiState.value = uiState.value.copy(isRefreshing = true)
+            loadStats()
+        }
     }
 
     private fun loadStats() {
@@ -79,7 +86,7 @@ class StartViewModel(
                     0 to 0
                 }
 
-                _uiState.value = StartUiState(
+                uiState.value = StartUiState(
                     projectName = metadata.name,
                     version = metadata.version,
                     author = metadata.author,
@@ -88,26 +95,19 @@ class StartViewModel(
                     documentsCount = documentsCount,
                     referenceTypesCount = referenceTypesCount,
                     referencesCount = referencesCount,
-                    isLoading = false
+                    isLoading = false,
+                    isRefreshing = false
                 )
             } catch (e: Exception) {
                 if (e is CancellationException) {
                     ensureActive()
                 }
-                _uiState.value = _uiState.value.copy(
+                uiState.value = uiState.value.copy(
                     isLoading = false,
+                    isRefreshing = false,
                     error = e.localizedMessage ?: "Failed to load stats"
                 )
             }
-        }
-    }
-
-    private fun extractJdbcUrl(): String {
-        return try {
-            val db = TransactionManager.defaultDatabase
-            db?.url ?: ""
-        } catch (_: Throwable) {
-            ""
         }
     }
 }

@@ -25,5 +25,6 @@ data class StartUiState(
     val referencesCount: Int = 0,
 
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val error: String? = null
 )

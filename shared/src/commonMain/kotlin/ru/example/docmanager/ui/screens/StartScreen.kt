@@ -22,12 +22,12 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ListAlt
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -58,58 +58,63 @@ fun StartScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val colorScheme = MaterialTheme.colorScheme
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = colorScheme.surface,
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    AnimatedVisibility(
-                        visible = canGoBack,
-                        enter = expandHorizontally() + fadeIn(),
-                        exit = shrinkHorizontally() + fadeOut()
-                    ) {
-                        IconButton(onClick = onBack) {
+    PullToRefreshBox(
+        isRefreshing = state.isRefreshing,
+        onRefresh = viewModel::refresh
+    ) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            containerColor = colorScheme.surface,
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        AnimatedVisibility(
+                            visible = canGoBack,
+                            enter = expandHorizontally() + fadeIn(),
+                            exit = shrinkHorizontally() + fadeOut()
+                        ) {
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                    contentDescription = stringResource(Res.string.component_back_button)
+                                )
+                            }
+                        }
+                    },
+                    title = {
+                        Text(
+                            text = stringResource(Res.string.route_home),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    },
+                    actions = {
+                        FilledTonalIconButton(
+                            onClick = { navigateTo(Route.Settings) },
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                contentDescription = stringResource(Res.string.component_back_button)
+                                imageVector = Icons.Rounded.Settings,
+                                contentDescription = stringResource(Res.string.route_settings)
                             )
                         }
-                    }
-                },
-                title = {
-                    Text(
-                        text = stringResource(Res.string.route_home),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = colorScheme.surface,
+                        titleContentColor = colorScheme.onSurface,
+                        navigationIconContentColor = colorScheme.onSurface,
+                        actionIconContentColor = colorScheme.onSurface
                     )
-                },
-                actions = {
-                    FilledTonalIconButton(
-                        onClick = { navigateTo(Route.Settings) },
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Settings,
-                            contentDescription = stringResource(Res.string.route_settings)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorScheme.surface,
-                    titleContentColor = colorScheme.onSurface,
-                    navigationIconContentColor = colorScheme.onSurface,
-                    actionIconContentColor = colorScheme.onSurface
                 )
+            }
+        ) { innerPadding ->
+            StartContent(
+                state = state,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             )
         }
-    ) { innerPadding ->
-        StartContent(
-            state = state,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        )
     }
 }
 
@@ -162,7 +167,9 @@ private fun HeroSection(
     modifier: Modifier = Modifier
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val projectName = state.projectName.ifBlank { stringResource(Res.string.start_project_untitled) }
+    val projectName = state.projectName.ifBlank {
+        stringResource(Res.string.start_project_untitled)
+    }
     val heroShape = RoundedCornerShape(
         topStart = 36.dp,
         topEnd = 36.dp,
@@ -261,22 +268,6 @@ private fun ProjectArtwork() {
         modifier = Modifier.size(96.dp),
         contentAlignment = Alignment.Center
     ) {
-        Surface(
-            modifier = Modifier
-                .size(66.dp)
-                .rotate(13f)
-                .offset(x = 10.dp, y = 5.dp),
-            shape = RoundedCornerShape(21.dp),
-            color = colorScheme.tertiaryContainer
-        ) {}
-        Surface(
-            modifier = Modifier
-                .size(66.dp)
-                .rotate(-10f)
-                .offset(x = (-6).dp, y = 2.dp),
-            shape = RoundedCornerShape(21.dp),
-            color = colorScheme.secondaryContainer
-        ) {}
         Surface(
             modifier = Modifier.size(66.dp),
             shape = RoundedCornerShape(21.dp),
