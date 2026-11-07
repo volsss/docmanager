@@ -1,107 +1,71 @@
 # docmanager
 
-Это Kotlin Multiplatform проект таргетированный на Android, Desktop (JVM).
+![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-purple)
+![Compose Multiplatform](https://img.shields.io/badge/Compose-1.11.1-blue)
+![License](https://img.shields.io/badge/License-GNU%20GPL-green)
 
-* [/shared](./shared/src) папка для кода, который будет использоваться совместно в ваших многоплатформенных приложениях Compose.
-  Она содержит несколько подпапок:
-  - [commonMain](./shared/src/commonMain/kotlin) относится к коду, который будет использоваться на всех таргетированных платформах.
-  - Другие папки предназначены для кода Kotlin, который будет скомпилирован только для платформы, указанной в имени папки.
-    Например, если вы хотите отредактировать часть, специфичную для настольных компьютеров (JVM) папка [jvmMain](./shared/src/jvmMain/kotlin)
-    будет подходящим местом. Аналогично, если вы хотите отредактировать часть, специфичную для Android, папка [androidMain](./shared/src/androidMain/kotlin)
-    будет подходящим местом.
+**`docmanager`** — это учебный проект и практическое руководство по разработке
+кроссплатформенного приложения на базе **Kotlin Multiplatform (KMP)** для
+управления документооборотом на примере автоматизации работы с доверенностями.
 
-### Запуск приложений
+### Цель проекта 
 
-Используйте конфигурации запуска в виджетах, предоставленных в вашей IDE. 
-Вы также можете использовать эти команды:
+Создание многоплатформенного приложения (поддерживающего Android и Desktop JVM), 
+демонстрирующего полный цикл разработки документ-ориентированных систем: от 
+проектирования базы данных и моделей до реализации пользовательских форм и 
+автоматизации генерации документов.
 
-- Android приложение: `./gradlew :androidApp:assembleDebug`
-- Desktop приложение:
-  - Hot reload: `./gradlew :desktopApp:hotRun --auto`
-  - Обычное: `./gradlew :desktopApp:run`
+### Возможности
+
+- [X] Кроссплатформенность: Android + Desktop (Windows, macOS, Linux)
+- [X] Управление документами типа Доверенность (Форма М-2)
+- [X] Управление справочниками (организации, физические лица, поставщики и т. д.)
+- [X] Создание документов формата Word (`.docx`) из шаблона с использованием Apache POI
+- [X] Поддержка печати на Desktop
+- [X] Поддержка датабаз: H2 (embedded/in-memory) и PostgreSQL
+- [X] Material 3 UI с Compose Multiplatform
+
+## Требования
+
+- **JDK 11+** (рекомендуется JDK 17)
+- **Android SDK** (для сборки Android-приложения)
+- **IntelliJ IDEA** (рекомендуется для разработки)
+
+## Сборка
+
+- Windows (MSI): `./gradlew :desktopApp:packageMsi`
+- macOS (DMG): `./gradlew :desktopApp:packageDmg`
+- Linux (DEB): `./gradlew :desktopApp:packageDeb`
+- Android APK: `./gradlew :androidApp:assembleRelease`
+
+## Настройка базы данных
+
+При первом запуске выберите тип подключения:
+- **H2 Embedded File** — встроенная файловая база (по умолчанию)
+- **H2 In-Memory** — временная база в памяти
+- **PostgreSQL Server** — удалённый сервер (укажите хост, порт, имя базы, логин и пароль)
+
+## Структура проекта
+
+| Модуль | Описание |
+|--------|---------|
+| [/shared](./shared) | Общий код (95% платформенно-независимый) |
+| [/shared/src/commonMain](./shared/src/commonMain) | Общий код для всех платформ |
+| [/shared/src/jvmMain](./shared/src/jvmMain) | JVM-специфичный код (AWT, печать) |
+| [/shared/src/androidMain](./shared/src/androidMain) | Android-специфичный код (MediaStore, Scoped Storage) |
+| [/desktopApp](./desktopApp) | Точка входа для Desktop-приложения |
+| [/androidApp](./androidApp) | Android-приложение |
+| [/docs](./docs) | Документация и лабораторные работы |
 
 ## Документация
 
-### Kotlin:
-- [X] **I. Первая часть**
-- - [X] Точка входа
-- - [X] Скрипты
-- - [X] Комментарии
-- - [X] Переменные
-- - [X] Типы данных
-- - [X] Строки
-- - [X] I/O
-- - [X] Операторы
-- - [X] Условные операторы
-- - [X] Диапазоны
-- - [X] Циклы
-- - [X] Исключения
-- [X] **II. Вторая часть**
-- - [X] Функции
-- - [X] Null safety
-- - [X] Лямбда-выражения
-- - [X] Тип функции
-- - [X] Функции высшего порядка
-- - [X] Trailing lambda
-- [X] **III. Третья часть**
-- - [X] Классы
-- - [X] Инкапсуляция
-- - [X] Полиморфизм
-- - [X] Коллекции
-- - [X] Перебор коллекций
-- - [X] Read-only и Mutable
-- [X] **IV. Четвёртая часть**
-- - [X] Коллекции и лямбды
-- - [X] Неиспользуемые параметры
-- - [X] Деструктуризация
-- - [X] Function references
-- - [X] Цепочки операций
-- - [X] Any
-- - [X] Extension functions
-- - [X] Extension functions
-- [X] **V. Пятая часть**
-- - [X] enum class
-- - [X] sealed class и sealed interface
-- - [X] Nothing
-- - [X] Generics
-- - [X] object
-- - [X] companion object
-- - [X] operator
-- - [X] Делегирование
-
-### Gradle:
-- [X] **I. Первая часть**
-- [X] **II. Вторая часть**
-- [X] **III. Третья часть**
-
-### Coroutines
-- [X] suspend
-- [X] runBlocking
-- [X] launch
-- [X] Job
-- [X] async
-- [X] CoroutineScope
-- [X] Dispatchers
-- [X] try-catch
-- [X] supervisorScope
-
-### Android:
-- [ ] **I. Первая часть**
-- [ ] **II. Вторая часть**
-
-### Compose:
-- [ ] **I. Первая часть**
-- [ ] **II. Вторая часть**
-
-### docmanager App:
-- [ ] **I. Первая часть**
-- [ ] **II. Вторая часть**
-- [ ] **III. Третья часть**
-- [ ] **IV. Четвёртая часть**
-- [ ] **V. Пятая часть**
-- [ ] **VI. Шестая часть**
-
----
+В документацию включено руководство по использованию следующих инструментов:
+- IntelliJ IDEA (`lab1`)
+- Kotlin (`lab2`-`lab4`)
+- Gradle (`lab5`)
+- Kotlin Coroutines (`lab6`)
+- Jetpack Compose (`lab7`)
+- Compose Multiplatform (`lab8`)
 
 ### Литература
 
