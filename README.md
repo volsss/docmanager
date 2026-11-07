@@ -8,7 +8,7 @@
 кроссплатформенного приложения на базе **Kotlin Multiplatform (KMP)** для
 управления документооборотом на примере автоматизации работы с доверенностями.
 
-<img src="img.png" width="640px" style="border-radius: 12px">
+<img src="img.png" width="512px">
 
 ### Цель проекта 
 
