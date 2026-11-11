@@ -1,13 +1,28 @@
 name: Release Build
+run-name: Release ${{ inputs.version }} (${{ inputs.app_type }})
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version without the leading v (for example, 1.2.0)"
+        required: true
+        type: string
+      app_type:
+        description: "Release channel"
+        required: true
+        type: choice
+        default: stable
+        options:
+          - stable
+          - beta
+          - alpha
+
+permissions:
+  contents: write
 
 env:
   app_name: "docmanager"
-  app_version: "1.1.1"
 
 jobs:
   init:
@@ -17,8 +32,12 @@ jobs:
     steps:
       - name: Making prefix
         id: make_prefix
+        env:
+          APP_VERSION: ${{ inputs.version }}
+          APP_TYPE: ${{ inputs.app_type }}
         run: |
-          echo "prefix=${{ env.app_name }}-${{ env.app_version }}-release" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          echo "prefix=${{ env.app_name }}-${APP_VERSION}-${APP_TYPE}-release" >> "$GITHUB_OUTPUT"
 
 
   android:
@@ -509,3 +528,100 @@ jobs:
           name: ${{ needs.init.outputs.prefix }}-windows-x64-dist
           path: desktopApp/build/compose/binaries/main/app/
           if-no-files-found: error
+
+  draft-release:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    needs:
+      - init
+      - android
+      - macos-arm
+      - macos
+      - linux-deb
+      - linux-deb-arm
+      - linux-rpm
+      - linux-rpm-arm
+      - windows
+      - windows-arm
+      - windows-dist
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-assets
+
+      # windows-dist is uploaded as a directory. Turn it into one downloadable
+      # release asset instead of attaching every file in the directory separately.
+      - name: Package Windows distributable
+        env:
+          PREFIX: ${{ needs.init.outputs.prefix }}
+        run: |
+          set -euo pipefail
+          python - <<'PYCODE'
+          import os
+          import shutil
+          from pathlib import Path
+          from zipfile import ZIP_DEFLATED, ZipFile
+
+          root = Path("release-assets")
+          source = root / f"{os.environ['PREFIX']}-windows-x64-dist"
+          if not source.is_dir():
+              raise SystemExit(f"Windows distributable artifact not found: {source}")
+
+          files = sorted(path for path in source.rglob("*") if path.is_file())
+          if not files:
+              raise SystemExit(f"Windows distributable is empty: {source}")
+
+          archive = root / f"{source.name}.zip"
+          with ZipFile(archive, "w", ZIP_DEFLATED) as bundle:
+              for path in files:
+                  bundle.write(path, path.relative_to(source))
+
+          shutil.rmtree(source)
+          print(f"Created {archive} ({len(files)} files)")
+          PYCODE
+
+      - name: Create GitHub draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_NAME: ${{ env.app_name }}
+          APP_VERSION: ${{ inputs.version }}
+          APP_TYPE: ${{ inputs.app_type }}
+        run: |
+          set -euo pipefail
+
+          VERSION="${APP_VERSION#v}"
+          if [[ "$APP_TYPE" != "stable" && "$VERSION" != *-* ]]; then
+            TAG="v${VERSION}-${APP_TYPE}"
+          else
+            # Allows versions such as 1.2.3-beta.1 / 1.2.3-alpha.2.
+            TAG="v${VERSION}"
+          fi
+
+          TITLE="${APP_NAME} ${VERSION}"
+          if [[ "$APP_TYPE" != "stable" ]]; then
+            TITLE="${TITLE} (${APP_TYPE})"
+          fi
+
+          mapfile -d '' assets < <(find release-assets -type f -print0)
+          if (( ${#assets[@]} == 0 )); then
+            echo "No build artifacts were downloaded."
+            exit 1
+          fi
+
+          echo "Creating draft release ${TAG} with ${#assets[@]} assets:"
+          printf ' - %s\n' "${assets[@]}"
+
+          release_flags=(
+            --draft
+            --title "$TITLE"
+            --generate-notes
+            --notes "Release channel: ${APP_TYPE}"
+            --target "$GITHUB_SHA"
+          )
+          if [[ "$APP_TYPE" != "stable" ]]; then
+            release_flags+=(--prerelease --latest=false)
+          fi
+
+          gh release create "$TAG" "${assets[@]}" "${release_flags[@]}"
+
