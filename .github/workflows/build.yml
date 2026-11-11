@@ -15,7 +15,7 @@ on:
 
 env:
   app_name: "docmanager"
-  app_version: "1.1.0"
+  app_version: "1.1.1"
 
 jobs:
   init:
@@ -60,20 +60,20 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Android App
-        run: ./gradlew :androidApp:assemble
+        run: ./gradlew :androidApp:assembleDebug
 
       - name: Name Android Artifact
         shell: bash
         run: |
           set -euo pipefail
-          apk="$(find androidApp/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)"
+          apk="$(find androidApp/build/outputs/apk/debug -maxdepth 1 -type f -name '*.apk' | head -n 1)"
           test -n "$apk" || { echo "No APK found"; exit 1; }
-          mv "$apk" "androidApp/build/outputs/apk/release/${{ needs.init.outputs.prefix }}-android-universal.apk"
+          mv "$apk" "androidApp/build/outputs/apk/debug/${{ needs.init.outputs.prefix }}-android-universal.apk"
 
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: androidApp/build/outputs/apk/release/${{ needs.init.outputs.prefix }}-android-universal.apk
+          path: androidApp/build/outputs/apk/debug/${{ needs.init.outputs.prefix }}-android-universal.apk
           archive: false
           if-no-files-found: error
 
