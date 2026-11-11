@@ -3,7 +3,6 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-purple)
 ![Compose Multiplatform](https://img.shields.io/badge/Compose-1.11.1-blue)
 ![License](https://img.shields.io/badge/License-GNU%20GPL-green)
-[![Release Build](https://github.com/volsss/docmanager/actions/workflows/release.yml/badge.svg)](https://github.com/volsss/docmanager/actions/workflows/release.yml)
 
 **`docmanager`** — это учебный проект и практическое руководство по разработке
 кроссплатформенного приложения на базе **Kotlin Multiplatform (KMP)** для
