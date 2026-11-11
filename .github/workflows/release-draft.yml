@@ -545,6 +545,12 @@ jobs:
       - windows-arm
       - windows-dist
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
       - name: Download all build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -562,21 +568,21 @@ jobs:
           import shutil
           from pathlib import Path
           from zipfile import ZIP_DEFLATED, ZipFile
-
+          
           root = Path("release-assets")
           source = root / f"{os.environ['PREFIX']}-windows-x64-dist"
           if not source.is_dir():
               raise SystemExit(f"Windows distributable artifact not found: {source}")
-
+          
           files = sorted(path for path in source.rglob("*") if path.is_file())
           if not files:
               raise SystemExit(f"Windows distributable is empty: {source}")
-
+          
           archive = root / f"{source.name}.zip"
           with ZipFile(archive, "w", ZIP_DEFLATED) as bundle:
               for path in files:
                   bundle.write(path, path.relative_to(source))
-
+          
           shutil.rmtree(source)
           print(f"Created {archive} ({len(files)} files)")
           PYCODE
@@ -589,7 +595,8 @@ jobs:
           APP_TYPE: ${{ inputs.app_type }}
         run: |
           set -euo pipefail
-
+          
+          # Accept either 1.2.3 or v1.2.3 as the input version.
           VERSION="${APP_VERSION#v}"
           if [[ "$APP_TYPE" != "stable" && "$VERSION" != *-* ]]; then
             TAG="v${VERSION}-${APP_TYPE}"
@@ -597,22 +604,23 @@ jobs:
             # Allows versions such as 1.2.3-beta.1 / 1.2.3-alpha.2.
             TAG="v${VERSION}"
           fi
-
+          
           TITLE="${APP_NAME} ${VERSION}"
           if [[ "$APP_TYPE" != "stable" ]]; then
             TITLE="${TITLE} (${APP_TYPE})"
           fi
-
+          
           mapfile -d '' assets < <(find release-assets -type f -print0)
           if (( ${#assets[@]} == 0 )); then
             echo "No build artifacts were downloaded."
             exit 1
           fi
-
+          
           echo "Creating draft release ${TAG} with ${#assets[@]} assets:"
           printf ' - %s\n' "${assets[@]}"
-
+          
           release_flags=(
+            --repo "$GITHUB_REPOSITORY"
             --draft
             --title "$TITLE"
             --generate-notes
@@ -622,6 +630,6 @@ jobs:
           if [[ "$APP_TYPE" != "stable" ]]; then
             release_flags+=(--prerelease --latest=false)
           fi
-
+          
           gh release create "$TAG" "${assets[@]}" "${release_flags[@]}"
 
