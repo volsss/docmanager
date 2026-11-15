@@ -36,6 +36,7 @@
 - [Лабораторная работа 7](lab7/)
   - [Теория Compose I](lab7/compose-1.md)
   - [Теория Compose II](lab7/compose-2.md)
+  - [Теория Compose III](lab7/compose-3.md)
   - [⚠️ Практическое задание ](lab7/practice.md)
 ---
 - [Лабораторная работа 8](lab8/)
