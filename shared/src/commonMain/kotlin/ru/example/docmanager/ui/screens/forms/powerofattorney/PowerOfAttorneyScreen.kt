@@ -44,6 +44,7 @@ import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
 import ru.example.docmanager.ui.utils.adaptiveWidth
 import ru.example.docmanager.ui.utils.applyAdaptive
+import ru.example.docmanager.ui.viewmodel.forms.FormEvent
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyBodyItemState
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyUiState
 import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyViewModel
@@ -67,13 +68,33 @@ fun PowerOfAttorneyScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is FormEvent.Status -> showSnackbar(event.message)
+                is FormEvent.Error -> showSnackbar(event.message)
+                is FormEvent.DocumentSaved<*> -> {
+                    val doc = event.document
+                    navigateTo(
+                        Route.Form(formState.type, doc),
+                        NavigationType.REPLACE
+                    )
+                }
+
+                FormEvent.DocumentDeleted -> {
+                    navigateTo(
+                        Route.Documents(formState.type),
+                        NavigationType.REPLACE
+                    )
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
     LaunchedEffect(document) {
-        viewModel.onInit(
-            onStatusUpdate = { message ->
-                showSnackbar(message)
-            },
-            document = document
-        )
+        viewModel.onInit(document = document)
     }
 
     if (formState.isLoading) {
@@ -121,43 +142,19 @@ fun PowerOfAttorneyScreen(
                 PowerOfAttorneyActions(
                     isEditing = formState.isEditing,
                     onSaveDocument = {
-                        viewModel.onSaveDocument(
-                            onStatusUpdate = ::showSnackbar,
-                            onDocumentSaved = { newDocument ->
-                                navigateTo(
-                                    Route.Form(formState.type, newDocument),
-                                    NavigationType.REPLACE
-                                )
-                            }
-                        )
+                        viewModel.onSaveDocument()
                     },
                     onSaveAsNewDocument = {
-                        viewModel.onSaveAsNewDocument(
-                            onStatusUpdate = ::showSnackbar,
-                            onDocumentSaved = { newDocument ->
-                                navigateTo(
-                                    Route.Form(formState.type, newDocument),
-                                    NavigationType.REPLACE
-                                )
-                            }
-                        )
+                        viewModel.onSaveAsNewDocument()
                     },
                     onDeleteDocument = {
-                        viewModel.onDeleteDocument(
-                            onStatusUpdate = ::showSnackbar,
-                            onDocumentDeleted = {
-                                navigateTo(
-                                    Route.Documents(formState.type),
-                                    NavigationType.REPLACE
-                                )
-                            }
-                        )
+                        viewModel.onDeleteDocument()
                     },
                     onExportDocument = {
-                        viewModel.onExportToFile(onStatusUpdate = ::showSnackbar)
+                        viewModel.onExportToFile()
                     },
                     onPrintDocument = {
-                        viewModel.onPrintDocument(onStatusUpdate = ::showSnackbar)
+                        viewModel.onPrintDocument()
                     }
                 )
 

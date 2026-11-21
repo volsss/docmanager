@@ -34,6 +34,7 @@ import ru.example.docmanager.data.repositories.references.ProductsRepository
 import ru.example.docmanager.data.repositories.references.SuppliersRepository
 import ru.example.docmanager.domain.document.Document
 import ru.example.docmanager.domain.document.DocumentProcessor
+import ru.example.docmanager.ui.viewmodel.forms.FormEvent
 import ru.example.docmanager.ui.viewmodel.forms.FormViewModel
 
 class PowerOfAttorneyViewModel(
@@ -113,7 +114,6 @@ class PowerOfAttorneyViewModel(
     }
 
     override fun onInit(
-        onStatusUpdate: (String) -> Unit,
         document: Document?,
     ) {
         viewModelScope.launch {
@@ -187,9 +187,7 @@ class PowerOfAttorneyViewModel(
                     }
 
                     else -> {
-                        onStatusUpdate.invoke(
-                            getString(Res.string.form_error_failed_init)
-                        )
+                        _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_init)))
                     }
                 }
             } finally {

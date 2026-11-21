@@ -14,7 +14,12 @@ package ru.example.docmanager.ui.viewmodel.forms
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import docmanager.shared.generated.resources.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
@@ -32,87 +37,94 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
 
     abstract val uiState: StateFlow<S>
 
+    protected val _events = MutableSharedFlow<FormEvent>()
+    val events: Flow<FormEvent> = _events.asSharedFlow()
+
     abstract fun onInit(
-        onStatusUpdate: (String) -> Unit,
         document: Document? = null,
     )
 
     abstract fun setLoading(loading: Boolean)
 
-    fun onSaveDocument(
-        onStatusUpdate: (String) -> Unit,
-        onDocumentUpdated: (() -> Unit)? = null,
-        onDocumentSaved: ((T) -> Unit)? = null,
-    ) {
+    fun onSaveDocument() {
         viewModelScope.launch {
             setLoading(true)
-            val document = uiState.value.toDocument(onStatusUpdate)
-                ?: return@launch
+            val document = uiState.value.toDocument(null)
+                ?: run {
+                    setLoading(false)
+                    return@launch
+                }
 
             runCatching {
                 if (uiState.value.isEditing) {
                     repository.updateDocument(document)
-                    onDocumentUpdated?.invoke()
+                    _events.emit(FormEvent.DocumentUpdated)
                 } else {
-                    onDocumentSaved?.invoke(repository.createDocument(document))
+                    _events.emit(FormEvent.DocumentSaved(repository.createDocument(document)))
                 }
-                onStatusUpdate.invoke(getString(Res.string.form_saved))
+                _events.emit(FormEvent.Status(getString(Res.string.form_saved)))
             }.onFailure { e ->
-                onStatusUpdate.invoke(getString(Res.string.form_error_failed_saving))
-                e.printStackTrace()
+                if (e is CancellationException) {
+                    ensureActive()
+                }
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_saving)))
             }
             setLoading(false)
         }
     }
 
-    fun onSaveAsNewDocument(
-        onStatusUpdate: (String) -> Unit,
-        onDocumentSaved: ((T) -> Unit)? = null,
-    ) {
+    fun onSaveAsNewDocument() {
         viewModelScope.launch {
             setLoading(true)
-            val document = uiState.value.toDocument(onStatusUpdate)
-                ?: return@launch
+            val document = uiState.value.toDocument(null)
+                ?: run {
+                    setLoading(false)
+                    return@launch
+                }
 
             runCatching {
                 val newDocument = repository.createDocument(document)
-                onStatusUpdate.invoke(getString(Res.string.form_saved_as_new))
-                onDocumentSaved?.invoke(newDocument)
+                _events.emit(FormEvent.Status(getString(Res.string.form_saved_as_new)))
+                _events.emit(FormEvent.DocumentSaved(newDocument))
             }.onFailure { e ->
-                onStatusUpdate.invoke(getString(Res.string.form_error_failed_saving))
-                e.printStackTrace()
+                if (e is CancellationException) {
+                    ensureActive()
+                }
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_saving)))
             }
             setLoading(false)
         }
     }
 
-    fun onDeleteDocument(
-        onStatusUpdate: (String) -> Unit,
-        onDocumentDeleted: (() -> Unit)? = null,
-    ) {
+    fun onDeleteDocument() {
         viewModelScope.launch {
             setLoading(true)
-            val docId = uiState.value.documentId ?: return@launch
+            val docId = uiState.value.documentId ?: run {
+                setLoading(false)
+                return@launch
+            }
             runCatching {
                 repository.deleteDocument(docId)
-                onStatusUpdate.invoke(getString(Res.string.form_deleted))
-                onDocumentDeleted?.invoke()
+                _events.emit(FormEvent.Status(getString(Res.string.form_deleted)))
+                _events.emit(FormEvent.DocumentDeleted)
             }.onFailure { e ->
-                onStatusUpdate.invoke(getString(Res.string.form_error_failed_deleting))
-                e.printStackTrace()
+                if (e is CancellationException) {
+                    ensureActive()
+                }
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_deleting)))
             }
             setLoading(false)
         }
     }
 
-    fun onExportToFile(
-        onStatusUpdate: (String) -> Unit,
-        onDocumentExported: (() -> Unit)? = null,
-    ) {
+    fun onExportToFile() {
         viewModelScope.launch {
             setLoading(true)
-            val document = uiState.value.toDocument(onStatusUpdate)
-                ?: return@launch
+            val document = uiState.value.toDocument(null)
+                ?: run {
+                    setLoading(false)
+                    return@launch
+                }
 
             runCatching {
                 documentProcessor.processSave(
@@ -120,28 +132,36 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
                             + getString(Res.string.form_document_number_separator) + uiState.value.number,
                     documentResourceFile = getString(documentResource),
                     document = document,
-                    onFailure = onStatusUpdate,
+                    onFailure = { msg ->
+                        viewModelScope.launch {
+                            _events.emit(FormEvent.Error(msg))
+                        }
+                    },
                     onSuccess = { s ->
-                        onStatusUpdate(s)
-                        onDocumentExported?.invoke()
+                        viewModelScope.launch {
+                            _events.emit(FormEvent.Status(s))
+                            _events.emit(FormEvent.DocumentExported)
+                        }
                     }
                 )
             }.onFailure { e ->
-                onStatusUpdate.invoke(getString(Res.string.form_error_failed_exporting))
-                e.printStackTrace()
+                if (e is CancellationException) {
+                    ensureActive()
+                }
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_exporting)))
             }
             setLoading(false)
         }
     }
 
-    fun onPrintDocument(
-        onStatusUpdate: (String) -> Unit,
-        onDocumentPrinted: (() -> Unit)? = null,
-    ) {
+    fun onPrintDocument() {
         viewModelScope.launch {
             setLoading(true)
-            val document = uiState.value.toDocument(onStatusUpdate)
-                ?: return@launch
+            val document = uiState.value.toDocument(null)
+                ?: run {
+                    setLoading(false)
+                    return@launch
+                }
 
             runCatching {
                 documentProcessor.processPrint(
@@ -149,15 +169,23 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
                             + getString(Res.string.form_document_number_separator) + uiState.value.number,
                     documentResourceFile = getString(documentResource),
                     document = document,
-                    onFailure = onStatusUpdate,
+                    onFailure = { msg ->
+                        viewModelScope.launch {
+                            _events.emit(FormEvent.Error(msg))
+                        }
+                    },
                     onSuccess = { s ->
-                        onStatusUpdate.invoke(s)
-                        onDocumentPrinted?.invoke()
+                        viewModelScope.launch {
+                            _events.emit(FormEvent.Status(s))
+                            _events.emit(FormEvent.DocumentPrinted)
+                        }
                     }
                 )
             }.onFailure { e ->
-                onStatusUpdate.invoke(getString(Res.string.form_error_failed_printing))
-                e.printStackTrace()
+                if (e is CancellationException) {
+                    ensureActive()
+                }
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_printing)))
             }
             setLoading(false)
         }
