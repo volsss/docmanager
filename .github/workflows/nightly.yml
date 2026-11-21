@@ -7,7 +7,7 @@ on:
 
 env:
   app_name: "docmanager"
-  app_version: "1.1.1"
+  app_version: "1.2.0"
 
 jobs:
   init:

@@ -40,7 +40,7 @@ compose.desktop {
 
         nativeDistributions {
             packageName = "docmanager"
-            packageVersion = "1.1.1"
+            packageVersion = "1.2.0"
             description = "A scalable document manager"
             copyright = "Copyright (c) 2026 Andrew Z."
             licenseFile.set(project.parent!!.file("LICENSE"))

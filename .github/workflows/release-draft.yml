@@ -596,16 +596,14 @@ jobs:
         run: |
           set -euo pipefail
           
-          # Accept either 1.2.3 or v1.2.3 as the input version.
           VERSION="${APP_VERSION#v}"
           if [[ "$APP_TYPE" != "stable" && "$VERSION" != *-* ]]; then
             TAG="v${VERSION}-${APP_TYPE}"
           else
-            # Allows versions such as 1.2.3-beta.1 / 1.2.3-alpha.2.
             TAG="v${VERSION}"
           fi
           
-          TITLE="${APP_NAME} ${VERSION}"
+          TITLE="${APP_TYPE} ${VERSION}"
           if [[ "$APP_TYPE" != "stable" ]]; then
             TITLE="${TITLE} (${APP_TYPE})"
           fi
