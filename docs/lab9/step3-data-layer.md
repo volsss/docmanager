@@ -931,7 +931,3 @@ actual val defaultPostgresJdbcUrl = "jdbc:postgresql://localhost:5432/new_projec
 
 > [!IMPORTANT]
 > **Почему `expect/actual`?** Путь к H2-базе данных различается на Desktop (`~/`) и Android (`/data/data/...`). Механизм `expect/actual` позволяет определить общий интерфейс в `commonMain` и платформенную реализацию в `jvmMain`/`androidMain`.
-
----
-
-**Следующий шаг:** [Шаг 4. Внедрение зависимостей](step4-di-layer.md) — связываем все слои с помощью Koin.

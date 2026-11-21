@@ -286,7 +286,3 @@ actual val platformModule = module {
    ↓
 9. Экспорт → documentProcessor.processSave() → DocumentEngine → .docx файл
 ```
-
----
-
-**Следующий шаг:** [Практическое задание](practice.md) — добавьте новый тип документа.

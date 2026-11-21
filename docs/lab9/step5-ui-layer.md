@@ -923,7 +923,3 @@ private fun PowerOfAttorneyActions(
 > - `LaunchedEffect` — запускает корутину при изменении параметров.
 > - `koinInject()` — получает ViewModel из Koin.
 > - `Scaffold` — базовая структура экрана с topBar, bottomBar, FAB и snackbar.
-
----
-
-**Следующий шаг:** [Шаг 6. ViewModel и состояние](step6-viewmodel.md) — логика формы, StateFlow, обработка событий.

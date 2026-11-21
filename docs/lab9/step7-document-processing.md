@@ -412,7 +412,3 @@ class JvmDocumentProcessor : DocumentProcessor {
 2. **`isPrintingAvailable()`** — проверка, доступна ли печать на текущем устройстве.
 3. **`processSaveToFile()`** — загружает шаблон из ресурсов, обрабатывает через `DocumentEngine` и сохраняет в файл.
 4. **`withContext(Dispatchers.IO)`** — все файловые операции выполняются в IO-диспатчере.
-
----
-
-**Следующий шаг:** [Шаг 8. Платформенные модули и запуск](step8-platform-modules.md) — точки входа для Desktop и Android.

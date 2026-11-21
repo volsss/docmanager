@@ -391,7 +391,3 @@ dependencies {
 
 > [!IMPORTANT]
 > Плейсхолдеры должны точно соответствовать значениям `placeholder` в `HeaderFieldType`. Например, `{{number}}` соответствует `HeaderFieldType.NUMBER`.
-
----
-
-**Следующий шаг:** [Шаг 2. Доменный слой](step2-domain-layer.md) — определяем интерфейсы документов, типы данных и справочники.

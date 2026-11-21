@@ -247,5 +247,3 @@ actual val platformModule = module {
 > **Почему разные реализации?** На Desktop используется Java AWT/Swing для выбора файла и печати. На Android используются ContentResolver и Intent. Интерфейс `DocumentProcessor` общий, но реализация платформенная.
 
 ---
-
-**Следующий шаг:** [Шаг 5. UI-слой: компоненты и навигация](step5-ui-layer.md) — создаём Compose-компоненты, навигацию и экраны.
