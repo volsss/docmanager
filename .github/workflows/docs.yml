@@ -27,13 +27,15 @@ jobs:
       - name: Install Mermaid filter
         run: npm install --global mermaid-filter
 
-      - name: Cache Mermaid CLI
+      - name: Cache Mermaid CLI and Chrome
         uses: actions/cache@v4
         with:
-          path: ${{ runner.temp }}/mermaid-cli
-          key: mermaid-cli-11.17.0
+          path: |
+            ${{ runner.temp }}/mermaid-cli
+            ~/.cache/puppeteer
+          key: mermaid-cli-11.17.0-chrome-157
 
-      - name: Install Mermaid CLI
+      - name: Install Mermaid CLI and Chrome
         shell: bash
         run: |
           set -euo pipefail
@@ -54,6 +56,15 @@ jobs:
 
           echo "Installed Mermaid CLI version:"
           "$MMDC" --version
+
+          # Install Chrome-headless-shell for Puppeteer
+          PUPPETEER_DIR="$CLI_DIR/node_modules/puppeteer-core"
+          if [ ! -d "$HOME/.cache/puppeteer/chrome-headless-shell" ]; then
+            echo "Installing Chrome-headless-shell..."
+            cd "$CLI_DIR"
+            npx puppeteer browsers install chrome-headless-shell
+            cd -
+          fi
 
           echo "Checking legacy options required by mermaid-filter:"
           "$MMDC" --help | grep -E -- '-w, --width|-f, --pdfFit'
