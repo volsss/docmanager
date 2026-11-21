@@ -1,0 +1,251 @@
+# Шаг 4. Внедрение зависимостей (Koin)
+
+Внедрение зависимостей (Dependency Injection, DI) — это паттерн, который позволяет связывать компоненты приложения без жёстких зависимостей. Мы используем **Koin** — лёгкий DI-фреймворк для Kotlin, который поддерживает KMP.
+
+## Зачем нужно DI?
+
+Без DI каждый класс создаёт свои зависимости вручную:
+```kotlin
+// Плохо: жёсткая зависимость
+class PowerOfAttorneyViewModel(
+    private val repo = PowerOfAttorneyRepository()  // ← создаёт сам
+)
+```
+
+С DI зависимости передаются извне:
+```kotlin
+// Хорошо: зависимость внедряется
+class PowerOfAttorneyViewModel(
+    private val repo: PowerOfAttorneyRepository  // ← получает извне
+)
+```
+
+**Преимущества:**
+- **Тестируемость.** Можно подменить репозиторий на mock-объект.
+- **Гибкость.** Можно заменить реализацию без изменения кода.
+- **Централизованное управление.** Все зависимости определены в одном месте.
+
+---
+
+## Шаг 4.1. Модуль данных
+
+**Файл:** `shared/src/commonMain/kotlin/.../di/DataModule.kt`
+
+```kotlin
+package ru.example.docmanager.di
+
+import org.koin.dsl.module
+import ru.example.docmanager.data.database.DatabaseManager
+import ru.example.docmanager.data.database.DefaultDatabaseManager
+
+val dataModule = module {
+    single<DatabaseManager> { DefaultDatabaseManager() }
+}
+```
+
+### Что делает `single`?
+
+`single` — это **синглтон**: объект создаётся один раз и переиспользуется везде. `DatabaseManager` должен быть единственным, потому что подключение к БД — дорогая операция.
+
+---
+
+## Шаг 4.2. Модуль репозиториев
+
+**Файл:** `shared/src/commonMain/kotlin/.../di/RepositoryModule.kt`
+
+```kotlin
+package ru.example.docmanager.di
+
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import ru.example.docmanager.data.repositories.MetadataRepository
+import ru.example.docmanager.data.repositories.documents.BaseDocumentRepository
+import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
+import ru.example.docmanager.data.repositories.references.*
+
+val repositoryModule = module {
+    singleOf(::MetadataRepository)
+
+    // Справочники — регистрируем каждый и привязываем к общему интерфейсу
+    singleOf(::IndividualsRepository) bind BaseReferenceRepository::class
+    singleOf(::OrganizationsRepository) bind BaseReferenceRepository::class
+    singleOf(::ProductsRepository) bind BaseReferenceRepository::class
+    singleOf(::SuppliersRepository) bind BaseReferenceRepository::class
+
+    // Карта всех репозиториев справочников, индексированных по типу
+    single(named("references")) {
+        getAll<BaseReferenceRepository>().associateBy { it.type }
+    }
+
+    // Документы
+    singleOf(::PowerOfAttorneyRepository) bind BaseDocumentRepository::class
+
+    // Карта всех репозиториев документов, индексированных по типу
+    single(named("documents")) {
+        getAll<BaseDocumentRepository>().associateBy { it.type }
+    }
+}
+```
+
+### Что делает `singleOf`?
+
+`singleOf(::Class)` — это сокращение для `single { Class() }`. Koin автоматически разрешает конструкторные зависимости.
+
+### Что делает `bind`?
+
+`bind(BaseReferenceRepository::class)` регистрирует реализацию под общим интерфейсом. Это позволяет запрашивать `BaseReferenceRepository` и получать конкретную реализацию.
+
+### Что делает `getAll`?
+
+`getAll<BaseReferenceRepository>()` возвращает **все** зарегистрированные реализации `BaseReferenceRepository`. Затем `.associateBy { it.type }` создаёт карту: `ReferenceType → Repository`.
+
+### Зачем `named("references")`?
+
+`named` — это квалификатор. Он позволяет иметь несколько объектов одного типа. `get(named("references"))` возвращает карту репозиториев, а не один репозиторий.
+
+---
+
+## Шаг 4.3. Модуль ViewModel
+
+**Файл:** `shared/src/commonMain/kotlin/.../di/ViewModelModule.kt`
+
+```kotlin
+package ru.example.docmanager.di
+
+import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+import ru.example.docmanager.ui.viewmodel.connection.ConnectionViewModel
+import ru.example.docmanager.ui.viewmodel.documents.DocumentsViewModel
+import ru.example.docmanager.ui.viewmodel.forms.powerofattorney.PowerOfAttorneyViewModel
+import ru.example.docmanager.ui.viewmodel.reference.ReferenceViewModel
+import ru.example.docmanager.ui.viewmodel.settings.SettingsViewModel
+import ru.example.docmanager.ui.viewmodel.start.StartViewModel
+
+val viewModelModule = module {
+    // Простые ViewModel — Koin сам разрешает зависимости
+    viewModelOf(::ConnectionViewModel)
+    viewModelOf(::SettingsViewModel)
+    viewModelOf(::PowerOfAttorneyViewModel)
+
+    // StartViewModel — требует карты репозиториев
+    viewModel {
+        StartViewModel(
+            metadataRepository = get(),
+            databaseManager = get(),
+            documentRepositories = get(named("documents")),
+            referenceRepositories = get(named("references"))
+        )
+    }
+
+    // ReferenceViewModel — требует параметр (тип справочника)
+    viewModel { params ->
+        ReferenceViewModel(
+            repositories = get(named("references")),
+            destination = params.get()
+        )
+    }
+
+    // DocumentsViewModel — требует параметр (тип документа)
+    viewModel { params ->
+        DocumentsViewModel(
+            repositories = get(named("documents")),
+            destination = params.get()
+        )
+    }
+}
+```
+
+### `viewModelOf` vs `viewModel { }`
+
+- **`viewModelOf(::Class)`** — для ViewModel, у которых все зависимости можно автоматически разрешить через конструктор.
+- **`viewModel { }`** — для ViewModel, которым нужны специальные параметры или карты из Koin.
+
+### `params.get()`
+
+Параметры передаются при создании ViewModel из UI:
+```kotlin
+val viewModel = koinViewModel { parametersOf(destination) }
+```
+
+---
+
+## Шаг 4.4. Общий модуль
+
+**Файл:** `shared/src/commonMain/kotlin/.../di/SharedModule.kt`
+
+```kotlin
+package ru.example.docmanager.di
+
+import org.koin.core.module.Module
+import org.koin.dsl.module
+
+val sharedModule = module {
+    includes(
+        dataModule,
+        repositoryModule,
+        viewModelModule,
+        platformModule  // Платформенный модуль (expect/actual)
+    )
+}
+
+expect val platformModule: Module
+```
+
+### `includes()`
+
+`includes()` объединяет несколько модулей в один. Это позволяет организовать DI по слоям: data → repository → viewModel → platform.
+
+### `expect val platformModule`
+
+Платформенный модуль различается для Desktop и Android, потому что `DocumentProcessor` (экспорт в Word) использует платформенные API.
+
+---
+
+## Шаг 4.5. Платформенный модуль
+
+### JVM (Desktop)
+
+**Файл:** `shared/src/jvmMain/kotlin/.../di/PlatformModule.jvm.kt`
+
+```kotlin
+package ru.example.docmanager.di
+
+import org.koin.dsl.module
+import ru.example.docmanager.data.document.JvmDocumentProcessor
+import ru.example.docmanager.domain.document.DocumentProcessor
+
+actual val platformModule = module {
+    single<DocumentProcessor> {
+        JvmDocumentProcessor()
+    }
+}
+```
+
+### Android
+
+**Файл:** `shared/src/androidMain/kotlin/.../di/PlatformModule.android.kt`
+
+```kotlin
+package ru.example.docmanager.di
+
+import org.koin.dsl.module
+import ru.example.docmanager.data.document.AndroidDocumentProcessor
+import ru.example.docmanager.domain.document.DocumentProcessor
+
+actual val platformModule = module {
+    single<DocumentProcessor> {
+        AndroidDocumentProcessor()
+    }
+}
+```
+
+> [!NOTE]
+> **Почему разные реализации?** На Desktop используется Java AWT/Swing для выбора файла и печати. На Android используются ContentResolver и Intent. Интерфейс `DocumentProcessor` общий, но реализация платформенная.
+
+---
+
+**Следующий шаг:** [Шаг 5. UI-слой: компоненты и навигация](step5-ui-layer.md) — создаём Compose-компоненты, навигацию и экраны.

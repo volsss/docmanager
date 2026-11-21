@@ -1,0 +1,448 @@
+# Шаг 6. ViewModel и состояние
+
+ViewModel (lab6) — это мост между UI и данными. Она хранит состояние экрана и содержит бизнес-логику. В MVVM-архитектуре ViewModel получает данные из репозиториев и передаёт их в UI через **StateFlow**.
+
+---
+
+## Шаг 6.1. Базовый класс FormState
+
+**Файл:** `shared/src/commonMain/kotlin/.../ui/viewmodel/forms/FormState.kt`
+
+```kotlin
+package ru.example.docmanager.ui.viewmodel.forms
+
+import kotlinx.datetime.LocalDate
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentType
+
+abstract class FormState<D : Document>(
+    val type: DocumentType
+) {
+    abstract val documentId: Int?
+    abstract val number: Int
+    abstract val dischargeDate: LocalDate
+
+    abstract val isLoading: Boolean
+    val isEditing: Boolean
+        get() = documentId != null
+
+    abstract suspend fun toDocument(onError: ((String) -> Unit)?): D?
+}
+```
+
+### Почему абстрактный класс?
+
+- **Общие свойства.** `type`, `documentId`, `number`, `dischargeDate`, `isLoading` есть у всех форм.
+- **`isEditing`** — вычисляемое свойство: если `documentId != null`, значит мы редактируем существующий документ.
+- **`toDocument()`** — абстрактный метод, который каждый подкласс реализует по-своему.
+
+---
+
+## Шаг 6.2. События формы
+
+**Файл:** `shared/src/commonMain/kotlin/.../ui/viewmodel/forms/FormEvent.kt`
+
+```kotlin
+package ru.example.docmanager.ui.viewmodel.forms
+
+import ru.example.docmanager.domain.document.Document
+
+sealed interface FormEvent {
+    data class Status(val message: String) : FormEvent
+    data class DocumentSaved<T : Document>(val document: T) : FormEvent
+    data object DocumentUpdated : FormEvent
+    data object DocumentDeleted : FormEvent
+    data object DocumentExported : FormEvent
+    data object DocumentPrinted : FormEvent
+    data class Error(val message: String) : FormEvent
+}
+```
+
+### Почему `sealed interface`?
+
+- **Исчерпывающий список событий.** UI обрабатывает все возможные события через `when` без `else`.
+- **Типобезопасность.** `DocumentSaved` несёт тип документа, `Error` — сообщение.
+
+---
+
+## Шаг 6.3. Базовый класс FormViewModel
+
+**Файл:** `shared/src/commonMain/kotlin/.../ui/viewmodel/forms/FormViewModel.kt`
+
+```kotlin
+package ru.example.docmanager.ui.viewmodel.forms
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import docmanager.shared.generated.resources.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
+import ru.example.docmanager.data.repositories.documents.DocumentRepository
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentProcessor
+
+abstract class FormViewModel<T : Document, S : FormState<T>>(
+    val repository: DocumentRepository<T>,
+    val documentName: StringResource,
+    val documentResource: StringResource,
+    val documentProcessor: DocumentProcessor,
+) : ViewModel() {
+
+    abstract val uiState: StateFlow<S>
+
+    protected val _events = MutableSharedFlow<FormEvent>()
+    val events: Flow<FormEvent> = _events.asSharedFlow()
+
+    abstract fun onInit(document: Document? = null)
+    abstract fun setLoading(loading: Boolean)
+
+    fun onSaveDocument() {
+        viewModelScope.launch {
+            setLoading(true)
+            val document = uiState.value.toDocument(null)
+                ?: run { setLoading(false); return@launch }
+
+            runCatching {
+                if (uiState.value.isEditing) {
+                    repository.updateDocument(document)
+                    _events.emit(FormEvent.DocumentUpdated)
+                } else {
+                    _events.emit(FormEvent.DocumentSaved(repository.createDocument(document)))
+                }
+                _events.emit(FormEvent.Status(getString(Res.string.form_saved)))
+            }.onFailure { e ->
+                if (e is CancellationException) ensureActive()
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_saving)))
+            }
+            setLoading(false)
+        }
+    }
+
+    fun onSaveAsNewDocument() {
+        viewModelScope.launch {
+            setLoading(true)
+            val document = uiState.value.toDocument(null)
+                ?: run { setLoading(false); return@launch }
+
+            runCatching {
+                val newDocument = repository.createDocument(document)
+                _events.emit(FormEvent.Status(getString(Res.string.form_saved_as_new)))
+                _events.emit(FormEvent.DocumentSaved(newDocument))
+            }.onFailure { e ->
+                if (e is CancellationException) ensureActive()
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_saving)))
+            }
+            setLoading(false)
+        }
+    }
+
+    fun onDeleteDocument() {
+        viewModelScope.launch {
+            setLoading(true)
+            val docId = uiState.value.documentId ?: run { setLoading(false); return@launch }
+            runCatching {
+                repository.deleteDocument(docId)
+                _events.emit(FormEvent.Status(getString(Res.string.form_deleted)))
+                _events.emit(FormEvent.DocumentDeleted)
+            }.onFailure { e ->
+                if (e is CancellationException) ensureActive()
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_deleting)))
+            }
+            setLoading(false)
+        }
+    }
+
+    fun onExportToFile() {
+        viewModelScope.launch {
+            setLoading(true)
+            val document = uiState.value.toDocument(null)
+                ?: run { setLoading(false); return@launch }
+
+            runCatching {
+                documentProcessor.processSave(
+                    documentName = getString(documentName) + getString(Res.string.form_document_number_separator) + uiState.value.number,
+                    documentResourceFile = getString(documentResource),
+                    document = document,
+                    onFailure = { msg -> viewModelScope.launch { _events.emit(FormEvent.Error(msg)) } },
+                    onSuccess = { s -> viewModelScope.launch { _events.emit(FormEvent.Status(s)); _events.emit(FormEvent.DocumentExported) } }
+                )
+            }.onFailure { e ->
+                if (e is CancellationException) ensureActive()
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_exporting)))
+            }
+            setLoading(false)
+        }
+    }
+
+    fun onPrintDocument() {
+        viewModelScope.launch {
+            setLoading(true)
+            val document = uiState.value.toDocument(null)
+                ?: run { setLoading(false); return@launch }
+
+            runCatching {
+                documentProcessor.processPrint(
+                    documentName = getString(documentName) + getString(Res.string.form_document_number_separator) + uiState.value.number,
+                    documentResourceFile = getString(documentResource),
+                    document = document,
+                    onFailure = { msg -> viewModelScope.launch { _events.emit(FormEvent.Error(msg)) } },
+                    onSuccess = { s -> viewModelScope.launch { _events.emit(FormEvent.Status(s)); _events.emit(FormEvent.DocumentPrinted) } }
+                )
+            }.onFailure { e ->
+                if (e is CancellationException) ensureActive()
+                _events.emit(FormEvent.Error(getString(Res.string.form_error_failed_printing)))
+            }
+            setLoading(false)
+        }
+    }
+}
+```
+
+### Ключевые паттерны
+
+1. **`StateFlow<S>`** — состояние формы. UI подписывается и автоматически обновляется при изменении.
+2. **`SharedFlow<FormEvent>`** — одноразовые события (сохранение, ошибка). UI обрабатывает их один раз.
+3. **`viewModelScope.launch`** — корутина, привязанная к жизненному циклу ViewModel. Автоматически отменяется при уничтожении.
+4. **`runCatching { }.onFailure { }`** — безопасная обработка ошибок без try-catch.
+5. **`ensureActive()`** — проверка, что корутина не была отменена (например, при закрытии экрана).
+
+---
+
+## Шаг 6.4. Состояние формы доверенности
+
+**Файл:** `shared/src/commonMain/kotlin/.../ui/viewmodel/forms/powerofattorney/PowerOfAttorneyUiState.kt`
+
+```kotlin
+package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
+
+import androidx.compose.ui.util.fastFilteredMap
+import docmanager.shared.generated.resources.Res
+import docmanager.shared.generated.resources.form_error_empty_required
+import kotlinx.datetime.*
+import org.jetbrains.compose.resources.getString
+import ru.example.docmanager.data.document.powerofattorney.*
+import ru.example.docmanager.data.reference.*
+import ru.example.docmanager.domain.document.DocumentType
+import ru.example.docmanager.ui.viewmodel.forms.FormState
+import kotlin.time.Clock
+
+data class PowerOfAttorneyUiState(
+    val individuals: List<Individual> = emptyList(),
+    val organizations: List<Organization> = emptyList(),
+    val products: List<Product> = emptyList(),
+    val suppliers: List<Supplier> = emptyList(),
+
+    override val documentId: Int? = null,
+    override val number: Int = 1,
+    override val dischargeDate: LocalDate =
+        Clock.System.todayIn(TimeZone.currentSystemDefault()),
+    val endDate: LocalDate = dischargeDate.plus(DatePeriod(days = 30)),
+    val organization: Organization? = null,
+    val individual: Individual? = null,
+    val supplier: Supplier? = null,
+    val supplierAgreement: String = "",
+
+    var bodyItems: List<PowerOfAttorneyBodyItemState> = emptyList(),
+
+    override val isLoading: Boolean = true
+) : FormState<PowerOfAttorney>(DocumentType.POWER_OF_ATTORNEY) {
+
+    override suspend fun toDocument(onError: ((String) -> Unit)?): PowerOfAttorney? {
+        if (organization == null || individual == null || supplier == null) {
+            onError?.invoke(getString(Res.string.form_error_empty_required))
+            return null
+        }
+
+        val header = PowerOfAttorneyHeader(
+            id = documentId ?: 0,
+            organization = organization,
+            number = number,
+            dischargeDate = dischargeDate,
+            endDate = endDate,
+            individual = individual,
+            supplier = supplier,
+            supplierAgreement = supplierAgreement
+        )
+
+        val bodyItemList = bodyItems.fastFilteredMap(
+            predicate = { it.product != null },
+            transform = { item ->
+                PowerOfAttorneyBodyItem(
+                    id = 0, count = item.count, unit = item.unit, product = item.product!!
+                )
+            }
+        )
+
+        return PowerOfAttorney(header, PowerOfAttorneyBody(bodyItemList))
+    }
+}
+```
+
+### Состояние элемента тела
+
+**Файл:** `shared/src/commonMain/kotlin/.../ui/viewmodel/forms/BodyItemState.kt`
+
+```kotlin
+package ru.example.docmanager.ui.viewmodel.forms
+
+abstract class BodyItemState(
+    open val id: Int
+)
+```
+
+**Файл:** `shared/src/commonMain/kotlin/.../ui/viewmodel/forms/powerofattorney/PowerOfAttorneyBodyItemState.kt`
+
+```kotlin
+package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
+
+import ru.example.docmanager.data.reference.Product
+import ru.example.docmanager.ui.viewmodel.forms.BodyItemState
+
+data class PowerOfAttorneyBodyItemState(
+    override val id: Int,
+    val product: Product? = null,
+    val unit: String = "шт",
+    val count: String = "Один"
+) : BodyItemState(id)
+```
+
+---
+
+## Шаг 6.5. ViewModel доверенности
+
+**Файл:** `shared/src/commonMain/kotlin/.../ui/viewmodel/forms/powerofattorney/PowerOfAttorneyViewModel.kt`
+
+```kotlin
+package ru.example.docmanager.ui.viewmodel.forms.powerofattorney
+
+import androidx.lifecycle.viewModelScope
+import docmanager.shared.generated.resources.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import org.jetbrains.compose.resources.getString
+import ru.example.docmanager.data.document.powerofattorney.PowerOfAttorney
+import ru.example.docmanager.data.reference.*
+import ru.example.docmanager.data.repositories.documents.PowerOfAttorneyRepository
+import ru.example.docmanager.data.repositories.references.*
+import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentProcessor
+import ru.example.docmanager.ui.viewmodel.forms.FormEvent
+import ru.example.docmanager.ui.viewmodel.forms.FormViewModel
+
+class PowerOfAttorneyViewModel(
+    powerOfAttorneyRepository: PowerOfAttorneyRepository,
+    private val individualsRepository: IndividualsRepository,
+    private val organizationsRepository: OrganizationsRepository,
+    private val productsRepository: ProductsRepository,
+    private val suppliersRepository: SuppliersRepository,
+    documentProcessor: DocumentProcessor
+) : FormViewModel<PowerOfAttorney, PowerOfAttorneyUiState>(
+    repository = powerOfAttorneyRepository,
+    documentName = Res.string.document_power_of_attorney,
+    documentResource = Res.string.document_power_of_attorney_resource,
+    documentProcessor = documentProcessor
+) {
+    override val uiState: StateFlow<PowerOfAttorneyUiState>
+        field = MutableStateFlow(PowerOfAttorneyUiState())
+
+    // --- Обработчики изменений полей ---
+    fun onNumberChanged(number: Int) = uiState.update { it.copy(number = number) }
+    fun onDischargeDateChanged(date: LocalDate) = uiState.update { it.copy(dischargeDate = date) }
+    fun onEndDateChanged(date: LocalDate) = uiState.update { it.copy(endDate = date) }
+    fun onOrganizationChanged(org: Organization?) = uiState.update { it.copy(organization = org) }
+    fun onIndividualChanged(ind: Individual?) = uiState.update { it.copy(individual = ind) }
+    fun onSupplierChanged(sup: Supplier?) = uiState.update { it.copy(supplier = sup) }
+    fun onSupplierAgreementChanged(agreement: String) = uiState.update { it.copy(supplierAgreement = agreement) }
+
+    // --- Управление элементами тела ---
+    fun addBodyItem() = uiState.update {
+        it.copy(bodyItems = it.bodyItems + PowerOfAttorneyBodyItemState(id = it.bodyItems.size))
+    }
+
+    fun updateBodyItem(index: Int, item: PowerOfAttorneyBodyItemState) = uiState.update { old ->
+        old.copy(bodyItems = old.bodyItems.toMutableList().also { if (index in it.indices) it[index] = item })
+    }
+
+    fun removeBodyItem(index: Int) = uiState.update {
+        it.copy(bodyItems = if (it.bodyItems.size > 1) it.bodyItems.filterIndexed { i, _ -> i != index } else listOf())
+    }
+
+    // --- Инициализация ---
+    override fun onInit(document: Document?) {
+        viewModelScope.launch {
+            setLoading(true)
+            try {
+                // Параллельная загрузка всех справочников
+                val individualsDeferred = async { individualsRepository.getItems() }
+                val suppliersDeferred = async { suppliersRepository.getItems() }
+                val organizationsDeferred = async { organizationsRepository.getItems() }
+                val productsDeferred = async { productsRepository.getItems() }
+
+                val individuals = individualsDeferred.await()
+                val suppliers = suppliersDeferred.await()
+                val organizations = organizationsDeferred.await()
+                val products = productsDeferred.await()
+
+                uiState.update { it.copy(
+                    individuals = individuals, suppliers = suppliers,
+                    organizations = organizations, products = products
+                ) }
+
+                // Если редактируем существующий документ — заполняем поля
+                if (document is PowerOfAttorney) {
+                    uiState.update { old ->
+                        old.copy(
+                            documentId = document.header.id,
+                            number = document.header.number,
+                            dischargeDate = document.header.dischargeDate,
+                            endDate = document.header.endDate,
+                            organization = organizations.firstOrNull { it.id == document.header.organization.id }
+                                ?: document.header.organization,
+                            individual = individuals.firstOrNull { it.id == document.header.individual.id }
+                                ?: document.header.individual,
+                            supplier = suppliers.firstOrNull { it.id == document.header.supplier.id }
+                                ?: document.header.supplier,
+                            supplierAgreement = document.header.supplierAgreement,
+                            bodyItems = if (document.body.items.isNotEmpty()) {
+                                document.body.items.map { body ->
+                                    PowerOfAttorneyBodyItemState(
+                                        id = body.id,
+                                        product = products.firstOrNull { it.id == body.product.id } ?: body.product,
+                                        unit = body.unit, count = body.count
+                                    )
+                                }
+                            } else listOf()
+                        )
+                    }
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+    }
+
+    override fun setLoading(loading: Boolean) = uiState.update { it.copy(isLoading = loading) }
+}
+```
+
+### Ключевые паттерны
+
+1. **`MutableStateFlow`** — изменяемый поток состояния. `uiState.update { }` создаёт новую копию состояния с изменённым полем.
+2. **`async { }.await()`** — параллельное выполнение. Все 4 справочника загружаются одновременно, а не последовательно.
+3. **`uiState.update { it.copy(...) }`** — неизменяемое обновление. Каждый вызов создаёт новый объект состояния, что позволяет Compose точно определить, что изменилось.
+4. **`try { } finally { setLoading(false) }`** — гарантирует, что индикатор загрузки будет скрыт даже при ошибке.
+
+---
+
+**Следующий шаг:** [Шаг 7. Обработка документов](step7-document-processing.md) — генерация Word-документов из шаблонов с помощью Apache POI.

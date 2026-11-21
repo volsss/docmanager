@@ -51,4 +51,16 @@
   - [Создание приложения](lab8/multiplatform-2.md)
   - [⚠️ Практическое задание ](lab6/practice.md)
 ---
+- [Лабораторная работа 9](lab9/)
+  - [Введение](lab9/README.md)
+  - [Шаг 1. Создание проекта и настройка Gradle](lab9/step1-project-setup.md)
+  - [Шаг 2. Доменный слой](lab9/step2-domain-layer.md)
+  - [Шаг 3. Слой данных](lab9/step3-data-layer.md)
+  - [Шаг 4. Внедрение зависимостей](lab9/step4-di-layer.md)
+  - [Шаг 5. UI-слой: компоненты и навигация](lab9/step5-ui-layer.md)
+  - [Шаг 6. ViewModel и состояние](lab9/step6-viewmodel.md)
+  - [Шаг 7. Обработка документов](lab9/step7-document-processing.md)
+  - [Шаг 8. Платформенные модули и запуск](lab9/step8-platform-modules.md)
+  - [Практическое задание](lab9/practice.md)
+---
 * [GitHub](https://github.com/volsss/docmanager)
