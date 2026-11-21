@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_back_button
@@ -32,7 +31,6 @@ import docmanager.shared.generated.resources.route_references
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.reference.ReferenceType
 import ru.example.docmanager.ui.router.Route
-import ru.example.docmanager.ui.theme.AppTheme
 import ru.example.docmanager.ui.utils.adaptiveWidth
 
 @Composable
@@ -116,29 +114,5 @@ private fun ReferencesContent(
                 Text(stringResource(type.stringResource))
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ReferencesScreenPreview() {
-    AppTheme(darkTheme = false) {
-        ReferencesScreen(
-            navigateTo = { },
-            canGoBack = false,
-            onBack = { }
-        )
-    }
-}
-
-@Preview
-@Composable
-fun ReferencesScreenDarkThemePreview() {
-    AppTheme(darkTheme = true) {
-        ReferencesScreen(
-            navigateTo = { },
-            canGoBack = false,
-            onBack = { }
-        )
     }
 }

@@ -26,6 +26,7 @@ kotlin {
 dependencies {
     implementation(projects.shared)
 
+    implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.koin.compose)
     implementation(libs.koin.core)

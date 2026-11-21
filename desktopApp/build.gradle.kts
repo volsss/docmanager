@@ -24,6 +24,7 @@ dependencies {
 
     implementation(libs.koin.compose)
     implementation(libs.compose.components.resources)
+    implementation(libs.compose.material3)
 }
 
 compose.desktop {

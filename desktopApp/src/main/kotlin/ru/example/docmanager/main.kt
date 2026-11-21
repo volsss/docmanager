@@ -11,6 +11,7 @@
 
 package ru.example.docmanager
 
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -30,17 +31,21 @@ fun main() {
     }
 
     application {
-        Window(
-            onCloseRequest = ::exitApplication,
-            state = rememberWindowState(
-                position = WindowPosition.Aligned(Alignment.Center),
-                width = 1300.dp,
-                height = 800.dp
-            ),
-            title = "docmanager",
-            icon = painterResource(Res.drawable.icon)
+        MaterialExpressiveTheme(
+            colorScheme = rememberAppColorScheme()
         ) {
-            App()
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = rememberWindowState(
+                    position = WindowPosition.Aligned(Alignment.Center),
+                    width = 1300.dp,
+                    height = 800.dp
+                ),
+                title = "docmanager",
+                icon = painterResource(Res.drawable.icon)
+            ) {
+                App()
+            }
         }
     }
 }
