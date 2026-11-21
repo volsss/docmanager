@@ -82,8 +82,8 @@ jobs:
           for file in "${files[@]}"; do
             count=$((count + 1))
             percentage=$((count * 100 / total))
-            filled=$((percentage / 5))
-            empty=$((32 - filled))
+            filled=$((percentage / 2))
+            empty=$((50 - filled))
 
             bar=$(printf '%0.s█' $(seq 1 $filled) $(seq 1 $empty | sed 's/.//g'))
             empty_bar=$(printf '%0.s░' $(seq 1 $empty))
