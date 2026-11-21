@@ -21,7 +21,8 @@
 
 ## Архитектура приложения
 
-```
+```mermaid
+treeView-beta
 docmanager/
 ├── shared/                          # Общий модуль (KMP)
 │   └── commonMain/kotlin/
@@ -59,17 +60,3 @@ docmanager/
 - **Внедрение зависимостей** — Koin для связывания слоёв.
 - **Compose Multiplatform** — единый UI для Desktop и Android.
 - **Экспорт документов** — Apache POI для генерации .docx-файлов из шаблонов.
-
-## Структура руководства
-
-Каждый шаг содержит **полный код** каждого файла, подробное описание решений и объяснение, **почему** сделано именно так.
-
-1. [Создание проекта и настройка Gradle](step1-project-setup.md)
-2. [Доменный слой](step2-domain-layer.md)
-3. [Слой данных](step3-data-layer.md)
-4. [Внедрение зависимостей](step4-di-layer.md)
-5. [UI-слой: компоненты и навигация](step5-ui-layer.md)
-6. [ViewModel и состояние](step6-viewmodel.md)
-7. [Обработка документов](step7-document-processing.md)
-8. [Платформенные модули и запуск](step8-platform-modules.md)
-9. [Практическое задание](practice.md)

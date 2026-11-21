@@ -20,9 +20,9 @@ jobs:
         uses: pandoc/actions/setup@v1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: latest
 
       - name: Install Mermaid filter
         run: npm install --global mermaid-filter
