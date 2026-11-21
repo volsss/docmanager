@@ -16,15 +16,14 @@ import androidx.lifecycle.viewModelScope
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.connection_error_failed
 import docmanager.shared.generated.resources.connection_error_url_driver_empty
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 import ru.example.docmanager.data.database.DatabaseDriver
 import ru.example.docmanager.data.database.DatabaseManager
-import ru.example.docmanager.data.database.DefaultConnectionConfig
+import ru.example.docmanager.data.database.defaultH2JdbcUrl
+import ru.example.docmanager.data.database.defaultPostgresJdbcUrl
 
 class ConnectionViewModel(
     private val databaseManager: DatabaseManager
@@ -51,7 +50,7 @@ class ConnectionViewModel(
             ConnectionUiState(
                 connectionType = ConnectionType.LOCAL,
                 driver = DatabaseDriver.H2.driverClassName,
-                jdbcUrl = DefaultConnectionConfig.h2JdbcUrl
+                jdbcUrl = defaultH2JdbcUrl
             )
         )
 
@@ -60,7 +59,7 @@ class ConnectionViewModel(
             ConnectionType.LOCAL -> uiState.value.copy(
                 connectionType = type,
                 driver = DatabaseDriver.H2.driverClassName,
-                jdbcUrl = DefaultConnectionConfig.h2JdbcUrl
+                jdbcUrl = defaultH2JdbcUrl
             )
 
             ConnectionType.REMOTE -> {
@@ -77,9 +76,9 @@ class ConnectionViewModel(
                 val driver = uiState.value.driver.ifBlank { DatabaseDriver.POSTGRESQL.driverClassName }
                 val jdbcUrl = uiState.value.jdbcUrl.ifBlank {
                     if (driver == DatabaseDriver.H2.driverClassName) {
-                        DefaultConnectionConfig.h2JdbcUrl
+                        defaultH2JdbcUrl
                     } else {
-                        DefaultConnectionConfig.postgresJdbcUrl
+                        defaultPostgresJdbcUrl
                     }
                 }
                 uiState.value.copy(
@@ -108,12 +107,18 @@ class ConnectionViewModel(
 
     fun onDriverChanged(newValue: String) {
         val updatedUrl = if (uiState.value.connectionType == ConnectionType.OTHER) {
-            if (newValue == DatabaseDriver.H2.driverClassName && uiState.value.jdbcUrl.startsWith("jdbc:postgresql:")) {
-                DefaultConnectionConfig.h2JdbcUrl
-            } else if (newValue == DatabaseDriver.POSTGRESQL.driverClassName && uiState.value.jdbcUrl.startsWith("jdbc:h2:")) {
-                DefaultConnectionConfig.postgresJdbcUrl
-            } else {
-                uiState.value.jdbcUrl
+            when (newValue) {
+                DatabaseDriver.H2.driverClassName if uiState.value.jdbcUrl.startsWith("jdbc:postgresql:") -> {
+                    defaultH2JdbcUrl
+                }
+
+                DatabaseDriver.POSTGRESQL.driverClassName if uiState.value.jdbcUrl.startsWith("jdbc:h2:") -> {
+                    defaultPostgresJdbcUrl
+                }
+
+                else -> {
+                    uiState.value.jdbcUrl
+                }
             }
         } else {
             uiState.value.jdbcUrl
@@ -140,7 +145,7 @@ class ConnectionViewModel(
             runCatching {
                 val state = uiState.value
                 val effectiveJdbcUrl = when (state.connectionType) {
-                    ConnectionType.LOCAL -> DefaultConnectionConfig.h2JdbcUrl
+                    ConnectionType.LOCAL -> defaultH2JdbcUrl
                     ConnectionType.REMOTE -> formatPostgresJdbcUrl(state.ip)
                     ConnectionType.OTHER -> state.jdbcUrl
                 }
@@ -164,11 +169,14 @@ class ConnectionViewModel(
                         password = if (state.connectionType == ConnectionType.LOCAL) "" else state.password,
                     )
                 }
+            }.onFailure {
+                if (it is CancellationException) {
+                    ensureActive()
+                }
+                onError(it.localizedMessage ?: getString(Res.string.connection_error_failed))
             }.onSuccess {
                 uiState.value = uiState.value.copy(isLoading = false, isConnected = true)
                 onSuccess()
-            }.onFailure {
-                onError(it.localizedMessage ?: getString(Res.string.connection_error_failed))
             }
         }
     }

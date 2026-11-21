@@ -20,7 +20,6 @@ import ru.example.docmanager.ui.screens.ConnectionScreen
 @Composable
 fun App() {
     val isConnected = remember { mutableStateOf(false) }
-
     if (isConnected.value) {
         Router()
     } else {

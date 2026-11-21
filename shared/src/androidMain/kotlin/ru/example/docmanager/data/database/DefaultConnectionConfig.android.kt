@@ -11,7 +11,5 @@
 
 package ru.example.docmanager.data.database
 
-actual object DefaultConnectionConfig {
-    actual val h2JdbcUrl = "jdbc:h2:/data/data/ru.example.docmanager/new_project;MODE=MySQL"
-    actual val postgresJdbcUrl = "jdbc:postgresql://localhost:5432/new_project"
-}
+actual val defaultH2JdbcUrl = "jdbc:h2:/data/data/ru.example.docmanager/new_project;MODE=MySQL"
+actual val defaultPostgresJdbcUrl = "jdbc:postgresql://localhost:5432/new_project"

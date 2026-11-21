@@ -14,11 +14,11 @@ package ru.example.docmanager.data.database
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.migration.jdbc.MigrationUtils
 import ru.example.docmanager.data.database.tables.MetadataTable
 import ru.example.docmanager.data.database.tables.documents.powerofattorney.PowerOfAttorneyBodiesTable
 import ru.example.docmanager.data.database.tables.documents.powerofattorney.PowerOfAttorneyHeadersTable
@@ -46,15 +46,18 @@ class DefaultDatabaseManager : DatabaseManager {
         TransactionManager.defaultDatabase = database
 
         transaction(database) {
-            SchemaUtils.create(
+            val statements = MigrationUtils.statementsRequiredForDatabaseMigration(
                 MetadataTable,
                 ProductsTable,
                 SuppliersTable,
                 IndividualsTable,
                 OrganizationsTable,
                 PowerOfAttorneyBodiesTable,
-                PowerOfAttorneyHeadersTable,
+                PowerOfAttorneyHeadersTable
             )
+            if (statements.isNotEmpty()) {
+                execInBatch(statements)
+            }
 
             if (MetadataTable.selectAll().empty()) {
                 MetadataTable.insert {

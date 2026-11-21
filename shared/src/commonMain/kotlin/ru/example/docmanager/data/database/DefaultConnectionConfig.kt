@@ -11,7 +11,5 @@
 
 package ru.example.docmanager.data.database
 
-expect object DefaultConnectionConfig {
-    val h2JdbcUrl: String
-    val postgresJdbcUrl: String
-}
+expect val defaultH2JdbcUrl: String
+expect val defaultPostgresJdbcUrl: String
