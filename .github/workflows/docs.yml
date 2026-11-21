@@ -27,20 +27,28 @@ jobs:
       - name: Install Mermaid filter
         run: npm install --global mermaid-filter
 
+      - name: Cache Mermaid CLI
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/mermaid-cli
+          key: mermaid-cli-11.17.0
+
       - name: Install Mermaid CLI
         shell: bash
         run: |
           set -euo pipefail
 
           CLI_DIR="$RUNNER_TEMP/mermaid-cli"
-          rm -rf "$CLI_DIR"
 
-          npm install \
-            --prefix "$CLI_DIR" \
-            --no-audit \
-            --no-fund \
-            --save-exact \
-            @mermaid-js/mermaid-cli@11.17.0
+          if [ ! -f "$CLI_DIR/node_modules/.bin/mmdc" ]; then
+            rm -rf "$CLI_DIR"
+            npm install \
+              --prefix "$CLI_DIR" \
+              --no-audit \
+              --no-fund \
+              --save-exact \
+              @mermaid-js/mermaid-cli@11.17.0
+          fi
 
           MMDC="$CLI_DIR/node_modules/.bin/mmdc"
 
@@ -55,26 +63,72 @@ jobs:
       - name: Convert MD to DOCX preserving structure
         run: |
           mkdir -p docx_output
+          counter_file=$(mktemp)
+          echo "0" > "$counter_file"
 
-          find docs -type f -name "*.md" | while read -r file; do
+          files=($(find docs -type f -name "*.md"))
+          total=${#files[@]}
+
+          # Parallel conversion with worker pool
+          max_workers=4
+          running=0
+
+          # Progress monitor in background
+          (
+            while true; do
+              count=$(cat "$counter_file" 2>/dev/null || echo "0")
+              if [ "$count" -ge "$total" ]; then
+                break
+              fi
+              percentage=$((count * 100 / total))
+              filled=$((percentage / 5))
+              empty=$((20 - filled))
+              bar=$(printf '%0.s█' $(seq 1 $filled))
+              empty_bar=$(printf '%0.s░' $(seq 1 $empty))
+              printf "\r[\033[32m%s%s\033[0m] %3d%% (%d/%d)" "$bar" "$empty_bar" "$percentage" "$count" "$total"
+              sleep 0.5
+            done
+            printf "\r[\033[32m%s\033[0m] 100%% (%d/%d) Done!\n" "$(printf '%0.s█' $(seq 1 20))" "$total" "$total"
+          ) &
+          monitor=$!
+
+          for file in "${files[@]}"; do
+            # Wait if we have max workers running
+            while [ $running -ge $max_workers ]; do
+              wait -n 2>/dev/null || true
+              running=$((running - 1))
+            done
+
             dir_name=$(dirname "$file")
-
             mkdir -p "docx_output/$dir_name"
-
             output_file="docx_output/${file%.md}.docx"
 
-            echo "Converting $file -> $output_file"
-          
-            pandoc --from=gfm \
-              --reference-doc=docs/reference.docx \
-              --toc --toc-depth=2 \
-              --metadata=toc-title="Содержание" \
-              --lua-filter=docs/alerts.lua \
-              --filter=mermaid-filter \
-              --resource-path=".:$dir_name" \
-              --output="$output_file" \
-              "$file"
+            (
+              pandoc --from=gfm \
+                --reference-doc=docs/reference.docx \
+                --toc --toc-depth=2 \
+                --metadata=toc-title="Содержание" \
+                --lua-filter=docs/alerts.lua \
+                --filter=mermaid-filter \
+                --resource-path=".:$dir_name" \
+                --output="$output_file" \
+                "$file"
+              # Increment counter atomically
+              (
+                flock -x 200
+                count=$(cat "$counter_file")
+                echo $((count + 1)) > "$counter_file"
+              ) 200>"$counter_file.lock"
+            ) &
+
+            running=$((running + 1))
           done
+
+          # Wait for remaining workers
+          wait
+          kill $monitor 2>/dev/null || true
+          wait $monitor 2>/dev/null || true
+          rm -f "$counter_file" "$counter_file.lock"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
