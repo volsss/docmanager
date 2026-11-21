@@ -64,7 +64,7 @@ jobs:
         run: |
           mkdir -p docx_output
           
-          files=($(find docs -type f -name "*.md"))
+          mapfile -d '' files < <(find docs -type f -name "*.md" -print0)
           total=${#files[@]}
           count=0
 
