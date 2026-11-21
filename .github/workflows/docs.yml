@@ -27,20 +27,28 @@ jobs:
       - name: Install Mermaid filter
         run: npm install --global mermaid-filter
 
+      - name: Cache Mermaid CLI
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/mermaid-cli
+          key: mermaid-cli-11.17.0
+
       - name: Install Mermaid CLI
         shell: bash
         run: |
           set -euo pipefail
 
           CLI_DIR="$RUNNER_TEMP/mermaid-cli"
-          rm -rf "$CLI_DIR"
 
-          npm install \
-            --prefix "$CLI_DIR" \
-            --no-audit \
-            --no-fund \
-            --save-exact \
-            @mermaid-js/mermaid-cli@11.17.0
+          if [ ! -f "$CLI_DIR/node_modules/.bin/mmdc" ]; then
+            rm -rf "$CLI_DIR"
+            npm install \
+              --prefix "$CLI_DIR" \
+              --no-audit \
+              --no-fund \
+              --save-exact \
+              @mermaid-js/mermaid-cli@11.17.0
+          fi
 
           MMDC="$CLI_DIR/node_modules/.bin/mmdc"
 
@@ -55,12 +63,24 @@ jobs:
       - name: Convert MD to DOCX preserving structure
         run: |
           mkdir -p docx_output
+          
+          files=($(find docs -type f -name "*.md"))
+          total=${#files[@]}
+          count=0
 
-          find docs -type f -name "*.md" | while read -r file; do
+          for file in "${files[@]}"; do
+            count=$((count + 1))
+            percentage=$((count * 100 / total))
+            filled=$((percentage / 5))
+            empty=$((20 - filled))
+
+            bar=$(printf '%0.s█' $(seq 1 $filled) $(seq 1 $empty | sed 's/.//g'))
+            empty_bar=$(printf '%0.s░' $(seq 1 $empty))
+
+            printf "\r[\033[32m%s%s\033[0m] %3d%% (%d/%d)" "$bar" "$empty_bar" "$percentage" "$count" "$total"
+
             dir_name=$(dirname "$file")
-
             mkdir -p "docx_output/$dir_name"
-
             output_file="docx_output/${file%.md}.docx"
 
             echo "Converting $file -> $output_file"
@@ -75,6 +95,7 @@ jobs:
               --output="$output_file" \
               "$file"
           done
+          echo ""
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
