@@ -79,12 +79,12 @@ org.example
 > соответствовал объявленному пакету. Однако рекомендуется поддерживать
 > соответствие между пакетами и каталогами, поскольку это облегчает работу
 > с проектом.
-
-Например, для пакета `org.example.model` обычно используется каталог:
-
-```text
-src/main/kotlin/org/example/model/
-```
+> 
+> Например, для пакета `org.example.model` используется каталог:
+> 
+> ```text
+> src/main/kotlin/org/example/model/
+> ```
 
 ## Imports — импорты
 
@@ -117,7 +117,7 @@ fun main() {
 
 Директива
 
-```text
+```kotlin
 import org.example.model.User
 ```
 
@@ -152,7 +152,7 @@ import org.example.model.User
 
 Также поддерживается импорт всех доступных объявлений верхнего уровня из пакета:
 
-```text
+```kotlin
 import org.example.model.*
 ```
 
