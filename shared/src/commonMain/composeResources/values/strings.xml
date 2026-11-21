@@ -77,8 +77,8 @@
     <!-- Document Types -->
     <string name="document_power_of_attorney">Доверенность</string>
     <string name="document_power_of_attorney_resource">Доверенность.docx</string>
-    <string name="document_test">Тестовый документ</string>
-    <string name="document_test_resource">Тестовый документ.docx</string>
+    <!-- <string name="document_example">Тестовый документ</string> -->
+    <!-- <string name="document_example_resource">Тестовый документ.docx</string> -->
 
     <!-- Documents Screen -->
     <string name="documents_empty_content">Заполненных документов нет</string>
@@ -116,7 +116,7 @@
     <string name="form_button_delete">Удалить</string>
     <string name="form_button_export">Экспорт в файл</string>
     <string name="form_button_print">Печать</string>
-    <string name="form_document_number_separator"> № </string>
+    <string name="form_document_number_separator">№</string>
 
     <!-- Document Header Fields -->
     <string name="header_field_discharge_date">Дата</string>

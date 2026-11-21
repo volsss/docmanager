@@ -12,12 +12,10 @@
 package ru.example.docmanager.domain.document
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.TableView
 import androidx.compose.ui.graphics.vector.ImageVector
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.document_power_of_attorney
-import docmanager.shared.generated.resources.document_test
 import org.jetbrains.compose.resources.StringResource
 
 enum class DocumentType(
@@ -27,9 +25,9 @@ enum class DocumentType(
     POWER_OF_ATTORNEY(
         stringResource = Res.string.document_power_of_attorney,
         icon = Icons.Rounded.TableView
-    ),
-    TEST(
-        stringResource = Res.string.document_test,
-        icon = Icons.Rounded.Description
     )
+    // EXAMPLE(
+    //     stringResource = Res.string.document_example,
+    //     icon = Icons.Rounded.Description
+    // )
 }
