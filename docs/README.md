@@ -74,8 +74,8 @@
 
 | Ресурс               | Ссылка                                                                                         |
 |----------------------|------------------------------------------------------------------------------------------------|
-| Kotlin               | [kotlinlang.org](https://kotlinlang.org/docs/getting-started.html)                             |
-| Kotlin Multiplatform | [jetbrains.com/help](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html) |
-| Jetpack Compose      | [developer.android.com](https://developer.android.com/develop/ui/compose/documentation)        |
-| PostgreSQL           | [postgresql.org/docs](https://www.postgresql.org/docs/)                                        |
-| H2 Database          | [h2database.com](https://h2database.com/html/quickstart.html)                                  |
+| **Kotlin**               | [kotlinlang.org](https://kotlinlang.org/docs/getting-started.html)                             |
+| **Kotlin Multiplatform** | [jetbrains.com/help](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html) |
+| **Jetpack Compose**      | [developer.android.com](https://developer.android.com/develop/ui/compose/documentation)        |
+| **PostgreSQL**           | [postgresql.org/docs](https://www.postgresql.org/docs/)                                        |
+| **H2 Database**          | [h2database.com](https://h2database.com/html/quickstart.html)                                  |
