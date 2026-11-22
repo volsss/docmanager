@@ -11,20 +11,8 @@
 
 package ru.example.docmanager.ui.screens.forms
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import docmanager.shared.generated.resources.Res
-import docmanager.shared.generated.resources.component_back_button
-import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
@@ -41,42 +29,15 @@ fun FormScreen(
     val type = destination.type
     val document = destination.document
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    AnimatedVisibility(
-                        visible = canGoBack,
-                        enter = expandHorizontally(),
-                        exit = shrinkHorizontally()
-                    ) {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                contentDescription = stringResource(Res.string.component_back_button),
-                            )
-                        }
-                    }
-                },
-                title = {
-                    Text(
-                        text = stringResource(type.stringResource),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            )
-        }
-    ) { paddingValues ->
-        when (type) {
-            DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(
-                document = document,
-                navigateTo = navigateTo,
-                modifier = modifier.padding(paddingValues)
-            )
+    when (type) {
+        DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(
+            document = document,
+            canGoBack = canGoBack,
+            onBack = onBack,
+            navigateTo = navigateTo,
+            modifier = modifier
+        )
 
-            // DocumentType.TEST -> TestScreen(...)
-        }
+        // DocumentType.TEST -> TestScreen(...)
     }
 }

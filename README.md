@@ -59,8 +59,7 @@
 | [/androidApp](./androidApp) | Android-приложение |
 | [/docs](./docs) | Документация и лабораторные работы |
 
-## Документация
-
+## [Документация](https://volsss.github.io/docmanager/)
 
 ### Лабораторная работа 1 — Установка и настройка окружения
 
@@ -124,7 +123,7 @@
 9. [Глава 8. Платформенные модули и запуск](docs/Лабораторная%20работа%206/Глава%208.%20Платформенные%20модули%20и%20запуск.md)
 10. [Практическое задание](docs/Лабораторная%20работа%206/Практическое%20задание.md)
 
-### Литература
+## Литература
 
 - [Kotlin](https://kotlinlang.org/docs/getting-started.html)
 - [Kotlin Multiplatform Development](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)

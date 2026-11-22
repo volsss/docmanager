@@ -11,10 +11,14 @@
 
 package ru.example.docmanager.ui.screens.forms.powerofattorney
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -53,6 +57,8 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun PowerOfAttorneyScreen(
     document: Document?,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
     navigateTo: (Route, NavigationType) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PowerOfAttorneyViewModel = koinInject()
@@ -97,7 +103,7 @@ fun PowerOfAttorneyScreen(
         viewModel.onInit(document = document)
     }
 
-    if (formState.isLoading) {
+    if (formState.isLoading || document == null) {
         LoadingBox(modifier = modifier)
         return
     }
@@ -105,6 +111,35 @@ fun PowerOfAttorneyScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { AppSnackbarHost(snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    AnimatedVisibility(
+                        visible = canGoBack,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally()
+                    ) {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                contentDescription = stringResource(Res.string.component_back_button),
+                            )
+                        }
+                    }
+                },
+                title = {
+                    Text(
+                        text = stringResource(
+                            Res.string.common_document_with_number,
+                            stringResource(document.type.stringResource),
+                            document.header.number
+                        ),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            )
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 text = { Text(stringResource(Res.string.form_fab)) },
