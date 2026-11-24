@@ -52,6 +52,7 @@ abstract class FormViewModel<T : Document, S : FormState<T>>(
             val document = uiState.value.toDocument(null)
                 ?: run {
                     setLoading(false)
+                    _events.emit(FormEvent.Status(getString(Res.string.form_error_empty_required)))
                     return@launch
                 }
 

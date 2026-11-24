@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.ui.router.NavigationType
 import ru.example.docmanager.ui.router.Route
-import ru.example.docmanager.ui.screens.forms.powerofattorney.PowerOfAttorneyScreen
 
 @Composable
 fun FormScreen(
@@ -26,12 +25,9 @@ fun FormScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val type = destination.type
-    val document = destination.document
-
-    when (type) {
+    when (destination.type) {
         DocumentType.POWER_OF_ATTORNEY -> PowerOfAttorneyScreen(
-            document = document,
+            document = destination.document,
             canGoBack = canGoBack,
             onBack = onBack,
             navigateTo = navigateTo,

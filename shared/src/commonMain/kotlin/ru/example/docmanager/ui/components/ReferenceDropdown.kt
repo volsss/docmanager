@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import docmanager.shared.generated.resources.Res
 import docmanager.shared.generated.resources.component_dropdown_empty
 import docmanager.shared.generated.resources.component_dropdown_selected
+import docmanager.shared.generated.resources.component_input_required
 import org.jetbrains.compose.resources.stringResource
 import ru.example.docmanager.domain.reference.Reference
 
@@ -49,6 +50,7 @@ fun <T : Reference> ReferenceDropdown(
     itemSupportingText: ((T?) -> String)? = null,
     label: String? = null,
     placeholder: String? = null,
+    required: Boolean = false,
     enabled: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
         imeAction = ImeAction.Done
@@ -124,6 +126,9 @@ fun <T : Reference> ReferenceDropdown(
                 ),
             enabled = enabled,
             label = label?.let { { Text(it) } },
+            supportingText = if (required) {
+                { Text(stringResource(Res.string.component_input_required)) }
+            } else null,
             placeholder = placeholder?.let { { Text(it) } },
             singleLine = true,
             shape = RoundedCornerShape(16.dp),

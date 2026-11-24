@@ -77,8 +77,10 @@
     <!-- Document Types -->
     <string name="document_power_of_attorney">Доверенность</string>
     <string name="document_power_of_attorney_resource">Доверенность.docx</string>
+    <string name="document_power_of_attorney_new">Новая доверенность</string>
     <!-- <string name="document_example">Тестовый документ</string> -->
     <!-- <string name="document_example_resource">Тестовый документ.docx</string> -->
+    <!-- <string name="document_example_resource_new">Новый тестовый документ</string> -->
 
     <!-- Documents Screen -->
     <string name="documents_empty_content">Заполненных документов нет</string>

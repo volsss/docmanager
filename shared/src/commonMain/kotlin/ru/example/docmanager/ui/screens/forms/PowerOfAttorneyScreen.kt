@@ -9,7 +9,7 @@
  * for more details: <https://gnu.org>
  */
 
-package ru.example.docmanager.ui.screens.forms.powerofattorney
+package ru.example.docmanager.ui.screens.forms
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -42,6 +42,7 @@ import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.domain.document.Document
+import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.domain.document.header.HeaderFieldType
 import ru.example.docmanager.ui.components.*
 import ru.example.docmanager.ui.router.NavigationType
@@ -103,7 +104,7 @@ fun PowerOfAttorneyScreen(
         viewModel.onInit(document = document)
     }
 
-    if (formState.isLoading || document == null) {
+    if (formState.isLoading) {
         LoadingBox(modifier = modifier)
         return
     }
@@ -129,11 +130,12 @@ fun PowerOfAttorneyScreen(
                 },
                 title = {
                     Text(
-                        text = stringResource(
-                            Res.string.common_document_with_number,
-                            stringResource(document.type.stringResource),
-                            document.header.number
-                        ),
+                        text = if (document != null)
+                            stringResource(
+                                Res.string.common_document_with_number,
+                                stringResource(document.type.stringResource),
+                                document.header.number
+                            ) else stringResource(Res.string.document_power_of_attorney_new),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -281,6 +283,7 @@ private fun PowerOfAttorneyHeaderSection(
                 value = formState.number,
                 onValueChange = onNumberChanged,
                 label = stringResource(HeaderFieldType.NUMBER.stringResource),
+                required = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -288,6 +291,7 @@ private fun PowerOfAttorneyHeaderSection(
                 value = formState.dischargeDate,
                 onValueChange = onDischargeDateChanged,
                 label = stringResource(HeaderFieldType.DISCHARGE_DATE.stringResource),
+                required = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -295,6 +299,7 @@ private fun PowerOfAttorneyHeaderSection(
                 value = formState.endDate,
                 onValueChange = onEndDateChanged,
                 label = stringResource(HeaderFieldType.END_DATE.stringResource),
+                required = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -304,6 +309,7 @@ private fun PowerOfAttorneyHeaderSection(
                 itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
                 onValueChange = onOrganizationChanged,
                 label = stringResource(Res.string.form_field_organization),
+                required = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -314,6 +320,7 @@ private fun PowerOfAttorneyHeaderSection(
                 itemSupportingText = { it?.job ?: "Unknown job" },
                 onValueChange = onIndividualChanged,
                 label = stringResource(Res.string.form_field_individual),
+                required = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -323,6 +330,7 @@ private fun PowerOfAttorneyHeaderSection(
                 itemName = { it?.name?.ifBlank { "ID: ${it.id}" } ?: "" },
                 onValueChange = onSupplierChanged,
                 label = stringResource(Res.string.form_field_supplier),
+                required = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -330,6 +338,7 @@ private fun PowerOfAttorneyHeaderSection(
                 value = formState.supplierAgreement,
                 onValueChange = onSupplierAgreementChanged,
                 label = stringResource(HeaderFieldType.SUPPLIER_AGREEMENT.stringResource),
+                required = true,
                 modifier = Modifier.fillMaxWidth()
             )
         }
