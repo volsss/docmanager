@@ -14,9 +14,9 @@ on:
         type: choice
         default: stable
         options:
-          - Stable
-          - Beta
-          - Alpha
+          - stable
+          - beta
+          - alpha
 
 permissions:
   contents: write
@@ -622,7 +622,6 @@ jobs:
             --draft
             --title "$TITLE"
             --generate-notes
-            --notes "Release channel: ${APP_TYPE}"
             --target "$GITHUB_SHA"
           )
           if [[ "$APP_TYPE" != "stable" ]]; then
