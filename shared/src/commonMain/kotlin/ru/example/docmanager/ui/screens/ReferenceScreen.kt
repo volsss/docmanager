@@ -247,12 +247,12 @@ fun ReferenceItemRow(
             modifier = Modifier
                 .size(42.dp)
                 .clip(MaterialShapes.Slanted.toShape())
-                .background(MaterialTheme.colorScheme.secondary),
+                .background(MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = item.id.toString(),
-                color = MaterialTheme.colorScheme.onSecondary,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )

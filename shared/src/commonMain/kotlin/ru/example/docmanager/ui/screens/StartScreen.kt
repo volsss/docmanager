@@ -15,7 +15,6 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -34,9 +33,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.graphics.shapes.RoundedPolygon
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import docmanager.shared.generated.resources.*
-import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import ru.example.docmanager.ui.components.LoadingBox
@@ -151,7 +150,7 @@ private fun StartContent(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            item(key = "overview-heading") {
+            item(key = "statistics-heading") {
                 SectionHeading()
             }
             item(key = "statistics") {
@@ -161,6 +160,7 @@ private fun StartContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun HeroSection(
     state: StartUiState,
@@ -179,7 +179,6 @@ private fun HeroSection(
 
     Surface(
         modifier = modifier
-            .heightIn(min = 252.dp)
             .clip(heroShape)
             .animateContentSize(),
         shape = heroShape,
@@ -190,21 +189,21 @@ private fun HeroSection(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = 54.dp, y = (-76).dp)
+                    .offset(x = 54.dp, y = (-70).dp)
                     .size(218.dp)
                     .background(
                         color = colorScheme.secondary.copy(alpha = 0.16f),
-                        shape = CircleShape
+                        shape = MaterialShapes.Cookie7Sided.toShape()
                     )
             )
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(x = 38.dp, y = 52.dp)
+                    .offset(x = 38.dp, y = 64.dp)
                     .size(144.dp)
                     .background(
                         color = colorScheme.tertiary.copy(alpha = 0.18f),
-                        shape = CircleShape
+                        shape = MaterialShapes.Pentagon.toShape()
                     )
             )
             Column(
@@ -213,22 +212,6 @@ private fun HeroSection(
                     .padding(horizontal = 26.dp, vertical = 25.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(9.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(9.dp)
-                            .background(colorScheme.primary, CircleShape)
-                    )
-                    Text(
-                        text = stringResource(Res.string.start_hero_eyebrow),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = colorScheme.primary
-                    )
-                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -239,22 +222,21 @@ private fun HeroSection(
                         verticalArrangement = Arrangement.spacedBy(11.dp)
                     ) {
                         Text(
+                            text = stringResource(Res.string.start_hero_tagline),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = colorScheme.onPrimaryContainer.copy(alpha = 0.78f)
+                        )
+                        Text(
                             text = projectName,
                             style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.Black,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Text(
-                            text = stringResource(Res.string.start_hero_tagline),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = colorScheme.onPrimaryContainer.copy(alpha = 0.78f)
-                        )
                     }
                     ProjectArtwork()
                 }
                 ProjectMetadata(state = state)
-                CreationDate(date = state.creationDate)
             }
         }
     }
@@ -262,8 +244,6 @@ private fun HeroSection(
 
 @Composable
 private fun ProjectArtwork() {
-    val colorScheme = MaterialTheme.colorScheme
-
     Box(
         modifier = Modifier.size(96.dp),
         contentAlignment = Alignment.Center
@@ -271,8 +251,8 @@ private fun ProjectArtwork() {
         Surface(
             modifier = Modifier.size(66.dp),
             shape = RoundedCornerShape(21.dp),
-            color = colorScheme.primary,
-            contentColor = colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
@@ -291,16 +271,16 @@ private fun ProjectMetadata(state: StartUiState) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (state.version.isNotBlank()) {
-            InfoChip(
-                icon = Icons.Rounded.Tag,
-                label = stringResource(Res.string.start_project_version, state.version)
-            )
-        }
         if (state.author.isNotBlank()) {
             InfoChip(
                 icon = Icons.Rounded.Person,
                 label = state.author
+            )
+        }
+        if (state.creationDate != null) {
+            InfoChip(
+                icon = Icons.Rounded.CalendarMonth,
+                label = state.creationDate.toRussianString()
             )
         }
     }
@@ -311,12 +291,10 @@ private fun InfoChip(
     icon: ImageVector,
     label: String
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-
     Surface(
         shape = RoundedCornerShape(50),
-        color = colorScheme.onPrimaryContainer.copy(alpha = 0.08f),
-        contentColor = colorScheme.onPrimaryContainer
+        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.08f),
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -336,31 +314,6 @@ private fun InfoChip(
                 overflow = TextOverflow.Ellipsis
             )
         }
-    }
-}
-
-@Composable
-private fun CreationDate(date: LocalDate?) {
-    if (date == null) return
-
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(7.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.CalendarToday,
-            contentDescription = null,
-            modifier = Modifier.size(15.dp),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f)
-        )
-        Text(
-            text = stringResource(
-                Res.string.start_project_created_on,
-                date.toRussianString()
-            ),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.78f)
-        )
     }
 }
 
@@ -386,9 +339,11 @@ private data class StatItem(
     val icon: ImageVector,
     val containerColor: Color,
     val contentColor: Color,
-    val shape: Shape
+    val shape: Shape,
+    val heroPolygon: RoundedPolygon
 )
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun StatsGrid(state: StartUiState) {
     val colorScheme = MaterialTheme.colorScheme
@@ -399,7 +354,8 @@ private fun StatsGrid(state: StartUiState) {
             icon = Icons.Rounded.Category,
             containerColor = colorScheme.primaryContainer,
             contentColor = colorScheme.onPrimaryContainer,
-            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp, bottomEnd = 12.dp, bottomStart = 34.dp)
+            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp, bottomEnd = 12.dp, bottomStart = 34.dp),
+            heroPolygon = MaterialShapes.Gem
         ),
         StatItem(
             title = stringResource(Res.string.start_stat_documents),
@@ -407,7 +363,8 @@ private fun StatsGrid(state: StartUiState) {
             icon = Icons.Rounded.Description,
             containerColor = colorScheme.secondaryContainer,
             contentColor = colorScheme.onSecondaryContainer,
-            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 34.dp, bottomEnd = 34.dp, bottomStart = 34.dp)
+            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 34.dp, bottomEnd = 34.dp, bottomStart = 34.dp),
+            heroPolygon = MaterialShapes.Cookie6Sided
         ),
         StatItem(
             title = stringResource(Res.string.start_stat_reference_types),
@@ -415,7 +372,8 @@ private fun StatsGrid(state: StartUiState) {
             icon = Icons.Rounded.DynamicFeed,
             containerColor = colorScheme.tertiaryContainer,
             contentColor = colorScheme.onTertiaryContainer,
-            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 12.dp, bottomEnd = 34.dp, bottomStart = 34.dp)
+            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 12.dp, bottomEnd = 34.dp, bottomStart = 34.dp),
+            heroPolygon = MaterialShapes.Pentagon
         ),
         StatItem(
             title = stringResource(Res.string.start_stat_references),
@@ -423,7 +381,8 @@ private fun StatsGrid(state: StartUiState) {
             icon = Icons.AutoMirrored.Rounded.ListAlt,
             containerColor = colorScheme.surfaceVariant,
             contentColor = colorScheme.onSurfaceVariant,
-            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp, bottomEnd = 34.dp, bottomStart = 12.dp)
+            shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp, bottomEnd = 34.dp, bottomStart = 12.dp),
+            heroPolygon = MaterialShapes.Gem
         )
     )
 
@@ -444,6 +403,7 @@ private fun StatsGrid(state: StartUiState) {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun StatCard(
     stat: StatItem,
@@ -459,11 +419,11 @@ private fun StatCard(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = 30.dp, y = (-34).dp)
-                    .size(112.dp)
+                    .offset(x = 40.dp, y = (-44).dp)
+                    .size(144.dp)
                     .background(
                         color = stat.contentColor.copy(alpha = 0.07f),
-                        shape = CircleShape
+                        stat.heroPolygon.toShape()
                     )
             )
             Column(
@@ -475,15 +435,9 @@ private fun StatCard(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(Res.string.start_stat_total),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = stat.contentColor.copy(alpha = 0.72f)
-                    )
                     Surface(
                         shape = RoundedCornerShape(15.dp),
                         color = stat.contentColor.copy(alpha = 0.10f),
@@ -498,7 +452,9 @@ private fun StatCard(
                         }
                     }
                 }
-                Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
                     Text(
                         text = stat.value.toString(),
                         style = MaterialTheme.typography.displayMedium,

@@ -42,7 +42,6 @@ import ru.example.docmanager.data.reference.Organization
 import ru.example.docmanager.data.reference.Product
 import ru.example.docmanager.data.reference.Supplier
 import ru.example.docmanager.domain.document.Document
-import ru.example.docmanager.domain.document.DocumentType
 import ru.example.docmanager.domain.document.header.HeaderFieldType
 import ru.example.docmanager.ui.components.*
 import ru.example.docmanager.ui.router.NavigationType
@@ -402,12 +401,12 @@ private fun BodyItemRow(
             modifier = Modifier
                 .size(42.dp)
                 .clip(MaterialShapes.Slanted.toShape())
-                .background(MaterialTheme.colorScheme.secondary),
+                .background(MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "${index + 1}",
-                color = MaterialTheme.colorScheme.onSecondary,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )
